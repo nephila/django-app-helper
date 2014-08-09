@@ -4,9 +4,9 @@ from copy import copy
 import os.path
 import shutil
 try:
-    from unittest2 import TestCase
+    import unittest2 as unittest
 except ImportError:
-    from unittest import TestCase
+    import unittest
 
 from ..main import (core, makemessages, makemigrations, compilemessages, shell,
                     generate_authors, static_analisys, test)
@@ -23,7 +23,7 @@ DEFAULT_ARGS = {
 }
 
 
-class CommandTests(TestCase):
+class CommandTests(unittest.TestCase):
     application = None
     basedir = None
     pofile = None
@@ -80,7 +80,8 @@ class CommandTests(TestCase):
 
     def test_pyflakes(self):
         with work_in(self.basedir):
-            static_analisys(self.application)
+            with captured_output() as (out, err):
+                static_analisys(self.application)
 
     def test_testrun(self):
         with work_in(self.basedir):
