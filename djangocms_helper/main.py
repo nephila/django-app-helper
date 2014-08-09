@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
 import contextlib
-from django.utils.importlib import import_module
 import pkgutil
 import pyclbr
 import subprocess
@@ -12,9 +11,12 @@ import warnings
 from docopt import docopt
 from django import VERSION
 from django.utils.encoding import force_text
+from django.utils.importlib import import_module
 
 from cms.test_utils.tmpdir import temp_dir
 from cms.utils.compat import DJANGO_1_6
+
+from .utils import work_in
 
 __doc__ = '''django CMS plugin development helper script.
 
@@ -39,7 +41,7 @@ Options:
 '''
 
 
-def _get_test_labels(application):
+def _get_test_labels(application):  # pragma: no cover
     test_labels = []
     for module in [name for _, name, _ in pkgutil.iter_modules([os.path.join(application, "tests")])]:
         clsmembers = pyclbr.readmodule("%s.tests.%s" % (application, module))
@@ -57,10 +59,9 @@ def _test_run_worker(test_labels, failfast=False,
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
     from django.conf import settings
-
-    settings.TEST_RUNNER = test_runner
     from django.test.utils import get_runner
 
+    settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
 
     test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
@@ -68,14 +69,15 @@ def _test_run_worker(test_labels, failfast=False,
     return failures
 
 
-def test(test_labels, application, failfast=False):
+def test(test_labels, application, failfast=False,
+         test_runner='django.test.simple.DjangoTestSuiteRunner'):
     """
     Runs the test suite
     :param test_labels: space separated list of test labels
     :param failfast: option to stop the testsuite on the first error
     """
     test_labels = test_labels or _get_test_labels(application)
-    return _test_run_worker(test_labels, failfast)
+    return _test_run_worker(test_labels, failfast, test_runner)
 
 
 def compilemessages(application):
@@ -84,8 +86,8 @@ def compilemessages(application):
     """
     from django.core.management import call_command
 
-    os.chdir(application)
-    call_command('compilemessages', all=True)
+    with work_in(application):
+        call_command('compilemessages', all=True)
 
 
 def makemessages(application):
@@ -94,8 +96,8 @@ def makemessages(application):
     """
     from django.core.management import call_command
 
-    os.chdir(application)
-    call_command('makemessages', locale=('en',))
+    with work_in(application):
+        call_command('makemessages', locale=('en',))
 
 
 def shell():
@@ -115,9 +117,16 @@ def makemigrations(application):
     from .utils import load_from_file
 
     if DJANGO_1_6:
-        loaded = load_from_file(os.path.join(application, 'migrations', '0001_initial.py'))
+        try:
+            loaded = load_from_file(os.path.join(application,'migrations',
+                                                 '0001_initial.py'))
+        except IOError:
+            loaded = None
         initial = loaded is None
-        call_command('schemamigration', initial=initial, auto=(not initial), *(application,))
+        call_command('schemamigration',
+                     initial=initial,
+                     auto=(not initial),
+                     *(application,))
     else:
         call_command('makemigrations', *(application,))
 
@@ -164,18 +173,9 @@ def static_analisys(application):
     assert pyflakes((application_module,)) == 0
 
 
-def main():
+def core(args, application):
     from django.conf import settings
     import dj_database_url
-
-    # Command is executed in the main directory of the plugin, and we must
-    # include it in the current path for the imports to work
-    sys.path.insert(0, '.')
-
-    args = docopt(__doc__)
-    application = args['<application>']
-    application_module = import_module(application)
-    args = docopt(__doc__, version=application_module.__version__)
 
     default_settings = {
         'INSTALLED_APPS': [
@@ -189,14 +189,12 @@ def main():
             'menus',
             application,
         ],
-
         'DATABASES': {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
                 'NAME': ':memory:',
             }
         },
-
         'TEMPLATE_CONTEXT_PROCESSORS': [
             'django.core.context_processors.auth',
             'django.core.context_processors.i18n',
@@ -206,8 +204,10 @@ def main():
             'cms.context_processors.media',
             'sekizai.context_processors.sekizai',
         ],
-
-        'ROOT_URLCONF': 'cms.urls'
+        'ROOT_URLCONF': 'cms.urls',
+        'SITE_ID': 1,
+        'LANGUAGE_CODE': 'en',
+        'LANGUAGES': (('en', 'English'),)
     }
 
     # configure django
@@ -242,14 +242,14 @@ def main():
             settings.configure(**default_settings)
 
             # run
-            if args['test']:
+            if args['test']:  # pragma: no cover
                 # make "Address already in use" errors less likely, see Django
                 # docs for more details on this env variable.
                 os.environ.setdefault(
                     'DJANGO_LIVE_TEST_SERVER_ADDRESS',
                     'localhost:8000-9000'
                 )
-                if args['--xvfb']:
+                if args['--xvfb']:  # pragma: no cover
                     import xvfbwrapper
 
                     context = xvfbwrapper.Xvfb(width=1280, height=720)
@@ -276,6 +276,18 @@ def main():
                 return static_analisys(application)
             elif args['authors']:
                 return generate_authors()
+
+
+def main():  # pragma: no cover
+    # Command is executed in the main directory of the plugin, and we must
+    # include it in the current path for the imports to work
+    sys.path.insert(0, '.')
+
+    args = docopt(__doc__)
+    application = args['<application>']
+    application_module = import_module(application)
+    args = docopt(__doc__, version=application_module.__version__)
+    core(args=args, application=application)
 
 
 if __name__ == '__main__':
