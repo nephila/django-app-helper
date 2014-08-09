@@ -4,11 +4,13 @@ import sys
 test_requirements = []
 if sys.version_info[:2] < (2, 7):
     test_requirements.append('unittest2')
+    test_suite = 'unittest2.collector'
+else:
+    test_suite = 'djangocms_helper.tests'
 try:
     import unittest2
-    test_suite = 'unittest2.collector'
 except ImportError:
-    test_suite = 'djangocms_helper.tests'
+    pass
 
 setuptools.setup(
     name="djangocms-helper",
@@ -23,6 +25,7 @@ setuptools.setup(
     license='GPLv2+',
 
     packages=setuptools.find_packages(),
+    include_package_data=True,
 
     install_requires=[
         'django-cms>3',

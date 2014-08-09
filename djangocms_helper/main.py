@@ -14,7 +14,7 @@ from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from cms.test_utils.tmpdir import temp_dir
-from cms.utils.compat import DJANGO_1_6
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_5
 
 from .utils import work_in
 
@@ -97,7 +97,10 @@ def makemessages(application):
     from django.core.management import call_command
 
     with work_in(application):
-        call_command('makemessages', locale=('en',))
+        if DJANGO_1_5:
+            call_command('makemessages', locale='en')
+        else:
+            call_command('makemessages', locale=('en',))
 
 
 def shell():
@@ -118,7 +121,7 @@ def makemigrations(application):
 
     if DJANGO_1_6:
         try:
-            loaded = load_from_file(os.path.join(application,'migrations',
+            loaded = load_from_file(os.path.join(application, 'migrations',
                                                  '0001_initial.py'))
         except IOError:
             loaded = None
