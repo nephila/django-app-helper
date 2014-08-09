@@ -17,13 +17,16 @@ setuptools.setup(
     install_requires=[
         'django-cms>3',
         'docopt',
-        'dj-database-url'
+        'dj-database-url',
+        'six'
     ],
     entry_points={
         'console_scripts': [
             'djangocms-helper = djangocms_helper.main:main',
         ]
     },
+    test_suite='djangocms_helper.tests',
+    tests_require=[],
 
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
