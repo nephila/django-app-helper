@@ -1,4 +1,14 @@
 import setuptools
+import sys
+
+test_requirements = []
+if sys.version_info[:2] < (2, 7):
+    test_requirements.append('unittest2')
+try:
+    import unittest2
+    test_suite = 'unittest2.collector'
+except ImportError:
+    test_suite = 'djangocms_helper.tests'
 
 setuptools.setup(
     name="djangocms-helper",
@@ -18,15 +28,15 @@ setuptools.setup(
         'django-cms>3',
         'docopt',
         'dj-database-url',
-        'six'
+        'pyflakes'
     ],
     entry_points={
         'console_scripts': [
             'djangocms-helper = djangocms_helper.main:main',
         ]
     },
-    test_suite='djangocms_helper.tests',
-    tests_require=[],
+    test_suite=test_suite,
+    tests_require=test_requirements,
 
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
