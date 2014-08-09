@@ -45,12 +45,10 @@ test
 
 Test command allows to run the application test suite using a setup similar to
 the django CMS testsuite.
-It requires that tests are included in ``application.tests`` module and imported
-from the ``tests`` module; modules into ``tests`` directory must be named
-**test_foo**.
+It requires that tests are included in ``application.tests`` package and
+imported in the package namespace; test modules must be named **test_foo**.
 
 application.tests.__init__.py::
-
 
     from .test_one import *
     from .test_two import *
@@ -116,6 +114,12 @@ Requirements
 * docopt
 * tox
 * dj-database-url
+
+TODO
+----
+
+* Add support to extend test configuration to handle dependencies and plugin
+  settings
 
 Authors
 -------
