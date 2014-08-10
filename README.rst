@@ -12,7 +12,7 @@ djangocms-helper
 
 .. image:: https://pypip.in/d/djangocms-helper/badge.png
         :target: https://pypi.python.org/pypi/djangocms-helper
-        :alt: Montly downloads
+        :alt: Monthly downloads
 
 .. image:: https://coveralls.io/repos/nephila/djangocms-helper/badge.png
         :target: https://coveralls.io/r/nephila/djangocms-helper
