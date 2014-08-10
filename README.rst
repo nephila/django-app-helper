@@ -1,3 +1,4 @@
+================
 djangocms-helper
 ================
 
@@ -17,9 +18,9 @@ djangocms-helper
         :target: https://coveralls.io/r/nephila/djangocms-helper
         :alt: Test coverage
 
-
+****************************************
 Helper for django CMS plugin development
-----------------------------------------
+****************************************
 
 djangocms-helper is a set of commands to handle django CMS plugins development
 process.
@@ -27,8 +28,9 @@ process.
 It's a modified version of django CMS's own ``develop.py`` script, modified
 to handle generic plugins development process.
 
+*****
 Usage
------
+*****
 
 The command **must** be executed in the main plugin directory (i.e. in the same
 directory as the ``setup.py`` file) as it needs to import files relative to the
@@ -42,10 +44,10 @@ where **<application>** is the django application name and **<command>** is one
 of the available commands. Optins vary for each command.
 
 Available commands
-^^^^^^^^^^^^^^^^^^
+==================
 
 test
-====
+####
 
 Test command allows to run the application test suite using a setup similar to
 the django CMS testsuite.
@@ -67,41 +69,55 @@ application.tests.test_one.py::
         def test_bar(self):
             pass
 
+Arguments
+^^^^^^^^^
+
+* ``<test-label>``: a space-separated list of tests to run;
+
+Options
+^^^^^^^
+
+* ``--runner``: custom test runner to use in dotted path notation;
+* ``--failfast``: whether to stop at first test failure;
+* ``--migrate``: whether to apply south migrations when running tests;
+* ``--xvfb``: whether to configure ``XVFB`` (for frontend tests);
+
 
 shell
-=====
+#####
 
 Starts a django shell for the test project.
 
 compilemessages
-===============
+###############
 
 Compiles the locale messages.
 
 makemessages
-============
+############
 
 Updates the locale messages for the current application.
 
 makemigrations
-==============
+##############
 
 Updates the application migrations (south migrations or Django migrations
 according to the current installed Django version). For South, it automatically
 handles **initial** / **auto** options.
 
 pyflakes
-========
+########
 
 Performs static analysis using pyflakes with the same configuration as django CMS.
 
 authors
-=======
+#######
 
 Generates the authors list from the git log suitable for the **AUTHORS** file.
 
+************
 Installation
-------------
+************
 
 Installing from pip::
 
@@ -112,20 +128,22 @@ Installing from source::
     pip install git+https://github.com/nephila/djangocms-helper#egg=djangocms-helper
 
 Requirements
-^^^^^^^^^^^^
+============
 
 * django CMS 3.0 (django CMS 3.0.4 is required for pyflake command)
 * docopt
 * tox
 * dj-database-url
 
+****
 TODO
-----
+****
 
 * Add support to extend test configuration to handle dependencies and plugin
   settings
 
+*******
 Authors
--------
+*******
 
 `djangocms-helper` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_.
