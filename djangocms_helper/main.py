@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
 import contextlib
+from django.utils.functional import empty
 import pkgutil
 import pyclbr
 import subprocess
@@ -24,7 +25,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb]
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>]
     djangocms-helper <application> shell
     djangocms-helper <application> compilemessages
     djangocms-helper <application> makemessages
@@ -41,7 +42,7 @@ Options:
 '''
 
 
-def _get_test_labels(application):  # pragma: no cover
+def _get_test_labels(application):
     test_labels = []
     for module in [name for _, name, _ in pkgutil.iter_modules([os.path.join(application, "tests")])]:
         clsmembers = pyclbr.readmodule("%s.tests.%s" % (application, module))
@@ -223,6 +224,7 @@ def core(args, application):
     db_url = os.environ.get("DATABASE_URL",
                             "sqlite://localhost/%s" % default_name)
     migrate = args.get('--migrate', False)
+    settings._wrapped = empty
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
@@ -245,7 +247,7 @@ def core(args, application):
             settings.configure(**default_settings)
 
             # run
-            if args['test']:  # pragma: no cover
+            if args['test']:
                 # make "Address already in use" errors less likely, see Django
                 # docs for more details on this env variable.
                 os.environ.setdefault(
@@ -265,7 +267,7 @@ def core(args, application):
 
                 with context:
                     num_failures = test(args['<test-label>'], application,
-                                        args['--failfast'])
+                                        args['--failfast'], args['--runner'])
                     sys.exit(num_failures)
             elif args['shell']:
                 shell()
