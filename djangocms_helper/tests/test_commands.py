@@ -8,7 +8,9 @@ try:
 except ImportError:
     import unittest
 
-from ..main import core
+from cms.test_utils.tmpdir import temp_dir
+
+from ..main import core, _make_settings
 from ..utils import work_in, captured_output
 
 DEFAULT_ARGS = {
@@ -56,6 +58,35 @@ class CommandTests(unittest.TestCase):
             shutil.rmtree(self.migration_dir)
         except OSError:
             pass
+
+    def test_extra_settings(self):
+        from django.conf import settings
+
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                with temp_dir() as STATIC_ROOT:
+                    with temp_dir() as MEDIA_ROOT:
+                        local_settings = _make_settings(args, self.application,
+                                                        settings,
+                                                        STATIC_ROOT, MEDIA_ROOT)
+                        # Testing that cms_helper.py in custom project is loaded
+                        self.assertEqual(local_settings.TIME_ZONE, 'Europe/Rome')
+
+                        args['--extra-settings'] = 'cms_helper_extra.py'
+                        local_settings = _make_settings(args, self.application,
+                                                        settings,
+                                                        STATIC_ROOT, MEDIA_ROOT)
+                        # Testing that cms_helper.py in the command option is loaded
+                        self.assertEqual(local_settings.TIME_ZONE, 'Europe/Paris')
+                        # Existing application is kept
+                        self.assertTrue('mptt' in local_settings.INSTALLED_APPS)
+                        # New one is added
+                        self.assertTrue('djangocms_admin_style' in local_settings.INSTALLED_APPS)
+                        # Existing application is kept
+                        self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
+                        # New one is added
+                        self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
 
     def test_makemigrations(self):
         with work_in(self.basedir):

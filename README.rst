@@ -80,7 +80,7 @@ Options
 * ``--runner``: custom test runner to use in dotted path notation;
 * ``--failfast``: whether to stop at first test failure;
 * ``--migrate``: whether to apply south migrations when running tests;
-* ``--xvfb``: whether to configure ``XVFB`` (for frontend tests);
+* ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
 
 
 shell
@@ -115,6 +115,31 @@ authors
 
 Generates the authors list from the git log suitable for the **AUTHORS** file.
 
+
+Customizing settings
+^^^^^^^^^^^^^^^^^^^^
+
+For non trivial applications, you'd probably want to customize the base django
+settings provided by ``djangocms-helper``.
+
+This can be achieved by either putting a ``cms_helper.py`` file in the application
+main directory or by passing the path to the file using ``--extra-settings``
+option.
+
+The file must contain a ``HELPER_SETTINGS`` dictionary containing the desired
+settings::
+
+    HELPER_SETTINGS = {
+        'TIME_ZONE': 'Europe/Rome',
+        'INSTALLED_APPS: [
+            'another_application',
+        ]
+    }
+
+All the parameter in settings will override the default ones, except
+``INSTALLED_APPS`` and ``TEMPLATE_CONTEXT_PROCESSORS`` that will be appended to
+the existing ones.
+
 ************
 Installation
 ************
@@ -134,13 +159,6 @@ Requirements
 * docopt
 * tox
 * dj-database-url
-
-****
-TODO
-****
-
-* Add support to extend test configuration to handle dependencies and plugin
-  settings
 
 *******
 Authors

@@ -17,21 +17,21 @@ from django.utils.importlib import import_module
 from cms.test_utils.tmpdir import temp_dir
 from cms.utils.compat import DJANGO_1_6, DJANGO_1_5
 
-from .utils import work_in
+from .utils import work_in, load_from_file
 
-__doc__ = '''django CMS plugin development helper script.
+__doc__ = '''django CMS applications development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>]
-    djangocms-helper <application> shell
-    djangocms-helper <application> compilemessages
-    djangocms-helper <application> makemessages
-    djangocms-helper <application> makemigrations
-    djangocms-helper <application> pyflakes
-    djangocms-helper <application> authors
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>]
 
 Options:
     -h --help                   Show this screen.
@@ -39,6 +39,8 @@ Options:
     --migrate                   Use south migrations in test.
     --failfast                  Stop tests on first failure.
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
+    --extra-settings            Filesystem path to a custom cms_helper file which defines custom settings
+    --runner                    Dotted path to a custom test runner
 '''
 
 
@@ -177,10 +179,17 @@ def static_analisys(application):
     assert pyflakes((application_module,)) == 0
 
 
-def core(args, application):
-    from django.conf import settings
+def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
+    """
+    Setup the Django settings
+    :param args: docopt arguments
+    :param default_settings: default Django settings
+    :param settings: Django settings module
+    :param STATIC_ROOT: static root directory
+    :param MEDIA_ROOT: media root directory
+    :return:
+    """
     import dj_database_url
-
     default_settings = {
         'INSTALLED_APPS': [
             'django.contrib.contenttypes',
@@ -214,37 +223,61 @@ def core(args, application):
         'LANGUAGES': (('en', 'English'),)
     }
 
+
+    default_name = ':memory:' if args['test'] else 'local.sqlite'
+
+    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    migrate = args.get('--migrate', False)
+    settings._wrapped = empty
+    use_tz = VERSION[:2] >= (1, 4)
+    configs = {
+        'default': dj_database_url.parse(db_url),
+        'STATIC_ROOT': STATIC_ROOT,
+        'MEDIA_ROOT': MEDIA_ROOT,
+        'USE_TZ': use_tz,
+        'SOUTH_TESTS_MIGRATE': migrate,
+    }
+    default_settings.update(configs)
+    try:
+        extra_settings_file = args.get('--extra-settings')
+        if not extra_settings_file:
+            extra_settings_file = 'cms_helper.py'
+        extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
+    except (IOError, AttributeError):
+        extra_settings = None
+
+    if extra_settings:
+        apps = extra_settings.get('INSTALLED_APPS', [])
+        template_processors = extra_settings.get('TEMPLATE_CONTEXT_PROCESSORS', [])
+        if apps:
+            del(extra_settings['INSTALLED_APPS'])
+        if template_processors:
+            del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
+        default_settings.update(extra_settings)
+        default_settings['INSTALLED_APPS'].extend(apps)
+        default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
+    if DJANGO_1_6:
+        default_settings['INSTALLED_APPS'].append('south')
+
+    if args['test']:
+        default_settings['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
+
+    settings.configure(**default_settings)
+    return settings
+
+
+def core(args, application):
+    from django.conf import settings
+
     # configure django
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 
-    default_name = ':memory:' if args['test'] else 'local.sqlite'
-
-    db_url = os.environ.get("DATABASE_URL",
-                            "sqlite://localhost/%s" % default_name)
-    migrate = args.get('--migrate', False)
-    settings._wrapped = empty
-
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            use_tz = VERSION[:2] >= (1, 4)
 
-            configs = {
-                'default': dj_database_url.parse(db_url),
-                'STATIC_ROOT': STATIC_ROOT,
-                'MEDIA_ROOT': MEDIA_ROOT,
-                'USE_TZ': use_tz,
-                'SOUTH_TESTS_MIGRATE': migrate,
-            }
-            default_settings.update(configs)
-            if DJANGO_1_6:
-                default_settings['INSTALLED_APPS'].append('south')
-
-            if args['test']:
-                default_settings['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
-
-            settings.configure(**default_settings)
+            _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
 
             # run
             if args['test']:
