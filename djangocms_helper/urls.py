@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.i18n import i18n_patterns
 
+from .utils import load_from_file
 
 admin.autodiscover()
 
@@ -11,8 +12,18 @@ urlpatterns = patterns('',
         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
 )
-
 urlpatterns += i18n_patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('cms.urls')),
 )
+try:
+    load_from_file('%s.urls' % settings.BASE_APPLICATION)
+    urlpatterns += i18n_patterns('',
+        url(r'^%s/' % settings.BASE_APPLICATION, include('%s.urls' % settings.BASE_APPLICATION))
+    )
+except IOError:
+    pass
+
+if settings.USE_CMS:
+    urlpatterns += i18n_patterns('',
+        url(r'^', include('cms.urls'))
+    )

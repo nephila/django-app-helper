@@ -21,6 +21,7 @@ DEFAULT_ARGS = {
     'makemigrations': False,
     'pyflakes': False,
     'authors': False,
+    'server': False,
     '--xvfb': '',
     '--cms': True,
     '--failfast': False,

@@ -28,6 +28,7 @@ Usage:
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
 
 Options:
     -h --help                   Show this screen.
@@ -36,8 +37,10 @@ Options:
     --cms                       Add support for CMS in the project configuration.
     --failfast                  Stop tests on first failure.
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
-    --extra-settings            Filesystem path to a custom cms_helper file which defines custom settings
-    --runner                    Dotted path to a custom test runner
+    --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
+    --runner=<test.runner.class>                Dotted path to a custom test runner
+    --port=<port>                               Port to listen on [default: 8000].
+    --bind=<bind>                               Interface to bind to [default: 127.0.0.1].
 '''
 
 
@@ -179,6 +182,52 @@ def static_analisys(application):
         print(u"Static analisys available only if django CMS is installed")
 
 
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
+    from cms.utils.compat.dj import get_user_model
+    from django.core.management import call_command
+    from django.utils import autoreload
+
+    if os.environ.get("RUN_MAIN") != "true":
+        if DJANGO_1_6:
+            if migrate_cmd:
+                call_command("syncdb", interactive=False, verbosity=1, database='default')
+                call_command("migrate", interactive=False, verbosity=1, database='default')
+            else:
+                call_command("syncdb", interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
+                call_command("migrate", interactive=False, verbosity=1, database='default', fake=True)
+        else:
+            call_command("migrate", database='default')
+        User = get_user_model()
+        if not User.objects.filter(is_superuser=True).exists():
+            usr = User()
+
+            if(User.USERNAME_FIELD != 'email'):
+                setattr(usr, User.USERNAME_FIELD, 'admin')
+
+            usr.email = 'admin@admin.com'
+            usr.set_password('admin')
+            usr.is_superuser = True
+            usr.is_staff = True
+            usr.is_active = True
+            usr.save()
+            print('')
+            print("A admin user (username: admin, password: admin) has been created.")
+            print('')
+    from django.contrib.staticfiles.management.commands import runserver
+    rs = runserver.Command()
+    rs.stdout = sys.stdout
+    rs.stderr = sys.stderr
+    rs.use_ipv6 = False
+    rs._raw_ipv6 = False
+    rs.addr = bind
+    rs.port = port
+    autoreload.main(rs.inner_run, (), {
+        'addrport': '%s:%s' % (bind, port),
+        'insecure_serving': True,
+        'use_threading': True
+    })
+
+
 def core(args, application):
     from django.conf import settings
 
@@ -215,6 +264,8 @@ def core(args, application):
                     num_failures = test(args['<test-label>'], application,
                                         args['--failfast'], args['--runner'])
                     sys.exit(num_failures)
+            elif args['server']:
+                server(args['--bind'], args['--port'], args.get('--migrate', True))
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
@@ -240,6 +291,3 @@ def main():  # pragma: no cover
     args = docopt(__doc__, version=application_module.__version__)
     core(args=args, application=application)
 
-
-if __name__ == '__main__':
-    main()
