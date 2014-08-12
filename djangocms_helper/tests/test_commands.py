@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, with_statement
 from copy import copy
+from django.core.urlresolvers import get_urlconf
 import os.path
 import shutil
 try:
@@ -60,6 +61,9 @@ class CommandTests(unittest.TestCase):
             shutil.rmtree(self.migration_dir)
         except OSError:
             pass
+
+    def tearDown(self):
+        self.setUp()
 
     def test_extra_settings(self):
         from django.conf import settings
@@ -141,7 +145,6 @@ class CommandTests(unittest.TestCase):
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
                     args['--cms'] = False
-                    args['--migrate'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
         self.assertTrue('Ran 1 test in 0.000s' in err.getvalue())
@@ -156,3 +159,25 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('Generating AUTHORS' in out.getvalue())
         self.assertTrue('* Iacopo Spalletti' in out.getvalue())
         self.assertTrue('Authors (2):' in out.getvalue())
+
+    def test_urls(self):
+        from django.core.urlresolvers import reverse
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['makemessages'] = True
+                core(args, self.application)
+                self.assertTrue(reverse('pages-root'))
+
+    def test_urls_nocms(self):
+        from django.core.urlresolvers import reverse, NoReverseMatch
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['makemessages'] = True
+                args['--cms'] = False
+                core(args, self.application)
+                with self.assertRaises(NoReverseMatch):
+                    reverse('pages-root')

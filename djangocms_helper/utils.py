@@ -8,6 +8,7 @@ import stat
 import sys
 from tempfile import mkdtemp
 import django
+from django.core.urlresolvers import clear_url_caches
 from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
 from django.utils.six import StringIO
@@ -91,6 +92,7 @@ def _reset_django(settings):
     :param settings: django settings module
     """
     if settings._wrapped != empty:
+        clear_url_caches()
         if DJANGO_1_5:
             from django.db.models.loading import cache as apps
             apps.app_store = SortedDict()
@@ -111,6 +113,7 @@ def _reset_django(settings):
             from django.apps import apps
             apps.clear_cache()
         settings._wrapped = empty
+        clear_url_caches()
 
 
 def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
@@ -196,4 +199,17 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     _reset_django(settings)
     settings.configure(**default_settings)
+    reload_urls(settings)
     return settings
+
+
+def reload_urls(settings):
+    url_modules = [
+        settings.ROOT_URLCONF,
+    ]
+
+    clear_url_caches()
+
+    for module in url_modules:
+        if module in sys.modules:
+            del sys.modules[module]
