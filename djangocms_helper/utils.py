@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 import contextlib
+from distutils.version import LooseVersion
 import os
+import random
+import shutil
+import stat
 import sys
+from tempfile import mkdtemp
+import django
 from django.utils.six import StringIO
+
+DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
+DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
+DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
+DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
 
 
 def load_from_file(module_path):
@@ -49,3 +60,24 @@ def captured_output():
         yield sys.stdout, sys.stderr
     finally:
         sys.stdout, sys.stderr = old_out, old_err
+
+
+# Borrowed from django CMS codebase
+@contextlib.contextmanager
+def temp_dir():
+    name = make_temp_dir()
+    yield name
+    shutil.rmtree(name)
+
+
+def make_temp_dir():
+    if os.path.exists('/dev/shm/'):
+        if os.stat('/dev/shm').st_mode & stat.S_IWGRP:
+            dirname = 'djangocms-helpder-%s' % random.randint(1, 1000000)
+            path = os.path.join('/dev/shm', dirname)
+            while os.path.exists(path):
+                dirname = 'djangocms-helpder-%s' % random.randint(1, 1000000)
+                path = os.path.join('/dev/shm', dirname)
+                os.mkdir(path)
+                return path
+    return mkdtemp()

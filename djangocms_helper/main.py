@@ -14,10 +14,8 @@ from django import VERSION
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
-from cms.test_utils.tmpdir import temp_dir
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_5
 
-from .utils import work_in, load_from_file
+from .utils import work_in, load_from_file, DJANGO_1_6, DJANGO_1_5, temp_dir
 
 __doc__ = '''django CMS applications development helper script.
 
@@ -25,18 +23,19 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>]
-    djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>]
-    djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>]
-    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>]
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>]
-    djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>]
-    djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>]
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
 
 Options:
     -h --help                   Show this screen.
     --version                   Show version.
     --migrate                   Use south migrations in test.
+    --cms                       Add support for CMS in the project configuration.
     --failfast                  Stop tests on first failure.
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings            Filesystem path to a custom cms_helper file which defines custom settings
@@ -174,9 +173,12 @@ def static_analisys(application):
     Performs a pyflakes static analysis with the same configuration as
     django CMS testsuite
     """
-    from cms.test_utils.util.static_analysis import pyflakes
-    application_module = import_module(application)
-    assert pyflakes((application_module,)) == 0
+    try:
+        from cms.test_utils.util.static_analysis import pyflakes
+        application_module = import_module(application)
+        assert pyflakes((application_module,)) == 0
+    except ImportError:
+        print(u"Static analisys available only if django CMS is installed")
 
 
 def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
@@ -189,6 +191,21 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     :param MEDIA_ROOT: media root directory
     :return:
     """
+    if args['--cms']:
+        CMS_APPS = [
+            'mptt',
+            'cms',
+            'menus',
+        ]
+        CMS_PROCESSORS = [
+            'cms.context_processors.media',
+            'sekizai.context_processors.sekizai',
+        ]
+        URLCONF = 'cms.urls'
+    else:
+        CMS_APPS = []
+        CMS_PROCESSORS = []
+        URLCONF = 'cms.urls'
     import dj_database_url
     default_settings = {
         'INSTALLED_APPS': [
@@ -197,11 +214,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             'django.contrib.sessions',
             'django.contrib.sites',
             'django.contrib.admin',
-            'mptt',
-            'cms',
-            'menus',
-            application,
-        ],
+        ] + CMS_APPS + [application],
         'DATABASES': {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
@@ -214,15 +227,12 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             'django.core.context_processors.request',
             'django.core.context_processors.media',
             'django.core.context_processors.static',
-            'cms.context_processors.media',
-            'sekizai.context_processors.sekizai',
-        ],
-        'ROOT_URLCONF': 'cms.urls',
+        ] + CMS_PROCESSORS,
+        'ROOT_URLCONF': URLCONF,
         'SITE_ID': 1,
         'LANGUAGE_CODE': 'en',
         'LANGUAGES': (('en', 'English'),)
     }
-
 
     default_name = ':memory:' if args['test'] else 'local.sqlite'
 
