@@ -8,6 +8,8 @@ import stat
 import sys
 from tempfile import mkdtemp
 import django
+from django.utils.datastructures import SortedDict
+from django.utils.functional import empty
 from django.utils.six import StringIO
 
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
@@ -81,3 +83,125 @@ def make_temp_dir():
                 os.mkdir(path)
                 return path
     return mkdtemp()
+
+
+def _reset_django(settings):
+    """
+    Hackish way to reset the django instance settings and AppConfig
+    :param settings: django settings module
+    """
+    if settings._wrapped != empty:
+        if DJANGO_1_5:
+            from django.db.models.loading import cache as apps
+            apps.app_store = SortedDict()
+            apps.loaded = False
+            apps.handled = {}
+            apps.postponed = []
+            apps.nesting_level = 0
+            apps._get_models_cache = {}
+        elif DJANGO_1_6:
+            from django.db.models.loading import cache as apps
+            apps.app_store = SortedDict()
+            apps.loaded = False
+            apps.handled = set()
+            apps.postponed = []
+            apps.nesting_level = 0
+            apps._get_models_cache = {}
+        else:
+            from django.apps import apps
+            apps.clear_cache()
+        settings._wrapped = empty
+
+
+def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
+    """
+    Setup the Django settings
+    :param args: docopt arguments
+    :param default_settings: default Django settings
+    :param settings: Django settings module
+    :param STATIC_ROOT: static root directory
+    :param MEDIA_ROOT: media root directory
+    :return:
+    """
+    import dj_database_url
+    if args['--cms']:
+        CMS_APPS = [
+            'mptt',
+            'cms',
+            'menus',
+        ]
+        CMS_PROCESSORS = [
+            'cms.context_processors.media',
+            'sekizai.context_processors.sekizai',
+        ]
+        URLCONF = 'cms.urls'
+    else:
+        CMS_APPS = []
+        CMS_PROCESSORS = []
+        URLCONF = 'djangocms_helper.urls'
+    default_settings = {
+        'INSTALLED_APPS': [
+            'django.contrib.contenttypes',
+            'django.contrib.auth',
+            'django.contrib.sessions',
+            'django.contrib.sites',
+            'django.contrib.admin',
+        ] + CMS_APPS + [application],
+        'DATABASES': {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
+            }
+        },
+        'TEMPLATE_CONTEXT_PROCESSORS': [
+            'django.core.context_processors.auth',
+            'django.core.context_processors.i18n',
+            'django.core.context_processors.request',
+            'django.core.context_processors.media',
+            'django.core.context_processors.static',
+        ] + CMS_PROCESSORS,
+        'ROOT_URLCONF': URLCONF,
+        'SITE_ID': 1,
+        'LANGUAGE_CODE': 'en',
+        'LANGUAGES': (('en', 'English'),)
+    }
+
+    default_name = ':memory:' if args['test'] else 'local.sqlite'
+
+    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    migrate = args.get('--migrate', False)
+    configs = {
+        'default': dj_database_url.parse(db_url),
+        'STATIC_ROOT': STATIC_ROOT,
+        'MEDIA_ROOT': MEDIA_ROOT,
+        'USE_TZ': True,
+        'SOUTH_TESTS_MIGRATE': migrate,
+    }
+    default_settings.update(configs)
+    try:
+        extra_settings_file = args.get('--extra-settings')
+        if not extra_settings_file:
+            extra_settings_file = 'cms_helper.py'
+        extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
+    except (IOError, AttributeError):
+        extra_settings = None
+
+    if extra_settings:
+        apps = extra_settings.get('INSTALLED_APPS', [])
+        template_processors = extra_settings.get('TEMPLATE_CONTEXT_PROCESSORS', [])
+        if apps:
+            del(extra_settings['INSTALLED_APPS'])
+        if template_processors:
+            del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
+        default_settings.update(extra_settings)
+        default_settings['INSTALLED_APPS'].extend(apps)
+        default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
+    if DJANGO_1_6:
+        default_settings['INSTALLED_APPS'].append('south')
+
+    if args['test']:
+        default_settings['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
+
+    _reset_django(settings)
+    settings.configure(**default_settings)
+    return settings
