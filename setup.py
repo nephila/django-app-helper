@@ -1,5 +1,6 @@
 import setuptools
 import sys
+from djangocms_helper import __version__
 
 test_requirements = []
 if sys.version_info[:2] < (2, 7):
@@ -14,7 +15,7 @@ except ImportError:
 
 setuptools.setup(
     name="djangocms-helper",
-    version="0.1.0",
+    version=__version__,
     url="https://github.com/nephila/djangocms-helper",
 
     author="Iacopo Spalletti",
