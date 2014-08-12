@@ -22,6 +22,7 @@ DEFAULT_ARGS = {
     'pyflakes': False,
     'authors': False,
     '--xvfb': '',
+    '--cms': True,
     '--failfast': False,
     '<test-label>': ''
 }
@@ -127,6 +128,19 @@ class CommandTests(unittest.TestCase):
                 with self.assertRaises(SystemExit) as exit:
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
+                    args['--runner'] = 'runners.CapturedOutputRunner'
+                    core(args, self.application)
+        self.assertTrue('Ran 1 test in 0.000s' in err.getvalue())
+        self.assertEqual(exit.exception.code, 0)
+
+    def test_testrun_nocms(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit:
+                    args = copy(DEFAULT_ARGS)
+                    args['test'] = True
+                    args['--cms'] = False
+                    args['--migrate'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
         self.assertTrue('Ran 1 test in 0.000s' in err.getvalue())
