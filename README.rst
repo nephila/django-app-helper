@@ -30,7 +30,7 @@ to handle generic plugins development process.
 
 
 Common options
-^^^^^^^^^^^^^^
+==============
 
 * ``--cms``: Loads configuration to properly run a django CMS-based application;
 * ``--extra-settings``: Path to a helper file to set extra settings; see
