@@ -124,58 +124,46 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     :return:
     """
     import dj_database_url
+    from .default_settings import get_default_settings
+
     if args['--cms']:
         CMS_APPS = [
             'mptt',
             'cms',
             'menus',
+            'sekizai',
         ]
         CMS_PROCESSORS = [
             'cms.context_processors.media',
             'sekizai.context_processors.sekizai',
+            'django.contrib.messages.context_processors.messages',
         ]
-        URLCONF = 'cms.urls'
+        CMS_MIDDLEWARE = [
+            'cms.middleware.language.LanguageCookieMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+        ]
+        URLCONF = 'djangocms_helper.urls'
     else:
         CMS_APPS = []
+        CMS_MIDDLEWARE = []
         CMS_PROCESSORS = []
         URLCONF = 'djangocms_helper.urls'
-    default_settings = {
-        'INSTALLED_APPS': [
-            'django.contrib.contenttypes',
-            'django.contrib.auth',
-            'django.contrib.sessions',
-            'django.contrib.sites',
-            'django.contrib.admin',
-        ] + CMS_APPS + [application],
-        'DATABASES': {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
-            }
-        },
-        'TEMPLATE_CONTEXT_PROCESSORS': [
-            'django.core.context_processors.auth',
-            'django.core.context_processors.i18n',
-            'django.core.context_processors.request',
-            'django.core.context_processors.media',
-            'django.core.context_processors.static',
-        ] + CMS_PROCESSORS,
-        'ROOT_URLCONF': URLCONF,
-        'SITE_ID': 1,
-        'LANGUAGE_CODE': 'en',
-        'LANGUAGES': (('en', 'English'),)
-    }
-
+    default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
+                                            CMS_MIDDLEWARE, URLCONF, application)
     default_name = ':memory:' if args['test'] else 'local.sqlite'
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
     migrate = args.get('--migrate', False)
     configs = {
-        'default': dj_database_url.parse(db_url),
+        'DATABASES': {'default': dj_database_url.parse(db_url)},
         'STATIC_ROOT': STATIC_ROOT,
         'MEDIA_ROOT': MEDIA_ROOT,
         'USE_TZ': True,
         'SOUTH_TESTS_MIGRATE': migrate,
+        'USE_CMS': args['--cms'],
+        'BASE_APPLICATION': application
     }
     default_settings.update(configs)
     try:
@@ -189,13 +177,17 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if extra_settings:
         apps = extra_settings.get('INSTALLED_APPS', [])
         template_processors = extra_settings.get('TEMPLATE_CONTEXT_PROCESSORS', [])
+        middleware = extra_settings.get('MIDDLEWARE_CLASSES', [])
         if apps:
             del(extra_settings['INSTALLED_APPS'])
         if template_processors:
             del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
+        if middleware:
+            del(extra_settings['MIDDLEWARE_CLASSES'])
         default_settings.update(extra_settings)
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
+        default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
     if DJANGO_1_6:
         default_settings['INSTALLED_APPS'].append('south')
 
