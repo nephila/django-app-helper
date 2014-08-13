@@ -57,25 +57,39 @@ Available commands
 test
 ####
 
-Test command allows to run the application test suite using a setup similar to
+Test command allows to run the application test suite using test environemnt similar to
 the django CMS testsuite.
-It requires that tests are included in ``application.tests`` package and
-imported in the package namespace; test modules must be named **test_foo**.
 
-application.tests.__init__.py::
+Test structure
+^^^^^^^^^^^^^^
+Currently two different tests layouts are supported:
 
-    from .test_one import *
-    from .test_two import *
+* tests outside the application module::
 
-application.tests.test_one.py::
+    setup.py
+    tests
+        __init__.py
+        test_module1.py
+        ....
 
-    class MyTests(TestCase):
+* tests inside the application::
 
-        def test_foo(self):
-            pass
+    setup.py
+    application
+        tests
+            __init__.py
+            test_module1.py
+            ...
 
-        def test_bar(self):
-            pass
+Depending on the used test runner you may need to setup your tests accordingly.
+
+Currently supported test runners are:
+
+* Django's DiscoverRunner (default)
+* Django's DjangoTestSuiteRunner (option ``--simple-runner``)
+* Nose's NoseTestSuiteRunner (option ``--nose-runner``)
+
+You can also write your own runner an use it with ``--runner`` option.
 
 Arguments
 ^^^^^^^^^
@@ -89,6 +103,8 @@ Options
 * ``--failfast``: whether to stop at first test failure;
 * ``--migrate``: whether to apply south migrations when running tests;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
+* ``nose-runner``: use django nose test suite
+* ``simple-runner`` use Django DjangoTestSuiteRunner
 
 
 shell

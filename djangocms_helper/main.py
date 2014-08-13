@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
 import contextlib
-import pkgutil
-import pyclbr
 import subprocess
 import os
 import sys
@@ -21,7 +19,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner]
     djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
@@ -36,6 +34,8 @@ Options:
     --migrate                   Use south migrations in test.
     --cms                       Add support for CMS in the project configuration.
     --failfast                  Stop tests on first failure.
+    --nose-runner               Use django-nose as test runner
+    --simple-runner             User DjangoTestSuiteRunner
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
@@ -44,20 +44,7 @@ Options:
 '''
 
 
-def _get_test_labels(application):
-    test_labels = []
-    for module in [name for _, name, _ in pkgutil.iter_modules([os.path.join(application, "tests")])]:
-        clsmembers = pyclbr.readmodule("%s.tests.%s" % (application, module))
-        for clsname, cls in clsmembers.items():
-            for method, _ in cls.methods.items():
-                if method.startswith('test_'):
-                    test_labels.append('%s.%s.%s' % (application, clsname, method))
-    test_labels = sorted(test_labels)
-    return test_labels
-
-
-def _test_run_worker(test_labels, failfast=False,
-                     test_runner='django.test.simple.DjangoTestSuiteRunner'):
+def _test_run_worker(test_labels, test_runner, failfast=False):
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
@@ -67,20 +54,26 @@ def _test_run_worker(test_labels, failfast=False,
     settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
 
+    # Monkeypatching sys.argv to avoid passing to nose unwanted arguments
+    if test_runner == 'django_nose.NoseTestSuiteRunner':
+        sys.argv = sys.argv[:2]
     test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 
 
-def test(test_labels, application, failfast=False,
-         test_runner='django.test.simple.DjangoTestSuiteRunner'):
+def test(test_labels, application, failfast=False, test_runner=None):
     """
     Runs the test suite
     :param test_labels: space separated list of test labels
     :param failfast: option to stop the testsuite on the first error
     """
-    test_labels = test_labels or _get_test_labels(application)
-    return _test_run_worker(test_labels, failfast, test_runner)
+    if not test_labels:
+        if os.path.exists('tests'):
+            test_labels = ['tests']
+        elif os.path.exists(os.path.join(application, 'tests')):
+            test_labels = [application]
+    return _test_run_worker(test_labels, test_runner, failfast)
 
 
 def compilemessages(application):
@@ -243,6 +236,14 @@ def core(args, application):
 
             # run
             if args['test']:
+                if args['--nose-runner']:
+                    runner = 'django_nose.NoseTestSuiteRunner'
+                elif args['--simple-runner']:
+                    runner = 'django.test.simple.DjangoTestSuiteRunner'
+                elif args['--runner']:
+                    runner = args['--runner']
+                else:
+                    runner = 'django.test.runner.DiscoverRunner'
                 # make "Address already in use" errors less likely, see Django
                 # docs for more details on this env variable.
                 os.environ.setdefault(
@@ -262,7 +263,7 @@ def core(args, application):
 
                 with context:
                     num_failures = test(args['<test-label>'], application,
-                                        args['--failfast'], args['--runner'])
+                                        args['--failfast'], runner)
                     sys.exit(num_failures)
             elif args['server']:
                 server(args['--bind'], args['--port'], args.get('--migrate', True))
@@ -285,9 +286,7 @@ def main():  # pragma: no cover
     # include it in the current path for the imports to work
     sys.path.insert(0, '.')
 
-    args = docopt(__doc__)
-    application = args['<application>']
+    application = sys.argv[1]
     application_module = import_module(application)
     args = docopt(__doc__, version=application_module.__version__)
     core(args=args, application=application)
-

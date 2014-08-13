@@ -24,6 +24,8 @@ DEFAULT_ARGS = {
     'authors': False,
     'server': False,
     '--xvfb': '',
+    '--nose-runner': False,
+    '--simple-runner': False,
     '--cms': True,
     '--failfast': False,
     '<test-label>': ''
