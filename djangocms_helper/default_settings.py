@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
+import os.path
 
 
 def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
                          URLCONF, application):
-     return {
+    return {
         'INSTALLED_APPS': [
             'django.contrib.contenttypes',
             'django.contrib.auth',
             'django.contrib.sessions',
             'django.contrib.sites',
             'django.contrib.admin',
+            'djangocms_helper.test_data',
         ] + CMS_APP + [application],
         'DATABASES': {
             'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
             }
         },
         'TEMPLATE_CONTEXT_PROCESSORS': [
@@ -40,4 +42,8 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
         'STATIC_URL': '/static/',
         'MEDIA_URL': '/media/',
         'DEBUG': True,
+        'CMS_TEMPLATES': (
+            ('fullwidth.html', 'Fullwidth'),
+        ),
+
     }
