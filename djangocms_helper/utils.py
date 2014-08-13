@@ -173,6 +173,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         extra_settings_file = args.get('--extra-settings')
         if not extra_settings_file:
             extra_settings_file = 'cms_helper.py'
+        if extra_settings_file[-3:] != '.py':
+            extra_settings_file = '%s.py' % extra_settings_file
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
     except (IOError, AttributeError):
         extra_settings = None
