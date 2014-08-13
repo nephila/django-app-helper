@@ -103,8 +103,8 @@ Options
 * ``--failfast``: whether to stop at first test failure;
 * ``--migrate``: whether to apply south migrations when running tests;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
-* ``nose-runner``: use django nose test suite
-* ``simple-runner`` use Django DjangoTestSuiteRunner
+* ``--nose-runner``: use django nose test suite
+* ``--simple-runner`` use Django DjangoTestSuiteRunner
 
 
 shell
@@ -148,7 +148,7 @@ settings provided by ``djangocms-helper``.
 
 This can be achieved by either putting a ``cms_helper.py`` file in the application
 main directory or by passing the path to the file using ``--extra-settings``
-option.
+option (use full path complete with `.py` extension).
 
 The file must contain a ``HELPER_SETTINGS`` dictionary containing the desired
 settings::
