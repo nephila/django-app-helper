@@ -144,7 +144,10 @@ def generate_authors():
                          stdout=subprocess.PIPE)
     seen_authors = []
     authors = []
-    with open('AUTHORS', 'r') as f:
+    for authfile in ('AUTHORS', 'AUTHORS.rst'):
+        if os.path.exists(authfile):
+            break
+    with open(authfile, 'r') as f:
         for line in f.readlines():
             if line.startswith("*"):
                 author = force_text(line).strip("* \n")
