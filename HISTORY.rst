@@ -3,7 +3,7 @@
 History
 -------
 
-0.3.0 (Unreleased)
+0.3.0 (2014-08-14)
 ++++++++++++++++++
 
 * Add support for django nose test runner;
