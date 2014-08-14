@@ -5,4 +5,4 @@ from django.db import models
 
 
 class ExampleModel(models.Model):
-    test_field = models.CharField(max_length=20, verbose_name=_(u'Test fie'))
+    test_field = models.CharField(max_length=20, verbose_name=_(u'Test field'))
