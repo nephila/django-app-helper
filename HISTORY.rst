@@ -6,7 +6,8 @@ History
 0.3.0 (Unreleased)
 ++++++++++++++++++
 
-* Add support for django nose test runner
+* Add support for django nose test runner;
+* Add default CMS template;
 
 0.2.0 (2014-08-12)
 ++++++++++++++++++
