@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os.path
 
 
 def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
@@ -15,8 +14,8 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
         ] + CMS_APP + [application],
         'DATABASES': {
             'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
             }
         },
         'TEMPLATE_CONTEXT_PROCESSORS': [
@@ -26,7 +25,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'django.core.context_processors.media',
             'django.core.context_processors.static',
         ] + CMS_PROCESSORS,
-        'MIDDLEWARE_CLASSES':[
+        'MIDDLEWARE_CLASSES': [
             'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',

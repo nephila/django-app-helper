@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, with_statement
 from copy import copy
-from django.core.urlresolvers import get_urlconf
 import os.path
 import shutil
 try:
