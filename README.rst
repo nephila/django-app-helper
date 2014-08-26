@@ -100,7 +100,7 @@ Options
 ^^^^^^^
 
 * ``--runner``: custom test runner to use in dotted path notation;
-* ``--runner-options=<option1>,<option2> ``: comma separated list of command
+* ``--runner-options=<option1>,<option2>``: comma separated list of command
   line options for the test runner: e.g. ``--runner-options=--with-coverage,--cover-package=my_package``
 * ``--failfast``: whether to stop at first test failure;
 * ``--migrate``: whether to apply south migrations when running tests;
