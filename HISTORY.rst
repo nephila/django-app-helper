@@ -3,6 +3,12 @@
 History
 -------
 
+0.3.1 (2014-08-25)
+++++++++++++++++++
+
+* Add staticfiles application;
+* Add djangocms_admin_style if cms is enabled;
+
 0.3.0 (2014-08-14)
 ++++++++++++++++++
 
