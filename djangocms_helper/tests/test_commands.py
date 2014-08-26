@@ -23,6 +23,8 @@ DEFAULT_ARGS = {
     'authors': False,
     'server': False,
     '--xvfb': '',
+    '--runner': None,
+    '--runner-options': None,
     '--nose-runner': False,
     '--simple-runner': False,
     '--cms': True,
