@@ -19,7 +19,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner]
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>]
     djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
@@ -39,12 +39,13 @@ Options:
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
+    --runner-options=<option1>,<option2>        Comma separated list of command line options for the test runner
     --port=<port>                               Port to listen on [default: 8000].
     --bind=<bind>                               Interface to bind to [default: 127.0.0.1].
 '''
 
 
-def _test_run_worker(test_labels, test_runner, failfast=False):
+def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]):
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
@@ -59,12 +60,15 @@ def _test_run_worker(test_labels, test_runner, failfast=False):
         sys.argv = sys.argv[:2]
         if failfast:
             sys.argv.append('-x')
+    if runner_options:
+        sys.argv.extend(runner_options.split(','))
     test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 
 
-def test(test_labels, application, failfast=False, test_runner=None):
+def test(test_labels, application, failfast=False, test_runner=None,
+         runner_options=[]):
     """
     Runs the test suite
     :param test_labels: space separated list of test labels
@@ -75,7 +79,7 @@ def test(test_labels, application, failfast=False, test_runner=None):
             test_labels = ['tests']
         elif os.path.exists(os.path.join(application, 'tests')):
             test_labels = [application]
-    return _test_run_worker(test_labels, test_runner, failfast)
+    return _test_run_worker(test_labels, test_runner, failfast, runner_options)
 
 
 def compilemessages(application):
@@ -191,8 +195,10 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
                 call_command("syncdb", interactive=False, verbosity=1, database='default')
                 call_command("migrate", interactive=False, verbosity=1, database='default')
             else:
-                call_command("syncdb", interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
-                call_command("migrate", interactive=False, verbosity=1, database='default', fake=True)
+                call_command("syncdb", interactive=False, verbosity=1, database='default',
+                             migrate=False, migrate_all=True)
+                call_command("migrate", interactive=False, verbosity=1, database='default',
+                             fake=True)
         else:
             call_command("migrate", database='default')
         User = get_user_model()
@@ -268,10 +274,12 @@ def core(args, application):
 
                 with context:
                     num_failures = test(args['<test-label>'], application,
-                                        args['--failfast'], runner)
+                                        args['--failfast'], runner,
+                                        args['--runner-options'])
                     sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'], args.get('--migrate', True))
+                server(args['--bind'], args['--port'],
+                       args.get('--migrate', True))
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
