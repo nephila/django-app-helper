@@ -3,6 +3,11 @@
 History
 -------
 
+0.3.2 (unreleased)
+++++++++++++++++++
+
+* Add support for command line test runner options;
+
 0.3.1 (2014-08-25)
 ++++++++++++++++++
 
