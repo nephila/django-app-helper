@@ -136,6 +136,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             'menus',
             'sekizai',
         ]
+        CMS_APP_STYLE = [
+            'djangocms_admin_style'
+        ]
         CMS_PROCESSORS = [
             'cms.context_processors.media',
             'sekizai.context_processors.sekizai',
@@ -150,11 +153,13 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         URLCONF = 'djangocms_helper.urls'
     else:
         CMS_APPS = []
+        CMS_APP_STYLE = []
         CMS_MIDDLEWARE = []
         CMS_PROCESSORS = []
         URLCONF = 'djangocms_helper.urls'
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
-                                            CMS_MIDDLEWARE, URLCONF, application)
+                                            CMS_MIDDLEWARE, CMS_APP_STYLE,
+                                            URLCONF, application)
     default_name = ':memory:' if args['test'] else 'local.sqlite'
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)

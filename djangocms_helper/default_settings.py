@@ -2,13 +2,15 @@
 
 
 def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
-                         URLCONF, application):
+                         CMS_APP_STYLE, URLCONF, application):
     return {
         'INSTALLED_APPS': [
             'django.contrib.contenttypes',
             'django.contrib.auth',
             'django.contrib.sessions',
             'django.contrib.sites',
+            'django.contrib.staticfiles',
+        ] + CMS_APP_STYLE + [
             'django.contrib.admin',
             'djangocms_helper.test_data',
         ] + CMS_APP + [application],
@@ -43,6 +45,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
         'DEBUG': True,
         'CMS_TEMPLATES': (
             ('fullwidth.html', 'Fullwidth'),
+            ('page.html', 'Normal page'),
         ),
 
     }

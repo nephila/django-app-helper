@@ -10,7 +10,7 @@ from docopt import docopt
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
-
+from . import __version__
 from .utils import work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings
 
 __doc__ = '''django CMS applications development helper script.
@@ -291,7 +291,10 @@ def main():  # pragma: no cover
     # include it in the current path for the imports to work
     sys.path.insert(0, '.')
 
-    application = sys.argv[1]
-    application_module = import_module(application)
-    args = docopt(__doc__, version=application_module.__version__)
-    core(args=args, application=application)
+    if len(sys.argv) > 1:
+        application = sys.argv[1]
+        application_module = import_module(application)
+        args = docopt(__doc__, version=application_module.__version__)
+        core(args=args, application=application)
+    else:
+        args = docopt(__doc__, version=__version__)
