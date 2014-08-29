@@ -7,6 +7,10 @@ History
 ++++++++++++++++++
 
 * Add support for command line test runner options;
+* Add check command on Django 1.7+;
+* Add cms check command (which triggers cms inclusion);
+* Add squashmigration command Django 1.7+;
+* Add support for makemigrations merge on Django 1.7+;
 
 0.3.1 (2014-08-25)
 ++++++++++++++++++
