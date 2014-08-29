@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import contextlib
 from distutils.version import LooseVersion
+from django.core.management import call_command
 import os
 import random
 import shutil
@@ -160,7 +161,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
-    default_name = ':memory:' if args['test'] else 'local.sqlite'
+    default_name = ':memory:' #if args['test'] else 'local.sqlite'
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
     migrate = args.get('--migrate', False)
@@ -210,6 +211,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         from south.management.commands import patch_for_test_db_setup
         patch_for_test_db_setup()
     reload_urls(settings)
+    print(settings.DATABASES)
     return settings
 
 
@@ -223,3 +225,17 @@ def reload_urls(settings):
     for module in url_modules:
         if module in sys.modules:
             del sys.modules[module]
+
+
+def _create_db(migrate_cmd=False):
+    if DJANGO_1_6:
+        if migrate_cmd:
+            call_command("syncdb", interactive=False, verbosity=1, database='default')
+            call_command("migrate", interactive=False, verbosity=1, database='default')
+        else:
+            call_command("syncdb", interactive=False, verbosity=1, database='default',
+                         migrate=False, migrate_all=True)
+            call_command("migrate", interactive=False, verbosity=1, database='default',
+                         fake=True)
+    else:
+        call_command("migrate", database='default')

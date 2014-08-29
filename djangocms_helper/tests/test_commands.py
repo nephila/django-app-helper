@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, with_statement
 from copy import copy
+from distutils.version import LooseVersion
 import os.path
 import shutil
 try:
@@ -9,6 +10,7 @@ except ImportError:
     import unittest
 
 from cms.test_utils.tmpdir import temp_dir
+import django
 
 from ..main import core, _make_settings
 from ..utils import work_in, captured_output
@@ -128,6 +130,8 @@ class CommandTests(unittest.TestCase):
                 core(args, self.application)
                 self.assertTrue(os.path.exists(self.mofile))
 
+    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
+                     reason='check command available for Django 1.7+ only')
     def test_check(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -135,7 +139,7 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['check'] = True
                 core(args, self.application)
-                self.assertEqual(len(out.getvalue()), 0)
+            self.assertEqual(len(out.getvalue()), 0)
 
     def test_cms_check(self):
         with work_in(self.basedir):
@@ -143,10 +147,11 @@ class CommandTests(unittest.TestCase):
                 shutil.copy(self.poexample, self.pofile)
                 args = copy(DEFAULT_ARGS)
                 args['cms_check'] = True
+                args['--migrate'] = False
                 core(args, self.application)
-                self.assertTrue('Installation okay' in out.getvalue())
-                self.assertFalse('[WARNING]' in out.getvalue())
-                self.assertFalse('[ERROR]' in out.getvalue())
+            self.assertTrue('Installation okay' in out.getvalue())
+            self.assertFalse('[WARNING]' in out.getvalue())
+            self.assertFalse('[ERROR]' in out.getvalue())
 
     def test_pyflakes(self):
         with work_in(self.basedir):

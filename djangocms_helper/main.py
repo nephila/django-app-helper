@@ -12,7 +12,8 @@ from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from . import __version__
-from .utils import work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings
+from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
+                    _create_db)
 
 __doc__ = '''django CMS applications development helper script.
 
@@ -23,7 +24,7 @@ Usage:
     djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>]
     djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> check [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge]
@@ -128,12 +129,13 @@ def check():
     call_command('check')
 
 
-def cms_check():
+def cms_check(migrate_cmd=False):
     """
     Runs the django CMS ``cms check`` command
     """
     from django.core.management import call_command
 
+    _create_db(migrate_cmd)
     call_command('cms', 'check')
 
 
@@ -218,21 +220,10 @@ def static_analisys(application):
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
     from cms.utils.compat.dj import get_user_model
-    from django.core.management import call_command
     from django.utils import autoreload
 
     if os.environ.get("RUN_MAIN") != "true":
-        if DJANGO_1_6:
-            if migrate_cmd:
-                call_command("syncdb", interactive=False, verbosity=1, database='default')
-                call_command("migrate", interactive=False, verbosity=1, database='default')
-            else:
-                call_command("syncdb", interactive=False, verbosity=1, database='default',
-                             migrate=False, migrate_all=True)
-                call_command("migrate", interactive=False, verbosity=1, database='default',
-                             fake=True)
-        else:
-            call_command("migrate", database='default')
+        _create_db(migrate_cmd)
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
@@ -274,6 +265,8 @@ def core(args, application):
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
+            if args['cms_check']:
+                args['--cms'] = True
 
             _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
 
@@ -317,7 +310,7 @@ def core(args, application):
             elif args['check']:
                 check()
             elif args['cms_check']:
-                cms_check()
+                cms_check(args.get('--migrate', True))
             elif args['compilemessages']:
                 compilemessages(application)
             elif args['makemessages']:
