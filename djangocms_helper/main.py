@@ -2,6 +2,7 @@
 from __future__ import print_function, with_statement
 import contextlib
 import subprocess
+from django.core.management import CommandError
 import os
 import sys
 import warnings
@@ -21,9 +22,12 @@ dj-database-url compatible value.
 Usage:
     djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>]
     djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> check [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge]
+    djangocms-helper <application> squashmigrations <migration-name>
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
@@ -33,6 +37,7 @@ Options:
     --version                   Show version.
     --migrate                   Use south migrations in test.
     --cms                       Add support for CMS in the project configuration.
+    --merge                     Merge migrations
     --failfast                  Stop tests on first failure.
     --nose-runner               Use django-nose as test runner
     --simple-runner             User DjangoTestSuiteRunner
@@ -114,7 +119,25 @@ def shell():
     call_command('shell')
 
 
-def makemigrations(application):
+def check():
+    """
+    Runs the Django ``check`` command
+    """
+    from django.core.management import call_command
+
+    call_command('check')
+
+
+def cms_check():
+    """
+    Runs the django CMS ``cms check`` command
+    """
+    from django.core.management import call_command
+
+    call_command('cms', 'check')
+
+
+def makemigrations(application, merge=False):
     """
     Generate migrations (for both south and django 1.7+)
     """
@@ -128,12 +151,21 @@ def makemigrations(application):
         except IOError:
             loaded = None
         initial = loaded is None
-        call_command('schemamigration',
-                     initial=initial,
-                     auto=(not initial),
+        call_command('schemamigration', initial=initial, auto=(not initial),
                      *(application,))
     else:
-        call_command('makemigrations', *(application,))
+        call_command('makemigrations', *(application,), merge=merge)
+
+
+def squashmigrations(application, migration):
+    """
+    Squash Django 1.7+ migrations
+    """
+    from django.core.management import call_command
+    if DJANGO_1_6:
+        raise CommandError(u'Command not implemented for Django 1.6')
+    else:
+        call_command('squashmigrations', application, migration)
 
 
 def generate_authors():
@@ -282,12 +314,18 @@ def core(args, application):
                        args.get('--migrate', True))
             elif args['shell']:
                 shell()
+            elif args['check']:
+                check()
+            elif args['cms_check']:
+                cms_check()
             elif args['compilemessages']:
                 compilemessages(application)
             elif args['makemessages']:
                 makemessages(application)
             elif args['makemigrations']:
-                makemigrations(application)
+                makemigrations(application, merge=args['--merge'])
+            elif args['squashmigrations']:
+                squashmigrations(application, args['<migration-name>'])
             elif args['pyflakes']:
                 return static_analisys(application)
             elif args['authors']:

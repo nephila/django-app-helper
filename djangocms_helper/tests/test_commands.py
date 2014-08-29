@@ -16,9 +16,12 @@ from ..utils import work_in, captured_output
 DEFAULT_ARGS = {
     'shell': False,
     'test': False,
+    'check': False,
+    'cms_check': False,
     'compilemessages': False,
     'makemessages': False,
     'makemigrations': False,
+    'squashmigrations': False,
     'pyflakes': False,
     'authors': False,
     'server': False,
@@ -29,6 +32,7 @@ DEFAULT_ARGS = {
     '--simple-runner': False,
     '--cms': True,
     '--failfast': False,
+    '--merge': False,
     '<test-label>': ''
 }
 
@@ -102,6 +106,7 @@ class CommandTests(unittest.TestCase):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args['makemigrations'] = True
+                args['--merge'] = True
                 core(args, self.application)
                 self.assertTrue(os.path.exists(self.migration_file))
         self.assertTrue('Created 0001_initial.py' in err.getvalue())
@@ -122,6 +127,26 @@ class CommandTests(unittest.TestCase):
                 args['compilemessages'] = True
                 core(args, self.application)
                 self.assertTrue(os.path.exists(self.mofile))
+
+    def test_check(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['check'] = True
+                core(args, self.application)
+                self.assertEqual(len(out.getvalue()), 0)
+
+    def test_cms_check(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['cms_check'] = True
+                core(args, self.application)
+                self.assertTrue('Installation okay' in out.getvalue())
+                self.assertFalse('[WARNING]' in out.getvalue())
+                self.assertFalse('[ERROR]' in out.getvalue())
 
     def test_pyflakes(self):
         with work_in(self.basedir):

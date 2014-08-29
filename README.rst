@@ -114,6 +114,16 @@ shell
 
 Starts a django shell for the test project.
 
+check
+#####
+
+Runs the Django ``check`` command
+
+cms_check
+#########
+
+Runs the django CMS ``cms check`` command
+
 compilemessages
 ###############
 
@@ -130,6 +140,21 @@ makemigrations
 Updates the application migrations (south migrations or Django migrations
 according to the current installed Django version). For South, it automatically
 handles **initial** / **auto** options.
+
+Options
+^^^^^^^
+
+* ``--merge``: Enable fixing of migration conflicts (for Django 1.7+ only)
+
+squashmigrations
+################
+
+Runs the ``squasmigrations`` command. It operates on the current application.
+
+Arguments
+^^^^^^^^^
+
+* ``<migration-name>``: Squash migrations until this migration
 
 pyflakes
 ########
