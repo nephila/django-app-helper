@@ -211,7 +211,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         from south.management.commands import patch_for_test_db_setup
         patch_for_test_db_setup()
     reload_urls(settings)
-    print(settings.DATABASES)
     return settings
 
 
