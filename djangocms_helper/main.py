@@ -2,18 +2,18 @@
 from __future__ import print_function, with_statement
 import contextlib
 import subprocess
-from django.core.management import CommandError
 import os
 import sys
 import warnings
 
 from docopt import docopt
+from django.core.management import CommandError
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from . import __version__
 from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
-                    _create_db)
+                    create_user, _create_db)
 
 __doc__ = '''django CMS applications development helper script.
 
@@ -226,19 +226,9 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
         _create_db(migrate_cmd)
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
-            usr = User()
-
-            if(User.USERNAME_FIELD != 'email'):
-                setattr(usr, User.USERNAME_FIELD, 'admin')
-
-            usr.email = 'admin@admin.com'
-            usr.set_password('admin')
-            usr.is_superuser = True
-            usr.is_staff = True
-            usr.is_active = True
-            usr.save()
+            usr = create_user('admin', 'admin@admin.com', 'admin', is_staff=True, is_superuser=True)
             print('')
-            print("A admin user (username: admin, password: admin) has been created.")
+            print('A admin user (username: %s, password: admin) has been created.' % usr.get_username())
             print('')
     from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()

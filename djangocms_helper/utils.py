@@ -161,7 +161,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
-    default_name = ':memory:' #if args['test'] else 'local.sqlite'
+    default_name = ':memory:' if not args['server'] else 'local.sqlite'
 
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
     migrate = args.get('--migrate', False)
@@ -199,8 +199,16 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
         default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
+
     if DJANGO_1_6:
         default_settings['INSTALLED_APPS'].append('south')
+
+    # Support for custom user models
+    if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in os.environ:
+        custom_user_app = os.environ['AUTH_USER_MODEL'].rpartition('.')[0]
+        custom_user_model = '.'.join(os.environ['AUTH_USER_MODEL'].split('.')[-2:])
+        default_settings['INSTALLED_APPS'].insert(default_settings['INSTALLED_APPS'].index('cms'), custom_user_app)
+        default_settings['AUTH_USER_MODEL'] = custom_user_model
 
     if args['test']:
         default_settings['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
@@ -238,3 +246,31 @@ def _create_db(migrate_cmd=False):
                          fake=True)
     else:
         call_command("migrate", database='default')
+
+
+def create_user(username, email, password, is_staff=False, is_superuser=False):
+    from cms.utils.compat.dj import get_user_model
+    User = get_user_model()
+    usr = User()
+
+    if User.USERNAME_FIELD != 'email':
+        setattr(usr, User.USERNAME_FIELD, username)
+
+    usr.email = email
+    usr.set_password(password)
+    if is_superuser:
+        usr.is_superuser = True
+    if is_superuser or is_staff:
+        usr.is_staff = True
+    usr.is_active = True
+    usr.save()
+    return usr
+
+
+def get_user_model_labels():
+    from cms.utils.compat.dj import get_user_model
+    User = get_user_model()
+
+    user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
+    user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
+    return user_orm_label, user_model_label
