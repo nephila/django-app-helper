@@ -180,7 +180,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 1 test in 0.000s' in err.getvalue())
+        self.assertTrue('Ran 1 test in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     def test_authors(self):
