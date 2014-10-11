@@ -13,6 +13,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
         ] + CMS_APP_STYLE + [
             'django.contrib.admin',
             'djangocms_helper.test_data',
+            'django.contrib.messages',
         ] + CMS_APP + [application],
         'DATABASES': {
             'default': {
@@ -22,6 +23,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
         },
         'TEMPLATE_CONTEXT_PROCESSORS': [
             'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
             'django.core.context_processors.i18n',
             'django.core.context_processors.request',
             'django.core.context_processors.media',
