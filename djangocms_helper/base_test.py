@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.compat import get_user_model
 from cms.utils import get_language_list
+from cms.utils.compat.dj import get_user_model
 from django.contrib.sites.models import Site
 from django.http import SimpleCookie
 from django.test import TestCase, RequestFactory
