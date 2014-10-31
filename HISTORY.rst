@@ -3,6 +3,14 @@
 History
 -------
 
+0.4.1 (Unreleased)
+++++++++++++++++++
+
+* Fixing bugs when using extra settings
+* Add messages framework to default environment
+* Add CSRF middleware / context_processor to default settings
+* Add base helper class for test cases
+
 0.4.0 (2014-09-18)
 ++++++++++++++++++
 
