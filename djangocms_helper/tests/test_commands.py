@@ -4,6 +4,7 @@ from copy import copy
 from distutils.version import LooseVersion
 import os.path
 import shutil
+import sys
 try:
     import unittest2 as unittest
 except ImportError:
@@ -13,7 +14,7 @@ from cms.test_utils.tmpdir import temp_dir
 import django
 
 from ..main import core, _make_settings
-from ..utils import work_in, captured_output
+from ..utils import work_in, captured_output, DJANGO_1_6
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -70,6 +71,10 @@ class CommandTests(unittest.TestCase):
             shutil.rmtree(self.migration_dir)
         except OSError:
             pass
+        try:
+            del sys.modules['example.migrations']
+        except KeyError:
+            pass
 
     def tearDown(self):
         self.setUp()
@@ -108,10 +113,23 @@ class CommandTests(unittest.TestCase):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args['makemigrations'] = True
-                args['--merge'] = True
                 core(args, self.application)
                 self.assertTrue(os.path.exists(self.migration_file))
-        self.assertTrue('Created 0001_initial.py' in err.getvalue())
+        if DJANGO_1_6:
+            self.assertTrue('Created 0001_initial.py' in err.getvalue())
+        else:
+            self.assertTrue('Create model ExampleModel' in out.getvalue())
+
+    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
+                     reason='merge options supported for Django 1.7+ only')
+    def test_makemigrations_merge(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['makemigrations'] = True
+                args['--merge'] = True
+                core(args, self.application)
+        self.assertTrue('No conflicts detected to merge' in out.getvalue())
 
     def test_makemessages(self):
         with work_in(self.basedir):
