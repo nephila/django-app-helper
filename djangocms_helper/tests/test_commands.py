@@ -157,7 +157,7 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['check'] = True
                 core(args, self.application)
-            self.assertEqual(len(out.getvalue()), 0)
+        self.assertTrue('no issues' in out.getvalue())
 
     def test_cms_check(self):
         with work_in(self.basedir):
