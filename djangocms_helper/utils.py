@@ -233,6 +233,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     _reset_django(settings)
     settings.configure(**default_settings)
+    if not DJANGO_1_6:
+        django.setup()
     if 'south' in settings.INSTALLED_APPS:
         from south.management.commands import patch_for_test_db_setup
         patch_for_test_db_setup()
