@@ -211,6 +211,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
         if 'MIDDLEWARE_CLASSES' in extra_settings:
             del(extra_settings['MIDDLEWARE_CLASSES'])
+        if application in default_settings['INSTALLED_APPS'] and application in apps:
+            default_settings['INSTALLED_APPS'].remove(application)
         default_settings.update(extra_settings)
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
