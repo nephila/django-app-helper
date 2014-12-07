@@ -3,13 +3,15 @@
 History
 -------
 
-0.4.1 (Unreleased)
+0.5.0 (Unreleased)
 ++++++++++++++++++
 
 * Fixing bugs when using extra settings
 * Add messages framework to default environment
 * Add CSRF middleware / context_processor to default settings
 * Add base helper class for test cases
+* Complete Django 1.7 support
+* Smarter detection of migration operations in Django 1.6-
 
 0.4.0 (2014-09-18)
 ++++++++++++++++++
