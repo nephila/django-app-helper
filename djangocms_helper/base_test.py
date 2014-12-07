@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 from cms.utils import get_language_list
-from cms.utils.compat.dj import get_user_model
-from django.contrib.sites.models import Site
 from django.http import SimpleCookie
 from django.test import TestCase, RequestFactory
 from django.utils.six import StringIO
 from djangocms_helper.utils import create_user
-
-User = get_user_model()
 
 
 class BaseTestCase(TestCase):
@@ -38,14 +34,19 @@ class BaseTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        from django.contrib.sites.models import Site
         cls.request_factory = RequestFactory()
-        cls.user = create_user('admin', 'admin@admin.com', 'admin', is_staff=True, is_superuser=True)
-        cls.user_staff = create_user('staff', 'staff@admin.com', 'staff', is_staff=True)
+        cls.user = create_user('admin', 'admin@admin.com', 'admin',
+                               is_staff=True, is_superuser=True)
+        cls.user_staff = create_user('staff', 'staff@admin.com', 'staff',
+                                     is_staff=True)
         cls.user_normal = create_user('normal', 'normal@admin.com', 'normal')
         cls.site_1 = Site.objects.get(pk=1)
 
     @classmethod
     def tearDownClass(cls):
+        from cms.utils.compat.dj import get_user_model
+        User = get_user_model()
         User.objects.all().delete()
 
     def get_pages_data(self):

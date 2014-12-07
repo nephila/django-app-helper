@@ -7,14 +7,12 @@ import sys
 import warnings
 
 from docopt import docopt
-from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
-from django.core.management import CommandError
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from . import __version__
 from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
-                    create_user, _create_db, captured_output)
+                    create_user, _create_db)
 
 __doc__ = '''django CMS applications development helper script.
 
@@ -144,14 +142,16 @@ def makemigrations(application, merge=False):
     """
     Generate migrations (for both south and django 1.7+)
     """
+    from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
     from django.core.management import call_command
+    from .utils import captured_output
 
     if DJANGO_1_6:
         from south.exceptions import NoMigrations
         from south.migration import Migrations
 
         if merge:
-            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
+            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6 and below')
         try:
             Migrations(application)
         except NoMigrations:
@@ -176,9 +176,10 @@ def squashmigrations(application, migration):
     """
     Squash Django 1.7+ migrations
     """
+    from django.core.exceptions import DjangoRuntimeWarning
     from django.core.management import call_command
     if DJANGO_1_6:
-        raise CommandError(u'Command not implemented for Django 1.6')
+        raise DjangoRuntimeWarning(u'Command not implemented for Django 1.6 and below')
     else:
         call_command('squashmigrations', application, migration)
 

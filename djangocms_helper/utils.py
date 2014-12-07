@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import contextlib
 from distutils.version import LooseVersion
-from django.core.management import call_command
 import os
 import random
 import shutil
 import stat
 import sys
 from tempfile import mkdtemp
+
 import django
+from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
 from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
