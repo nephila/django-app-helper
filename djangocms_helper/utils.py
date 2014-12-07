@@ -14,6 +14,14 @@ from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
 from django.utils.six import StringIO
 
+try:
+    import cms
+    CMS_31 = LooseVersion(django.get_version()) < LooseVersion('3.2')
+    CMS_30 = LooseVersion(django.get_version()) < LooseVersion('3.1')
+except ImportError:
+    CMS_31 = False
+    CMS_30 = False
+
 DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
@@ -158,6 +166,14 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_MIDDLEWARE = []
         CMS_PROCESSORS = []
         URLCONF = 'djangocms_helper.urls'
+
+    if CMS_30:
+        CMS_1_7_MIGRATIONS = {
+            'cms': 'cms.migrations_django',
+            'menus': 'menus.migrations_django',
+        }
+    else:
+        CMS_1_7_MIGRATIONS = {}
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
@@ -202,6 +218,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     if DJANGO_1_6:
         default_settings['INSTALLED_APPS'].append('south')
+    elif args['--cms']:
+        default_settings['MIGRATION_MODULES'].update(CMS_1_7_MIGRATIONS)
 
     # Support for custom user models
     if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in os.environ:
@@ -215,6 +233,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     _reset_django(settings)
     settings.configure(**default_settings)
+    if not DJANGO_1_6:
+        django.setup()
     if 'south' in settings.INSTALLED_APPS:
         from south.management.commands import patch_for_test_db_setup
         patch_for_test_db_setup()
@@ -245,7 +265,7 @@ def _create_db(migrate_cmd=False):
             call_command("migrate", interactive=False, verbosity=1, database='default',
                          fake=True)
     else:
-        call_command("migrate", database='default')
+        call_command("migrate")
 
 
 def create_user(username, email, password, is_staff=False, is_superuser=False):
