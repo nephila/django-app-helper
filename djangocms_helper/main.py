@@ -231,7 +231,7 @@ def static_analisys(application):
         print(u"Static analisys available only if django CMS is installed")
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
     from cms.utils.compat.dj import get_user_model
     from django.utils import autoreload
 

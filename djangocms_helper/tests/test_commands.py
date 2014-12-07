@@ -37,6 +37,8 @@ DEFAULT_ARGS = {
     '--cms': True,
     '--failfast': False,
     '--merge': False,
+    '--bind': '',
+    '--port': '',
     '<test-label>': ''
 }
 
@@ -134,7 +136,6 @@ class CommandTests(unittest.TestCase):
                 else:
                     core(args, self.application)
                     self.assertTrue('No conflicts detected to merge' in out.getvalue())
-
 
     def test_squashmigrations(self):
         with work_in(self.basedir):
