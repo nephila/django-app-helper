@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
 import contextlib
-import subprocess
 import os
+import subprocess
 import sys
 import warnings
 
 from docopt import docopt
+from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
 from django.core.management import CommandError
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from . import __version__
 from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
-                    create_user, _create_db)
+                    create_user, _create_db, captured_output)
 
 __doc__ = '''django CMS applications development helper script.
 
@@ -144,17 +145,29 @@ def makemigrations(application, merge=False):
     Generate migrations (for both south and django 1.7+)
     """
     from django.core.management import call_command
-    from .utils import load_from_file
 
     if DJANGO_1_6:
+        from south.exceptions import NoMigrations
+        from south.migration import Migrations
+
+        if merge:
+            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
         try:
-            loaded = load_from_file(os.path.join(application, 'migrations',
-                                                 '0001_initial.py'))
-        except IOError:
-            loaded = None
-        initial = loaded is None
-        call_command('schemamigration', initial=initial, auto=(not initial),
-                     *(application,))
+            Migrations(application)
+        except NoMigrations:
+            print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(application))
+            try:
+                call_command('schemamigration', *(application,), initial=True)
+            except SystemExit:
+                pass
+        except ImproperlyConfigured:
+            print('WARNING: The app: {0} could not be found.'.format(application))
+        else:
+            try:
+                with captured_output():
+                    call_command('schemamigration', *(application,), auto=True)
+            except SystemExit:
+                pass
     else:
         call_command('makemigrations', *(application,), merge=merge)
 

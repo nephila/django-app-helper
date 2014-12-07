@@ -121,16 +121,20 @@ class CommandTests(unittest.TestCase):
         else:
             self.assertTrue('Create model ExampleModel' in out.getvalue())
 
-    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
-                     reason='merge options supported for Django 1.7+ only')
     def test_makemigrations_merge(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args['makemigrations'] = True
                 args['--merge'] = True
-                core(args, self.application)
-        self.assertTrue('No conflicts detected to merge' in out.getvalue())
+                if DJANGO_1_6:
+                    with self.assertRaises(CommandError) as exit:
+                        core(args, self.application)
+                    self.assertEqual(exit.exception.message, 'Option not implemented for Django 1.6')
+                else:
+                    core(args, self.application)
+                    self.assertTrue('No conflicts detected to merge' in out.getvalue())
+
 
     def test_squashmigrations(self):
         with work_in(self.basedir):
