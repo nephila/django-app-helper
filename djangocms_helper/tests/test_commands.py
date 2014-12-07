@@ -2,6 +2,7 @@
 from __future__ import print_function, with_statement
 from copy import copy
 from distutils.version import LooseVersion
+from django.core.management import CommandError
 import os.path
 import shutil
 import sys
@@ -131,6 +132,21 @@ class CommandTests(unittest.TestCase):
                 core(args, self.application)
         self.assertTrue('No conflicts detected to merge' in out.getvalue())
 
+    def test_squashmigrations(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['squashmigrations'] = True
+                args['<migration-name>'] = '0001_initial'
+                if DJANGO_1_6:
+                    with self.assertRaises(CommandError) as exit:
+                        core(args, self.application)
+                    self.assertEqual(exit.exception.message, 'Command not implemented for Django 1.6')
+                else:
+                    with self.assertRaises(CommandError) as exit:
+                        core(args, self.application)
+                    self.assertTrue('squashmigrations on it makes no sense' in exit.exception.message)
+
     def test_makemessages(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -186,7 +202,7 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 1 test in 0.000s' in err.getvalue())
+        self.assertTrue('Ran 3 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     def test_testrun_nocms(self):
@@ -198,7 +214,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 1 test in' in err.getvalue())
+        self.assertTrue('Ran 3 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     def test_authors(self):
