@@ -2,3 +2,4 @@
 coverage
 coveralls
 wheel
+tox>=1.8
