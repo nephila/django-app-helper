@@ -8,10 +8,6 @@ if sys.version_info[:2] < (2, 7):
     test_suite = 'unittest2.collector'
 else:
     test_suite = 'djangocms_helper.tests'
-try:
-    import unittest2
-except ImportError:
-    pass
 
 setuptools.setup(
     name="djangocms-helper",

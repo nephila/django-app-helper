@@ -51,6 +51,11 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             ('fullwidth.html', 'Fullwidth'),
             ('page.html', 'Normal page'),
         ),
-        'MIGRATION_MODULES': {}
+        'MIGRATION_MODULES': {},
+        'CACHES': {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            }
+        }
 
     }

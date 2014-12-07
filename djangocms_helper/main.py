@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
 import contextlib
-import subprocess
 import os
+import subprocess
 import sys
 import warnings
 
 from docopt import docopt
-from django.core.management import CommandError
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
@@ -143,18 +142,32 @@ def makemigrations(application, merge=False):
     """
     Generate migrations (for both south and django 1.7+)
     """
+    from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
     from django.core.management import call_command
-    from .utils import load_from_file
+    from .utils import captured_output
 
     if DJANGO_1_6:
+        from south.exceptions import NoMigrations
+        from south.migration import Migrations
+
+        if merge:
+            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6 and below')
         try:
-            loaded = load_from_file(os.path.join(application, 'migrations',
-                                                 '0001_initial.py'))
-        except IOError:
-            loaded = None
-        initial = loaded is None
-        call_command('schemamigration', initial=initial, auto=(not initial),
-                     *(application,))
+            Migrations(application)
+        except NoMigrations:
+            print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(application))
+            try:
+                call_command('schemamigration', *(application,), initial=True)
+            except SystemExit:
+                pass
+        except ImproperlyConfigured:
+            print('WARNING: The app: {0} could not be found.'.format(application))
+        else:
+            try:
+                with captured_output():
+                    call_command('schemamigration', *(application,), auto=True)
+            except SystemExit:
+                pass
     else:
         call_command('makemigrations', *(application,), merge=merge)
 
@@ -163,9 +176,10 @@ def squashmigrations(application, migration):
     """
     Squash Django 1.7+ migrations
     """
+    from django.core.exceptions import DjangoRuntimeWarning
     from django.core.management import call_command
     if DJANGO_1_6:
-        raise CommandError(u'Command not implemented for Django 1.6')
+        raise DjangoRuntimeWarning(u'Command not implemented for Django 1.6 and below')
     else:
         call_command('squashmigrations', application, migration)
 
@@ -218,7 +232,7 @@ def static_analisys(application):
         print(u"Static analisys available only if django CMS is installed")
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
     from cms.utils.compat.dj import get_user_model
     from django.utils import autoreload
 

@@ -2,6 +2,7 @@
 from __future__ import print_function, with_statement
 from copy import copy
 from distutils.version import LooseVersion
+from django.utils.encoding import force_text
 import os.path
 import shutil
 import sys
@@ -36,6 +37,8 @@ DEFAULT_ARGS = {
     '--cms': True,
     '--failfast': False,
     '--merge': False,
+    '--bind': '',
+    '--port': '',
     '<test-label>': ''
 }
 
@@ -45,6 +48,7 @@ class CommandTests(unittest.TestCase):
     basedir = None
     pofile = None
     mofile = None
+    migration_dir = None
 
     @classmethod
     def setUpClass(cls):
@@ -61,15 +65,16 @@ class CommandTests(unittest.TestCase):
     def setUp(self):
         try:
             os.unlink(self.pofile)
-        except OSError:
+        except (OSError, TypeError):
             pass
         try:
             os.unlink(self.mofile)
-        except OSError:
+        except (OSError, TypeError):
             pass
         try:
-            shutil.rmtree(self.migration_dir)
-        except OSError:
+            if self.migration_dir:
+                shutil.rmtree(self.migration_dir)
+        except (OSError, TypeError):
             pass
         try:
             del sys.modules['example.migrations']
@@ -120,16 +125,37 @@ class CommandTests(unittest.TestCase):
         else:
             self.assertTrue('Create model ExampleModel' in out.getvalue())
 
-    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
-                     reason='merge options supported for Django 1.7+ only')
     def test_makemigrations_merge(self):
+        from django.core.exceptions import DjangoRuntimeWarning
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args['makemigrations'] = True
                 args['--merge'] = True
-                core(args, self.application)
-        self.assertTrue('No conflicts detected to merge' in out.getvalue())
+                if DJANGO_1_6:
+                    with self.assertRaises(DjangoRuntimeWarning) as exit:
+                        core(args, self.application)
+                    self.assertEqual(force_text(exit.exception), 'Option not implemented for Django 1.6 and below')
+                else:
+                    core(args, self.application)
+                    self.assertTrue('No conflicts detected to merge' in out.getvalue())
+
+    def test_squashmigrations(self):
+        from django.core.exceptions import DjangoRuntimeWarning
+        from django.core.management import CommandError
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['squashmigrations'] = True
+                args['<migration-name>'] = '0001_initial'
+                if DJANGO_1_6:
+                    with self.assertRaises(DjangoRuntimeWarning) as exit:
+                        core(args, self.application)
+                    self.assertEqual(force_text(exit.exception), 'Command not implemented for Django 1.6 and below')
+                else:
+                    with self.assertRaises(CommandError) as exit:
+                        core(args, self.application)
+                    self.assertTrue('squashmigrations on it makes no sense' in force_text(exit.exception))
 
     def test_makemessages(self):
         with work_in(self.basedir):
@@ -178,6 +204,8 @@ class CommandTests(unittest.TestCase):
                 args['pyflakes'] = True
                 core(args, self.application)
 
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason="Example test non discoverable in Python 2.6")
     def test_testrun(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -186,9 +214,11 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 1 test in 0.000s' in err.getvalue())
+        self.assertTrue('Ran 3 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason="Example test non discoverable in Python 2.6")
     def test_testrun_nocms(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -198,7 +228,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 1 test in' in err.getvalue())
+        self.assertTrue('Ran 3 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     def test_authors(self):
