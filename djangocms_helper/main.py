@@ -6,14 +6,14 @@ import subprocess
 import sys
 import warnings
 
-from docopt import docopt
+from docopt import docopt, DocoptExit
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from . import __version__
 from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
-                    create_user, _create_db)
-
+                    create_user, _create_db, call_command_raw)
+0
 __doc__ = '''django CMS applications development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
@@ -31,6 +31,7 @@ Usage:
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> <command> [options]
 
 Options:
     -h --help                   Show this screen.
@@ -269,6 +270,10 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
     })
 
 
+def run_command(command, options):
+    call_command_raw(command, **options)
+
+
 def core(args, application):
     from django.conf import settings
 
@@ -277,6 +282,7 @@ def core(args, application):
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 
+    default_args = ['--bind', '--port', '<application>', '<command>']
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
             if args['cms_check']:
@@ -340,6 +346,12 @@ def core(args, application):
                 return static_analisys(application)
             elif args['authors']:
                 return generate_authors()
+            elif args['<command>']:
+                real_args = {}
+                for arg, value in args.items():
+                    if value and arg not in default_args:
+                        real_args[arg] = value
+                return run_command(args['<command>'], real_args)
 
 
 def main():  # pragma: no cover
@@ -350,7 +362,15 @@ def main():  # pragma: no cover
     if len(sys.argv) > 1:
         application = sys.argv[1]
         application_module = import_module(application)
-        args = docopt(__doc__, version=application_module.__version__)
+        try:
+            args = docopt(__doc__, version=application_module.__version__)
+            if sys.argv[2] == 'help':
+                raise DocoptExit()
+        except DocoptExit:
+            if sys.argv[2] == 'help':
+                raise
+            args = docopt(__doc__, sys.argv[1:3], version=application_module.__version__)
+            args['<extra-arguments>'] = sys.argv[3:]
         core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)
