@@ -6,7 +6,7 @@ import subprocess
 import sys
 import warnings
 
-from docopt import docopt
+from docopt import docopt, DocoptExit
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
@@ -21,16 +21,14 @@ dj-database-url compatible value.
 
 Usage:
     djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>]
-    djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> check [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [<extra-applications>...]
-    djangocms-helper <application> squashmigrations <migration-name>
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms]
 
 Options:
     -h --help                   Show this screen.
@@ -114,24 +112,6 @@ def makemessages(application):
             call_command('makemessages', locale=('en',))
 
 
-def shell():
-    """
-    Returns a django shell for the test project
-    """
-    from django.core.management import call_command
-
-    call_command('shell')
-
-
-def check():
-    """
-    Runs the Django ``check`` command
-    """
-    from django.core.management import call_command
-
-    call_command('check')
-
-
 def cms_check(migrate_cmd=False):
     """
     Runs the django CMS ``cms check`` command
@@ -181,18 +161,6 @@ def makemigrations(application, merge=False, extra_applications=None):
     else:
         for app in apps:
             call_command('makemigrations', *(app,), merge=merge)
-
-
-def squashmigrations(application, migration):
-    """
-    Squash Django 1.7+ migrations
-    """
-    from django.core.exceptions import DjangoRuntimeWarning
-    from django.core.management import call_command
-    if DJANGO_1_6:
-        raise DjangoRuntimeWarning(u'Command not implemented for Django 1.6 and below')
-    else:
-        call_command('squashmigrations', application, migration)
 
 
 def generate_authors():
@@ -283,64 +251,67 @@ def core(args, application):
             if args['cms_check']:
                 args['--cms'] = True
 
-            _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
+            if args['<command>']:
+                options = args['options']
+                from django.core.management import execute_from_command_line
+                options = [option for option in args['options'] if option != '--cms' and '--extra-settings' not in option]
+                print(options)
+                _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
+                execute_from_command_line(options)
 
-            # run
-            if args['test']:
-                if args['--nose-runner']:
-                    runner = 'django_nose.NoseTestSuiteRunner'
-                elif args['--simple-runner']:
-                    runner = 'django.test.simple.DjangoTestSuiteRunner'
-                elif args['--runner']:
-                    runner = args['--runner']
-                else:
-                    if DJANGO_1_5:
+            else:
+                _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
+                print(settings.INSTALLED_APPS)
+                # run
+                if args['test']:
+                    if args['--nose-runner']:
+                        runner = 'django_nose.NoseTestSuiteRunner'
+                    elif args['--simple-runner']:
                         runner = 'django.test.simple.DjangoTestSuiteRunner'
+                    elif args['--runner']:
+                        runner = args['--runner']
                     else:
-                        runner = 'django.test.runner.DiscoverRunner'
-                # make "Address already in use" errors less likely, see Django
-                # docs for more details on this env variable.
-                os.environ.setdefault(
-                    'DJANGO_LIVE_TEST_SERVER_ADDRESS',
-                    'localhost:8000-9000'
-                )
-                if args['--xvfb']:  # pragma: no cover
-                    import xvfbwrapper
+                        if DJANGO_1_5:
+                            runner = 'django.test.simple.DjangoTestSuiteRunner'
+                        else:
+                            runner = 'django.test.runner.DiscoverRunner'
+                    # make "Address already in use" errors less likely, see Django
+                    # docs for more details on this env variable.
+                    os.environ.setdefault(
+                        'DJANGO_LIVE_TEST_SERVER_ADDRESS',
+                        'localhost:8000-9000'
+                    )
+                    if args['--xvfb']:  # pragma: no cover
+                        import xvfbwrapper
 
-                    context = xvfbwrapper.Xvfb(width=1280, height=720)
-                else:
-                    @contextlib.contextmanager
-                    def null_context():
-                        yield
+                        context = xvfbwrapper.Xvfb(width=1280, height=720)
+                    else:
+                        @contextlib.contextmanager
+                        def null_context():
+                            yield
 
-                    context = null_context()
+                        context = null_context()
 
-                with context:
-                    num_failures = test(args['<test-label>'], application,
-                                        args['--failfast'], runner,
-                                        args['--runner-options'])
-                    sys.exit(num_failures)
-            elif args['server']:
-                server(args['--bind'], args['--port'],
-                       args.get('--migrate', True))
-            elif args['shell']:
-                shell()
-            elif args['check']:
-                check()
-            elif args['cms_check']:
-                cms_check(args.get('--migrate', True))
-            elif args['compilemessages']:
-                compilemessages(application)
-            elif args['makemessages']:
-                makemessages(application)
-            elif args['makemigrations']:
-                makemigrations(application, merge=args['--merge'], extra_applications=args['<extra-applications>'])
-            elif args['squashmigrations']:
-                squashmigrations(application, args['<migration-name>'])
-            elif args['pyflakes']:
-                return static_analisys(application)
-            elif args['authors']:
-                return generate_authors()
+                    with context:
+                        num_failures = test(args['<test-label>'], application,
+                                            args['--failfast'], runner,
+                                            args['--runner-options'])
+                        sys.exit(num_failures)
+                elif args['server']:
+                    server(args['--bind'], args['--port'],
+                           args.get('--migrate', True))
+                elif args['cms_check']:
+                    cms_check(args.get('--migrate', True))
+                elif args['compilemessages']:
+                    compilemessages(application)
+                elif args['makemessages']:
+                    makemessages(application)
+                elif args['makemigrations']:
+                    makemigrations(application, merge=args['--merge'], extra_applications=args['<extra-applications>'])
+                elif args['pyflakes']:
+                    return static_analisys(application)
+                elif args['authors']:
+                    return generate_authors()
 
 
 def main():  # pragma: no cover
@@ -351,7 +322,16 @@ def main():  # pragma: no cover
     if len(sys.argv) > 1:
         application = sys.argv[1]
         application_module = import_module(application)
-        args = docopt(__doc__, version=application_module.__version__)
+        try:
+            args = docopt(__doc__, version=application_module.__version__)
+            if sys.argv[2] == 'help':
+                raise DocoptExit()
+        except DocoptExit:
+            if sys.argv[2] == 'help':
+                raise
+            print(sys.argv[1:3])
+            args = docopt(__doc__, sys.argv[1:3], version=application_module.__version__)
+        args['options'] = [sys.argv[0]] + sys.argv[2:]
         core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)
