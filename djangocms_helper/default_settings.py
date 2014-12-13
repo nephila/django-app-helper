@@ -26,6 +26,8 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'django.contrib.messages.context_processors.messages',
             'django.core.context_processors.i18n',
             'django.core.context_processors.csrf',
+            'django.core.context_processors.debug',
+            'django.core.context_processors.tz',
             'django.core.context_processors.request',
             'django.core.context_processors.media',
             'django.core.context_processors.static',
@@ -52,10 +54,4 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             ('page.html', 'Normal page'),
         ),
         'MIGRATION_MODULES': {},
-        'CACHES': {
-            'default': {
-                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-            }
-        }
-
     }
