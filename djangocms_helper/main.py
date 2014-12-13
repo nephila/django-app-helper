@@ -83,7 +83,7 @@ def test(test_labels, application, failfast=False, test_runner=None,
         if os.path.exists('tests'):
             test_labels = ['tests']
         elif os.path.exists(os.path.join(application, 'tests')):
-            test_labels = [application]
+            test_labels = ['%s.tests' % application]
     return _test_run_worker(test_labels, test_runner, failfast, runner_options)
 
 
