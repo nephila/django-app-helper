@@ -85,8 +85,8 @@ Depending on the used test runner you may need to setup your tests accordingly.
 
 Currently supported test runners are:
 
-* Django's DiscoverRunner (default)
-* Django's DjangoTestSuiteRunner (option ``--simple-runner``)
+* Django's DiscoverRunner (default on Django 1.6+)
+* Django's DjangoTestSuiteRunner (default on Django 1.5- or with option ``--simple-runner``)
 * Nose's NoseTestSuiteRunner (option ``--nose-runner``)
 
 You can also write your own runner an use it with ``--runner`` option.
