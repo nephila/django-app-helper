@@ -4,5 +4,5 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
 
-class ExampleModel(models.Model):
+class ExampleModel1(models.Model):
     test_field = models.CharField(max_length=20, verbose_name=_(u'Test field'))
