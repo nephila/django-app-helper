@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import sys
-from django.test.simple import DjangoTestSuiteRunner
+try:
+    from django.test.runner import DiscoverRunner
+except ImportError:
+    from discover_runner import DiscoverRunner
 from django.utils import unittest
 
 
-class CapturedOutputRunner(DjangoTestSuiteRunner):
+class CapturedOutputRunner(DiscoverRunner):
 
     def run_suite(self, suite, **kwargs):
         return unittest.TextTestRunner(
