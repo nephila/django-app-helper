@@ -26,7 +26,7 @@ Usage:
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge]
+    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [<extra-applications>...]
     djangocms-helper <application> squashmigrations <migration-name>
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
@@ -47,6 +47,7 @@ Options:
     --runner-options=<option1>,<option2>        Comma separated list of command line options for the test runner
     --port=<port>                               Port to listen on [default: 8000].
     --bind=<bind>                               Interface to bind to [default: 127.0.0.1].
+    <extra-applications>                        Comma separated list of applications to create migrations for
 '''
 
 
@@ -138,7 +139,7 @@ def cms_check(migrate_cmd=False):
     call_command('cms', 'check')
 
 
-def makemigrations(application, merge=False):
+def makemigrations(application, merge=False, extra_applications=None):
     """
     Generate migrations (for both south and django 1.7+)
     """
@@ -146,30 +147,42 @@ def makemigrations(application, merge=False):
     from django.core.management import call_command
     from .utils import captured_output
 
+    apps = [application]
+    if extra_applications:
+        apps += extra_applications
+
     if DJANGO_1_6:
         from south.exceptions import NoMigrations
         from south.migration import Migrations
 
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6 and below')
-        try:
-            Migrations(application)
-        except NoMigrations:
-            print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(application))
+        for app in apps:
+            print(app)
             try:
-                call_command('schemamigration', *(application,), initial=True)
-            except SystemExit:
-                pass
-        except ImproperlyConfigured:
-            print('WARNING: The app: {0} could not be found.'.format(application))
-        else:
-            try:
-                with captured_output():
-                    call_command('schemamigration', *(application,), auto=True)
-            except SystemExit:
-                pass
+                Migrations(app)
+            except NoMigrations as e:
+                print(e)
+                print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(app))
+                try:
+                    call_command('schemamigration', *(app,), initial=True)
+                except SystemExit:
+                    pass
+            except ImproperlyConfigured as e:
+                print(e)
+                print('WARNING: The app: {0} could not be found.'.format(app))
+            else:
+                try:
+                    with captured_output() as x:
+                        call_command('schemamigration', *(app,), auto=True)
+                        print(x)
+                        print(x.get_value())
+                except SystemExit as e:
+                    print("exit", e, e.message, e.code)
+                    pass
     else:
-        call_command('makemigrations', *(application,), merge=merge)
+        for app in apps:
+            call_command('makemigrations', *(app,), merge=merge)
 
 
 def squashmigrations(application, migration):
@@ -320,7 +333,7 @@ def core(args, application):
             elif args['makemessages']:
                 makemessages(application)
             elif args['makemigrations']:
-                makemigrations(application, merge=args['--merge'])
+                makemigrations(application, merge=args['--merge'], extra_applications=args['<extra-applications>'])
             elif args['squashmigrations']:
                 squashmigrations(application, args['<migration-name>'])
             elif args['pyflakes']:
