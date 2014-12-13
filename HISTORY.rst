@@ -12,6 +12,7 @@ History
 * Add base helper class for test cases
 * Complete Django 1.7 support
 * Smarter detection of migration operations in Django 1.6-
+* Add option to create migrations for external applications
 
 0.4.0 (2014-09-18)
 ++++++++++++++++++

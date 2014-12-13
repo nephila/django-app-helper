@@ -146,6 +146,11 @@ Options
 
 * ``--merge``: Enable fixing of migration conflicts (for Django 1.7+ only)
 
+Arguments
+^^^^^^^^^
+
+* ``<extra-applications>``: Spaces separated list of applications to migrate
+
 squashmigrations
 ################
 
