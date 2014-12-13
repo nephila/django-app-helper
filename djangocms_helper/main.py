@@ -84,7 +84,10 @@ def test(test_labels, application, failfast=False, test_runner=None,
         if os.path.exists('tests'):
             test_labels = ['tests']
         elif os.path.exists(os.path.join(application, 'tests')):
-            test_labels = ['%s.tests' % application]
+            if 'DjangoTestSuiteRunner' in test_runner:
+                test_labels = [application]
+            else:
+                test_labels = ['%s.tests' % application]
     return _test_run_worker(test_labels, test_runner, failfast, runner_options)
 
 
@@ -158,7 +161,6 @@ def makemigrations(application, merge=False, extra_applications=None):
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6 and below')
         for app in apps:
-            print(app)
             try:
                 Migrations(app)
             except NoMigrations:
@@ -291,7 +293,10 @@ def core(args, application):
                 elif args['--runner']:
                     runner = args['--runner']
                 else:
-                    runner = 'django.test.runner.DiscoverRunner'
+                    if DJANGO_1_5:
+                        runner = 'django.test.simple.DjangoTestSuiteRunner'
+                    else:
+                        runner = 'django.test.runner.DiscoverRunner'
                 # make "Address already in use" errors less likely, see Django
                 # docs for more details on this env variable.
                 os.environ.setdefault(
