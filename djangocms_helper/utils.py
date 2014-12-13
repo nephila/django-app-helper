@@ -150,7 +150,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             'djangocms_admin_style'
         ]
         CMS_PROCESSORS = [
-            'cms.context_processors.media',
+            'cms.context_processors.cms_settings',
             'sekizai.context_processors.sekizai',
             'django.contrib.messages.context_processors.messages',
         ]
