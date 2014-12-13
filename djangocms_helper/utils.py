@@ -16,7 +16,7 @@ from django.utils.functional import empty
 from django.utils.six import StringIO
 
 try:
-    import cms
+    import cms  # NOQA
     CMS_31 = LooseVersion(django.get_version()) < LooseVersion('3.2')
     CMS_30 = LooseVersion(django.get_version()) < LooseVersion('3.1')
 except ImportError:

@@ -161,24 +161,19 @@ def makemigrations(application, merge=False, extra_applications=None):
             print(app)
             try:
                 Migrations(app)
-            except NoMigrations as e:
-                print(e)
+            except NoMigrations:
                 print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(app))
                 try:
                     call_command('schemamigration', *(app,), initial=True)
                 except SystemExit:
                     pass
-            except ImproperlyConfigured as e:
-                print(e)
+            except ImproperlyConfigured:
                 print('WARNING: The app: {0} could not be found.'.format(app))
             else:
                 try:
-                    with captured_output() as x:
+                    with captured_output():
                         call_command('schemamigration', *(app,), auto=True)
-                        print(x)
-                        print(x.get_value())
-                except SystemExit as e:
-                    print("exit", e, e.message, e.code)
+                except SystemExit:
                     pass
     else:
         for app in apps:
