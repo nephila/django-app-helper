@@ -15,7 +15,7 @@ from cms.test_utils.tmpdir import temp_dir
 import django
 
 from ..main import core, _make_settings
-from ..utils import work_in, captured_output, DJANGO_1_6
+from ..utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_5
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -39,7 +39,8 @@ DEFAULT_ARGS = {
     '--merge': False,
     '--bind': '',
     '--port': '',
-    '<test-label>': ''
+    '<test-label>': '',
+    '<extra-applications>': ''
 }
 
 
@@ -53,14 +54,17 @@ class CommandTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.basedir = os.path.abspath(os.path.join('djangocms_helper', 'test_utils'))
-        cls.application = 'example'
+        cls.application = 'example1'
+        cls.application_2 = 'example2'
         with work_in(cls.basedir):
             with captured_output() as (out, err):
                 cls.poexample = os.path.abspath(os.path.join(cls.application, 'data', 'django.po'))
                 cls.pofile = os.path.abspath(os.path.join(cls.application, 'locale', 'en', 'LC_MESSAGES', 'django.po'))
                 cls.mofile = os.path.abspath(os.path.join(cls.application, 'locale', 'en', 'LC_MESSAGES', 'django.mo'))
                 cls.migration_dir = os.path.abspath(os.path.join(cls.application, 'migrations'))
+                cls.migration_dir_2 = os.path.abspath(os.path.join(cls.application_2, 'migrations'))
                 cls.migration_file = os.path.abspath(os.path.join(cls.application, 'migrations', '0001_initial.py'))
+                cls.migration_file_2 = os.path.abspath(os.path.join(cls.application_2, 'migrations', '0001_initial.py'))
 
     def setUp(self):
         try:
@@ -74,11 +78,17 @@ class CommandTests(unittest.TestCase):
         try:
             if self.migration_dir:
                 shutil.rmtree(self.migration_dir)
+            if self.migration_dir_2:
+                shutil.rmtree(self.migration_dir_2)
         except (OSError, TypeError):
             pass
         try:
-            del sys.modules['example.migrations']
-        except KeyError:
+            del sys.modules['example1.migrations']
+        except KeyError as e:
+            pass
+        try:
+            del sys.modules['example2.migrations']
+        except KeyError as e:
             pass
 
     def tearDown(self):
@@ -118,12 +128,17 @@ class CommandTests(unittest.TestCase):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args['makemigrations'] = True
+                args['<extra-applications>'] = ['example2']
                 core(args, self.application)
-                self.assertTrue(os.path.exists(self.migration_file))
+            self.assertTrue(os.path.exists(self.migration_file))
+            self.assertTrue(os.path.exists(self.migration_file_2))
         if DJANGO_1_6:
             self.assertTrue('Created 0001_initial.py' in err.getvalue())
+            self.assertTrue('migrate example1' in err.getvalue())
+            self.assertTrue('migrate example2' in err.getvalue())
         else:
-            self.assertTrue('Create model ExampleModel' in out.getvalue())
+            self.assertTrue('Create model ExampleModel1' in out.getvalue())
+            self.assertTrue('Create model ExampleModel2' in out.getvalue())
 
     def test_makemigrations_merge(self):
         from django.core.exceptions import DjangoRuntimeWarning
