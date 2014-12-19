@@ -207,6 +207,8 @@ class CommandTests(unittest.TestCase):
             self.assertFalse('[WARNING]' in out.getvalue())
             self.assertFalse('[ERROR]' in out.getvalue())
 
+    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
+                     reason='check command available in Django 1.7+ only')
     def test_any_command_check(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
