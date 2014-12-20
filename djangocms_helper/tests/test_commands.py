@@ -254,7 +254,7 @@ class CommandTests(unittest.TestCase):
                 core(args, self.application)
         self.assertTrue('Generating AUTHORS' in out.getvalue())
         self.assertTrue('* Iacopo Spalletti' in out.getvalue())
-        self.assertTrue('Authors (2):' in out.getvalue())
+        self.assertTrue('Authors (' in out.getvalue())
 
     def test_urls(self):
         from django.core.urlresolvers import reverse
