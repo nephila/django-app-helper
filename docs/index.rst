@@ -51,4 +51,6 @@ Requirements
 
    introduction
    reference
+   basetest
    development
+   contributing
