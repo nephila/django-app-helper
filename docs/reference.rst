@@ -63,6 +63,8 @@ Currently two different tests layouts are supported:
             test_module1.py
             ...
 
+Depending on the used test runner you may need to setup your tests accordingly.
+
 Currently supported test runners are:
 
 * Django's DiscoverRunner (default)

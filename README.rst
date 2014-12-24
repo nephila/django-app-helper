@@ -51,151 +51,6 @@ The basic command structure is::
 where **<application>** is the django application name and **<command>** is one
 of the available commands. Optins vary for each command.
 
-Available commands
-==================
-
-test
-####
-
-Test command allows to run the application test suite using test environemnt similar to
-the django CMS testsuite.
-
-Test structure
-^^^^^^^^^^^^^^
-Currently two different tests layouts are supported:
-
-* tests outside the application module::
-
-    setup.py
-    tests
-        __init__.py
-        test_module1.py
-        ....
-
-* tests inside the application::
-
-    setup.py
-    application
-        tests
-            __init__.py
-            test_module1.py
-            ...
-
-Depending on the used test runner you may need to setup your tests accordingly.
-
-Currently supported test runners are:
-
-* Django's DiscoverRunner (default on Django 1.6+)
-* Django's DjangoTestSuiteRunner (default on Django 1.5- or with option ``--simple-runner``)
-* Nose's NoseTestSuiteRunner (option ``--nose-runner``)
-
-You can also write your own runner an use it with ``--runner`` option.
-
-Arguments
-^^^^^^^^^
-
-* ``<test-label>``: a space-separated list of tests to run;
-
-Options
-^^^^^^^
-
-* ``--runner``: custom test runner to use in dotted path notation;
-* ``--runner-options=<option1>,<option2>``: comma separated list of command
-  line options for the test runner: e.g. ``--runner-options=--with-coverage,--cover-package=my_package``
-* ``--failfast``: whether to stop at first test failure;
-* ``--migrate``: whether to apply south migrations when running tests;
-* ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
-* ``--nose-runner``: use django nose test suite
-* ``--simple-runner`` use Django DjangoTestSuiteRunner
-
-
-shell
-#####
-
-Starts a django shell for the test project.
-
-check
-#####
-
-Runs the Django ``check`` command
-
-cms_check
-#########
-
-Runs the django CMS ``cms check`` command
-
-compilemessages
-###############
-
-Compiles the locale messages.
-
-makemessages
-############
-
-Updates the locale messages for the current application.
-
-makemigrations
-##############
-
-Updates the application migrations (south migrations or Django migrations
-according to the current installed Django version). For South, it automatically
-handles **initial** / **auto** options.
-
-Options
-^^^^^^^
-
-* ``--merge``: Enable fixing of migration conflicts (for Django 1.7+ only)
-
-Arguments
-^^^^^^^^^
-
-* ``<extra-applications>``: Spaces separated list of applications to migrate
-
-squashmigrations
-################
-
-Runs the ``squasmigrations`` command. It operates on the current application.
-
-Arguments
-^^^^^^^^^
-
-* ``<migration-name>``: Squash migrations until this migration
-
-pyflakes
-########
-
-Performs static analysis using pyflakes with the same configuration as django CMS.
-
-authors
-#######
-
-Generates the authors list from the git log suitable for the **AUTHORS** file.
-
-
-Customizing settings
-^^^^^^^^^^^^^^^^^^^^
-
-For non trivial applications, you'd probably want to customize the base django
-settings provided by ``djangocms-helper``.
-
-This can be achieved by either putting a ``cms_helper.py`` file in the application
-main directory or by passing the path to the file using ``--extra-settings``
-option (use full path complete with `.py` extension).
-
-The file must contain a ``HELPER_SETTINGS`` dictionary containing the desired
-settings::
-
-    HELPER_SETTINGS = {
-        'TIME_ZONE': 'Europe/Rome',
-        'INSTALLED_APPS': [
-            'another_application',
-        ]
-    }
-
-All the parameter in settings will override the default ones, except
-``INSTALLED_APPS`` and ``TEMPLATE_CONTEXT_PROCESSORS`` that will be appended to
-the existing ones.
-
 ************
 Installation
 ************
@@ -216,8 +71,23 @@ Requirements
 * tox
 * dj-database-url
 
+*************
+Documentation
+*************
+
+Documentation is available on `readthedocs <http://djangocms-helper.readthedocs.org>`_.
+
+
 *******
 Authors
 *******
 
-`djangocms-helper` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_.
+`djangocms-helper` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
+other contributors.
+
+Thanks
+======
+
+The general logic and part of the code of the whole application is heavily taken from
+`django CMS's <https://github.com/divio/django-cms`_ own `develop.py` so all the contributors
+ deserve a huge thanks for their work.
