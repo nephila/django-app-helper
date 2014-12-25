@@ -279,7 +279,7 @@ def get_user_model():
         from django.contrib.auth.models import User
         User.USERNAME_FIELD = 'username'
         get_user_model = lambda: User
-    return get_user_model
+    return get_user_model()
 
 
 def create_user(username, email, password, is_staff=False, is_superuser=False):

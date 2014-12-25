@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-from cms.utils import get_language_list
+import os.path
+
+from django.conf import settings
 from django.http import SimpleCookie
 from django.test import TestCase, RequestFactory
 from django.utils.six import StringIO
-from djangocms_helper.utils import create_user
+
+from .utils import create_user, get_user_model
 
 
 class BaseTestCase(TestCase):
@@ -17,7 +20,7 @@ class BaseTestCase(TestCase):
     user_staff = None
     user_normal = None
     site_1 = None
-    languages = get_language_list()
+    languages = None
 
     """
     List of pages data for the different languages
@@ -43,9 +46,14 @@ class BaseTestCase(TestCase):
         cls.user_normal = create_user('normal', 'normal@admin.com', 'normal')
         cls.site_1 = Site.objects.get(pk=1)
 
+        try:
+            from cms.utils import get_language_list
+            cls.languages = get_language_list()
+        except ImportError:
+            cls.languages = [x[0] for x in settings.LANGUAGES]
+
     @classmethod
     def tearDownClass(cls):
-        from cms.utils.compat.dj import get_user_model
         User = get_user_model()
         User.objects.all().delete()
 
@@ -144,3 +152,64 @@ class BaseTestCase(TestCase):
 
     def reload_model(self, obj):
         return obj.__class__.objects.get(pk=obj.pk)
+
+    def create_image(self, mode='RGB', size=(800, 600)):
+        """
+        Create a random image suitable for saving as DjangoFile
+        :param mode: color mode
+        :param size: tuple of width, height
+        :return: image object
+
+        It requires Pillow installed in the environment to work
+
+        """
+        from PIL import Image as PilImage, ImageDraw
+
+        image = PilImage.new(mode, size)
+        draw = ImageDraw.Draw(image)
+        x_bit, y_bit = size[0] // 10, size[1] // 10
+        draw.rectangle((x_bit, y_bit * 2, x_bit * 7, y_bit * 3), 'red')
+        draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), 'red')
+        return image
+
+    def create_django_image_obj(self):
+        """
+        Create a django image file object suitable for FileField
+        It also sets the following attributes:
+
+        * ``self.image_name``: the image base name
+        * ``self.filename``: the complete image path
+
+        :return: django file object
+
+        It requires Pillow installed in the environment to work
+
+        """
+        from django.core.files import File as DjangoFile
+
+        img = self.create_image()
+        self.image_name = 'test_file.jpg'
+        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
+        img.save(self.filename, 'JPEG')
+        return DjangoFile(open(self.filename, 'rb'), name=self.image_name)
+
+    def create_filer_image_object(self):
+        """
+        Create a filer image object suitable for FilerImageField
+        It also sets the following attributes:
+
+        * ``self.image_name``: the image base name
+        * ``self.filename``: the complete image path
+        * ``self.filer_image``: the filer image object
+
+        :return: filer image object
+
+        It requires Pillow and django-filer installed in the environment to work
+
+        """
+        from filer.models import Image
+
+        file_obj = self.create_django_image_obj()
+        self.filer_image = Image.objects.create(owner=self.user, file=file_obj,
+                                                original_filename=self.image_name)
+        return self.filer_image

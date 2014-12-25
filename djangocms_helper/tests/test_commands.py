@@ -196,6 +196,10 @@ class CommandTests(unittest.TestCase):
                 self.assertTrue(os.path.exists(self.mofile))
 
     def test_cms_check(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 shutil.copy(self.poexample, self.pofile)
@@ -244,6 +248,10 @@ class CommandTests(unittest.TestCase):
             self.assertTrue(os.path.exists(self.migration_file_2))
 
     def test_pyflakes(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
@@ -266,6 +274,10 @@ class CommandTests(unittest.TestCase):
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason="Example test non discoverable in Python 2.6")
     def test_testrun_nocms(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit:
