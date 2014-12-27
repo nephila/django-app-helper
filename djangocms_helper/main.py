@@ -162,7 +162,8 @@ def makemigrations(application, merge=False, extra_applications=None):
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6 and below')
         for app in apps:
             try:
-                Migrations(app)
+                if not Migrations(app):
+                    raise NoMigrations(app)
             except NoMigrations:
                 print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(app))
                 try:
