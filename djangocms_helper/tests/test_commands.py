@@ -141,23 +141,24 @@ class CommandTests(unittest.TestCase):
             self.assertTrue('Create model ExampleModel1' in out.getvalue())
             self.assertTrue('Create model ExampleModel2' in out.getvalue())
 
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
+                     reason='check only for Django < 1.7')
     def test_makemigrations_existing_folder(self):
-        if DJANGO_1_6:
-            os.makedirs(self.migration_dir)
-            os.makedirs(self.migration_dir_2)
-            open(os.path.join(self.migration_dir, '__init__.py'), 'w')
-            open(os.path.join(self.migration_dir_2, '__init__.py'), 'w')
-            with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    args = copy(DEFAULT_ARGS)
-                    args['makemigrations'] = True
-                    args['<extra-applications>'] = ['example2']
-                    core(args, self.application)
-                self.assertTrue(os.path.exists(self.migration_file))
-                self.assertTrue(os.path.exists(self.migration_file_2))
-            self.assertTrue('Created 0001_initial.py' in err.getvalue())
-            self.assertTrue('migrate example1' in err.getvalue())
-            self.assertTrue('migrate example2' in err.getvalue())
+        os.makedirs(self.migration_dir)
+        os.makedirs(self.migration_dir_2)
+        open(os.path.join(self.migration_dir, '__init__.py'), 'w')
+        open(os.path.join(self.migration_dir_2, '__init__.py'), 'w')
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['makemigrations'] = True
+                args['<extra-applications>'] = ['example2']
+                core(args, self.application)
+            self.assertTrue(os.path.exists(self.migration_file))
+            self.assertTrue(os.path.exists(self.migration_file_2))
+        self.assertTrue('Created 0001_initial.py' in err.getvalue())
+        self.assertTrue('migrate example1' in err.getvalue())
+        self.assertTrue('migrate example2' in err.getvalue())
 
     def test_makemigrations_merge(self):
         from django.core.exceptions import DjangoRuntimeWarning
