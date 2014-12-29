@@ -22,6 +22,10 @@ def cms(app, argv=sys.argv):
 
     :param app: application
     """
+    try:
+        import cms
+    except ImportError:
+        print(u"runner.cms is available only if django CMS is installed")
     from .main import main
     if len(argv) == 1:
         argv.append('test')

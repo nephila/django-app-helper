@@ -25,11 +25,11 @@ setuptools.setup(
     include_package_data=True,
 
     install_requires=[
-        'django-cms>=3.0',
         'pyflakes',
         'docopt',
         'dj-database-url',
-        'pyflakes'
+        'pyflakes',
+        'south',
     ],
     entry_points={
         'console_scripts': [
