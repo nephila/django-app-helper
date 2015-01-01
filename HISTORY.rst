@@ -3,7 +3,7 @@
 History
 -------
 
-0.5.0 (Unreleased)
+0.5.0 (2015-01-01)
 ++++++++++++++++++
 
 * Fixing bugs when using extra settings
