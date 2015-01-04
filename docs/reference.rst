@@ -10,8 +10,35 @@ Commands take the general form::
 
     djangocms-helper <application> <command> [options ...]
 
-where **<application>** is the Django application name and **<command>** is one
-of the available commands. Options vary for each command.
+where **<application>** is the Django application name and **<command>** is a Django supported
+command, *or* one of the djangocms-helper commands detailed below. Options vary for each command.
+
+
+Common options
+==============
+
+* ``--extra-settings=path``: loads the extra settings from the provided file instead of the
+  default ``cms_helper.py``
+* ``cms``: loads django CMS specific options (see `cms_option`_ for details)
+
+
+Django commands
+===============
+
+django CMS Helper supports any Django command available according to the project setup; the
+general syntax is::
+
+    djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms]
+
+Example: ``djangocms-helper some_application shell --cms``
+
+Arguments
+---------
+
+* ``<command>`` is any available Django command
+* ``[options]`` is any option/argument accepted by the above command
+
+
 
 test
 ====
@@ -73,28 +100,6 @@ Currently supported test runners are:
 
 You can also specify your own custom runner with the ``--runner`` option.
 
-
-shell
-=====
-
-::
-
-    djangocms-helper <application> shell [--extra-settings=</path/to/settings.py>] [--cms]
-
-Example: ``djangocms-helper some_application shell --cms``
-
-Starts a django shell for the test project.
-
-check
-=====
-
-::
-
-    djangocms-helper <application> check [--extra-settings=</path/to/settings.py>] [--cms]
-
-Runs the Django ``check`` command.
-
-Example: ``djangocms-helper some_application check --cms``
 
 cms_check
 =========

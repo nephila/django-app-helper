@@ -62,7 +62,7 @@ The --cms option
 ================
 
 You'll need the ``--cms`` option most of the time. It sets up the virtual project appropriately
-for django CMS, providing the required configuration.
+for django CMS, providing the required configuration (see `cms_option`_ for details).
 
 ==============
 Other commands
