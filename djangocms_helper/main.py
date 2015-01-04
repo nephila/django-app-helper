@@ -251,16 +251,13 @@ def core(args, application):
                 args['--cms'] = True
 
             if args['<command>']:
-                options = args['options']
                 from django.core.management import execute_from_command_line
                 options = [option for option in args['options'] if option != '--cms' and '--extra-settings' not in option]
-                print(options)
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 execute_from_command_line(options)
 
             else:
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
-                print(settings.INSTALLED_APPS)
                 # run
                 if args['test']:
                     if args['--nose-runner']:
@@ -328,7 +325,6 @@ def main():  # pragma: no cover
         except DocoptExit:
             if sys.argv[2] == 'help':
                 raise
-            print(sys.argv[1:3])
             args = docopt(__doc__, sys.argv[1:3], version=application_module.__version__)
         args['options'] = [sys.argv[0]] + sys.argv[2:]
         core(args=args, application=application)
