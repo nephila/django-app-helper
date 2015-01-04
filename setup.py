@@ -25,13 +25,12 @@ setuptools.setup(
     include_package_data=True,
 
     install_requires=[
+        'django-cms>=3.0',
+        'pyflakes',
         'docopt',
         'dj-database-url',
         'pyflakes'
     ],
-    extras_require={
-        'cms': ['django-cms>=3.0', 'pyflakes']
-    },
     entry_points={
         'console_scripts': [
             'djangocms-helper = djangocms_helper.main:main',
@@ -39,7 +38,6 @@ setuptools.setup(
     },
     test_suite=test_suite,
     tests_require=test_requirements,
-
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
         'Development Status :: 2 - Pre-Alpha',
