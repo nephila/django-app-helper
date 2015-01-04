@@ -21,12 +21,10 @@ from ..utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_5
 DEFAULT_ARGS = {
     'shell': False,
     'test': False,
-    'check': False,
     'cms_check': False,
     'compilemessages': False,
     'makemessages': False,
     'makemigrations': False,
-    'squashmigrations': False,
     'pyflakes': False,
     'authors': False,
     'server': False,
@@ -41,7 +39,9 @@ DEFAULT_ARGS = {
     '--bind': '',
     '--port': '',
     '<test-label>': '',
-    '<extra-applications>': ''
+    '<extra-applications>': '',
+    'options': '',
+    '<command>': '',
 }
 
 
@@ -79,6 +79,9 @@ class CommandTests(unittest.TestCase):
         try:
             if self.migration_dir:
                 shutil.rmtree(self.migration_dir)
+        except (OSError, TypeError):
+            pass
+        try:
             if self.migration_dir_2:
                 shutil.rmtree(self.migration_dir_2)
         except (OSError, TypeError):
@@ -175,23 +178,6 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
                     self.assertTrue('No conflicts detected to merge' in out.getvalue())
 
-    def test_squashmigrations(self):
-        from django.core.exceptions import DjangoRuntimeWarning
-        from django.core.management import CommandError
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args['squashmigrations'] = True
-                args['<migration-name>'] = '0001_initial'
-                if DJANGO_1_6:
-                    with self.assertRaises(DjangoRuntimeWarning) as exit:
-                        core(args, self.application)
-                    self.assertEqual(force_text(exit.exception), 'Command not implemented for Django 1.6 and below')
-                else:
-                    with self.assertRaises(CommandError) as exit:
-                        core(args, self.application)
-                    self.assertTrue('squashmigrations on it makes no sense' in force_text(exit.exception))
-
     def test_makemessages(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -209,17 +195,6 @@ class CommandTests(unittest.TestCase):
                 core(args, self.application)
                 self.assertTrue(os.path.exists(self.mofile))
 
-    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
-                     reason='check command available for Django 1.7+ only')
-    def test_check(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                shutil.copy(self.poexample, self.pofile)
-                args = copy(DEFAULT_ARGS)
-                args['check'] = True
-                core(args, self.application)
-        self.assertTrue('no issues' in out.getvalue())
-
     def test_cms_check(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -231,6 +206,42 @@ class CommandTests(unittest.TestCase):
             self.assertTrue('Installation okay' in out.getvalue())
             self.assertFalse('[WARNING]' in out.getvalue())
             self.assertFalse('[ERROR]' in out.getvalue())
+
+    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
+                     reason='check command available in Django 1.7+ only')
+    def test_any_command_check(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                pass
+                args = copy(DEFAULT_ARGS)
+                args['<command>'] = 'check'
+                args['options'] = ['helper', 'check', '--extra-settings=cms_helper_extra.py']
+                core(args, self.application)
+        self.assertTrue('no issues' in out.getvalue())
+
+    def test_any_command_compilemessages(self):
+        with work_in(os.path.join(self.basedir, self.application)):
+            with captured_output() as (out, err):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['<command>'] = 'compilemessages'
+                args['options'] = 'helper compilemessages --cms -len --verbosity=2'.split(' ')
+                core(args, self.application)
+                self.assertTrue(os.path.exists(self.mofile))
+
+    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
+                     reason='makemigrations command available for Django 1.7+ only')
+    def test_any_command_migrations(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['<command>'] = 'makemigrations'
+                args['options'] = 'helper makemigrations example2 --verbosity=2'.split(' ')
+                core(args, self.application)
+            self.assertFalse('Create model ExampleModel1' in out.getvalue())
+            self.assertFalse(os.path.exists(self.migration_file))
+            self.assertTrue('Create model ExampleModel2' in out.getvalue())
+            self.assertTrue(os.path.exists(self.migration_file_2))
 
     def test_pyflakes(self):
         with work_in(self.basedir):
