@@ -19,7 +19,7 @@ Common options
 
 * ``--extra-settings=path``: loads the extra settings from the provided file instead of the
   default ``cms_helper.py``
-* ``cms``: loads django CMS specific options (see `cms_option`_ for details)
+* ``cms``: loads django CMS specific options (see :ref:`cms-option` for details)
 
 
 Django commands
