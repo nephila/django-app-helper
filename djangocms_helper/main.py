@@ -310,23 +310,23 @@ def core(args, application):
                     return generate_authors()
 
 
-def main():  # pragma: no cover
+def main(argv=sys.argv):  # pragma: no cover
     # Command is executed in the main directory of the plugin, and we must
     # include it in the current path for the imports to work
     sys.path.insert(0, '.')
 
-    if len(sys.argv) > 1:
-        application = sys.argv[1]
+    if len(argv) > 1:
+        application = argv[1]
         application_module = import_module(application)
         try:
             args = docopt(__doc__, version=application_module.__version__)
-            if sys.argv[2] == 'help':
+            if argv[2] == 'help':
                 raise DocoptExit()
         except DocoptExit:
-            if sys.argv[2] == 'help':
+            if argv[2] == 'help':
                 raise
-            args = docopt(__doc__, sys.argv[1:3], version=application_module.__version__)
-        args['options'] = [sys.argv[0]] + sys.argv[2:]
+            args = docopt(__doc__, argv[1:3], version=application_module.__version__)
+        args['options'] = [argv[0]] + argv[2:]
         core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)

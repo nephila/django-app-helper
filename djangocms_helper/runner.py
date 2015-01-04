@@ -2,21 +2,31 @@
 import sys
 
 
-def run(app):
+def run(app, argv=sys.argv):
+    """
+    Function to invoke to run commands in a plain django environment
+
+    :param app: application
+    """
     from .main import main
-    if len(sys.argv) == 1:
-        sys.argv.append('test')
-    if app not in sys.argv:
-        sys.argv.insert(1, app)
+    if len(argv) == 1:
+        argv.append('test')
+    if app not in argv:
+        argv.insert(1, app)
     main()
 
 
-def cms(app):
+def cms(app, argv=sys.argv):
+    """
+    Function to invoke to run commands in a django CMS environment
+
+    :param app: application
+    """
     from .main import main
-    if len(sys.argv) == 1:
-        sys.argv.append('test')
-    if app not in sys.argv:
-        sys.argv.insert(1, app)
-    if '--cms' not in sys.argv:
-        sys.argv.insert(2, '--cms')
+    if len(argv) == 1:
+        argv.append('test')
+    if app not in argv:
+        argv.insert(1, app)
+    if '--cms' not in argv:
+        argv.insert(2, '--cms')
     main()
