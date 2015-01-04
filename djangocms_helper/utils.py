@@ -9,7 +9,8 @@ import sys
 from tempfile import mkdtemp
 
 import django
-from django.core.management import call_command
+from django.core.management import (call_command, get_commands, CommandError, BaseCommand,
+                                    load_command_class)
 from django.core.urlresolvers import clear_url_caches
 from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
@@ -297,3 +298,28 @@ def get_user_model_labels():
     user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
     user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
     return user_orm_label, user_model_label
+
+
+def call_command_raw(command, *args):
+    """
+    Reimplementation of Django call_command that parses arguments through optparse
+
+    :param command: name of the django command
+    :param args: command arguments as provided by the CLI
+    :return: options and arguments
+    """
+    # Load the command object.
+    try:
+        app_name = get_commands()[command]
+    except KeyError:
+        raise CommandError("Unknown command: %r" % command)
+
+    if isinstance(app_name, BaseCommand):
+        # If the command is already loaded, use it directly.
+        klass = app_name
+    else:
+        klass = load_command_class(app_name, command)
+
+    parser = klass.create_parser('manage.py', command)
+    options, args = parser.parse_args(*args)
+    return klass.execute(*args[2:], **(options.__dict__))
