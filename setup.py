@@ -29,7 +29,7 @@ setuptools.setup(
         'dj-database-url',
         'pyflakes'
     ],
-    extras_requires={
+    extras_require={
         'cms': ['django-cms>=3.0', 'pyflakes']
     },
     entry_points={
