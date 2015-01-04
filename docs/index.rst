@@ -59,6 +59,7 @@ Requirements
    introduction
    reference
    settings
+   runner
    basetest
    development
    contributing

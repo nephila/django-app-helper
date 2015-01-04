@@ -78,3 +78,25 @@ Try a couple of the other commands; they're mostly self-explanatory::
 
 Note that the last of these doesn't take the ``--cms`` option, because of course that is implied
 anyway by ``cms_check``.
+
+
+
+=================
+Integrated runner
+=================
+
+In some contexts running commands by using the complete syntax can be clunky or unfeasible.
+
+django CMS Helper contains function that allow to run the commands with a much shorter syntax::
+
+    python cms_helper.py
+
+to run tests
+
+Or::
+
+    python cms_helper.py server
+
+to invoke a server.
+
+See :doc:`runner` for details.
