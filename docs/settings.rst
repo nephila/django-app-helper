@@ -1,6 +1,6 @@
-###########################
-django CMS Helper reference
-###########################
+###############################
+Settings with django CMS Helper
+###############################
 
 ==============
 Extra settings
@@ -64,11 +64,11 @@ Middlewares::
     'django.middleware.common.CommonMiddleware',
 
 
-.. _cms_option:
+.. _cms-option:
 
-==========
-cms option
-==========
+============
+--cms option
+============
 
 When using ``--cms`` option, ``INSTALLED_APPS``, ``TEMPLATE_CONTEXT_PROCESSORS`` and
 ``MIDDLEWARE_CLASSES`` related to django CMS are added to the default settings so you

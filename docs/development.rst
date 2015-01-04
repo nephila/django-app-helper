@@ -11,7 +11,7 @@ knowledge, and a willingness to follow the contribution guidelines.
 Nephila
 *******
 
-django CMS Helper was created by Iacopo Spalletti at `Nephila <https://nephila.it/>`_ of Florence
+django CMS Helper was created by Iacopo Spalletti at `Nephila <https://nephila.it/>`_
 and is released under a GNU GENERAL PUBLIC LICENSE.
 
 Nephila is an active supporter of django CMS and its community. django CMS Helper is intended to
