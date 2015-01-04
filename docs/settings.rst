@@ -2,6 +2,8 @@
 Settings with django CMS Helper
 ###############################
 
+.. _extra-settings:
+
 ==============
 Extra settings
 ==============

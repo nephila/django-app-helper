@@ -251,16 +251,13 @@ def core(args, application):
                 args['--cms'] = True
 
             if args['<command>']:
-                options = args['options']
                 from django.core.management import execute_from_command_line
                 options = [option for option in args['options'] if option != '--cms' and '--extra-settings' not in option]
-                print(options)
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 execute_from_command_line(options)
 
             else:
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
-                print(settings.INSTALLED_APPS)
                 # run
                 if args['test']:
                     if args['--nose-runner']:
@@ -313,24 +310,23 @@ def core(args, application):
                     return generate_authors()
 
 
-def main():  # pragma: no cover
+def main(argv=sys.argv):  # pragma: no cover
     # Command is executed in the main directory of the plugin, and we must
     # include it in the current path for the imports to work
     sys.path.insert(0, '.')
 
-    if len(sys.argv) > 1:
-        application = sys.argv[1]
+    if len(argv) > 1:
+        application = argv[1]
         application_module = import_module(application)
         try:
             args = docopt(__doc__, version=application_module.__version__)
-            if sys.argv[2] == 'help':
+            if argv[2] == 'help':
                 raise DocoptExit()
         except DocoptExit:
-            if sys.argv[2] == 'help':
+            if argv[2] == 'help':
                 raise
-            print(sys.argv[1:3])
-            args = docopt(__doc__, sys.argv[1:3], version=application_module.__version__)
-        args['options'] = [sys.argv[0]] + sys.argv[2:]
+            args = docopt(__doc__, argv[1:3], version=application_module.__version__)
+        args['options'] = [argv[0]] + argv[2:]
         core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)

@@ -66,7 +66,8 @@ Installing from source::
 Requirements
 ============
 
-* django CMS 3.0 (django CMS 3.0.4 is required for pyflake command)
+* django CMS 3.0 (django CMS 3.0.4 is required for pyflake command), optional; required only
+  to work with ``--cms`` option
 * docopt
 * tox
 * dj-database-url
