@@ -12,7 +12,7 @@ from django.utils.importlib import import_module
 
 from . import __version__
 from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
-                    create_user, _create_db)
+                    create_user, _create_db, get_user_model)
 
 __doc__ = '''django CMS applications development helper script.
 
@@ -212,7 +212,6 @@ def static_analisys(application):
 
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
-    from cms.utils.compat.dj import get_user_model
     from django.utils import autoreload
 
     if os.environ.get("RUN_MAIN") != "true":

@@ -2,7 +2,6 @@
 from __future__ import print_function, with_statement
 from copy import copy
 from distutils.version import LooseVersion
-from django.utils.encoding import force_text
 import os
 import os.path
 import shutil
@@ -12,11 +11,11 @@ try:
 except ImportError:
     import unittest
 
-from cms.test_utils.tmpdir import temp_dir
 import django
+from django.utils.encoding import force_text
 
 from ..main import core, _make_settings
-from ..utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_5
+from ..utils import work_in, captured_output, DJANGO_1_6, temp_dir
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -66,6 +65,10 @@ class CommandTests(unittest.TestCase):
                 cls.migration_dir_2 = os.path.abspath(os.path.join(cls.application_2, 'migrations'))
                 cls.migration_file = os.path.abspath(os.path.join(cls.application, 'migrations', '0001_initial.py'))
                 cls.migration_file_2 = os.path.abspath(os.path.join(cls.application_2, 'migrations', '0001_initial.py'))
+        try:
+            import cms
+        except ImportError:
+            DEFAULT_ARGS['--cms'] = False
 
     def setUp(self):
         try:
@@ -119,7 +122,7 @@ class CommandTests(unittest.TestCase):
                         # Testing that cms_helper.py in the command option is loaded
                         self.assertEqual(local_settings.TIME_ZONE, 'Europe/Paris')
                         # Existing application is kept
-                        self.assertTrue('mptt' in local_settings.INSTALLED_APPS)
+                        self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
                         # New one is added
                         self.assertTrue('djangocms_admin_style' in local_settings.INSTALLED_APPS)
                         # Existing application is kept
@@ -196,6 +199,10 @@ class CommandTests(unittest.TestCase):
                 self.assertTrue(os.path.exists(self.mofile))
 
     def test_cms_check(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 shutil.copy(self.poexample, self.pofile)
@@ -244,6 +251,10 @@ class CommandTests(unittest.TestCase):
             self.assertTrue(os.path.exists(self.migration_file_2))
 
     def test_pyflakes(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
@@ -266,6 +277,10 @@ class CommandTests(unittest.TestCase):
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason="Example test non discoverable in Python 2.6")
     def test_testrun_nocms(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit:
@@ -288,6 +303,10 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('Authors (' in out.getvalue())
 
     def test_urls(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         from django.core.urlresolvers import reverse
         with work_in(self.basedir):
             with captured_output() as (out, err):

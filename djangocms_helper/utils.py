@@ -271,8 +271,18 @@ def _create_db(migrate_cmd=False):
         call_command("migrate")
 
 
+def get_user_model():
+    # Django 1.5+ compatibility
+    if django.VERSION >= (1, 5):
+        from django.contrib.auth import get_user_model
+    else:
+        from django.contrib.auth.models import User
+        User.USERNAME_FIELD = 'username'
+        get_user_model = lambda: User
+    return get_user_model()
+
+
 def create_user(username, email, password, is_staff=False, is_superuser=False):
-    from cms.utils.compat.dj import get_user_model
     User = get_user_model()
     usr = User()
 
@@ -291,7 +301,6 @@ def create_user(username, email, password, is_staff=False, is_superuser=False):
 
 
 def get_user_model_labels():
-    from cms.utils.compat.dj import get_user_model
     User = get_user_model()
 
     user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)

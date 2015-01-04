@@ -22,7 +22,7 @@ The utilities provided:
 * perform static analysis using pyflakes
 * build an authors list automatically
 
-Django CMS Helper was created by Iacopo Spalletti.
+django CMS Helper was created by Iacopo Spalletti.
 
 ============
 Installation
@@ -32,6 +32,12 @@ Installing from pip::
 
     pip install djangocms-helper
 
+or::
+
+    pip install djangocms-helper[cms]
+
+to install it along with django CMS
+
 Installing from source::
 
     pip install git+https://github.com/nephila/djangocms-helper#egg=djangocms-helper
@@ -40,10 +46,11 @@ Installing from source::
 Requirements
 ============
 
-* django CMS 3.0 (django CMS 3.0.4 is required for pyflake command)
 * docopt
 * tox
 * dj-database-url
+* django CMS 3.0 (django CMS 3.0.4 is required for pyflake command), optional; required only
+  to work with ``--cms`` option
 
 
 .. toctree::
@@ -51,6 +58,7 @@ Requirements
 
    introduction
    reference
+   settings
    basetest
    development
    contributing
