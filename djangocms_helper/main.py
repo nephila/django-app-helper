@@ -154,8 +154,7 @@ def makemigrations(application, merge=False, extra_applications=None):
                 print('WARNING: The app: {0} could not be found.'.format(app))
             else:
                 try:
-                    with captured_output():
-                        call_command('schemamigration', *(app,), auto=True)
+                    call_command('schemamigration', *(app,), auto=True)
                 except SystemExit:
                     pass
     else:
