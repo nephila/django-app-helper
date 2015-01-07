@@ -27,7 +27,7 @@ Usage:
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
+    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate]
     djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms]
 
 Options:
