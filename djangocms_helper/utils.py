@@ -17,8 +17,8 @@ from django.utils.six import StringIO
 
 try:
     import cms  # NOQA
-    CMS_31 = LooseVersion(django.get_version()) < LooseVersion('3.2')
-    CMS_30 = LooseVersion(django.get_version()) < LooseVersion('3.1')
+    CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
+    CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:
     CMS_31 = False
     CMS_30 = False
@@ -141,7 +141,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     if args['--cms']:
         CMS_APPS = [
-            'mptt',
             'cms',
             'menus',
             'sekizai',
@@ -223,6 +222,15 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         default_settings['INSTALLED_APPS'].append('south')
     elif args['--cms']:
         default_settings['MIGRATION_MODULES'].update(CMS_1_7_MIGRATIONS)
+    if CMS_31:
+        if 'treebeard' not in default_settings['INSTALLED_APPS']:
+            default_settings['INSTALLED_APPS'].append('treebeard')
+        if ('filer' in default_settings['INSTALLED_APPS'] and 
+                'mptt' not in default_settings['INSTALLED_APPS']):
+            default_settings['INSTALLED_APPS'].append('mptt')
+    else:
+        if 'mptt' not in default_settings['INSTALLED_APPS']:
+            default_settings['INSTALLED_APPS'].append('mptt')
 
     # Support for custom user models
     if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in os.environ:
