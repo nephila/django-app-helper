@@ -3,6 +3,14 @@
 History
 -------
 
+0.6.0 (2015-01-10)
+++++++++++++++++++
+
+* Add a runner to make cms_helper file itself a runner for djangocms-helper
+* Fix issues with mptt / treebeard and Django 1.7
+* Fix some makemigrations / --migrate issues
+* Make djangocms-helper less django CMS dependent
+
 0.5.0 (2015-01-01)
 ++++++++++++++++++
 
