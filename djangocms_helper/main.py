@@ -117,9 +117,12 @@ def cms_check(migrate_cmd=False):
     Runs the django CMS ``cms check`` command
     """
     from django.core.management import call_command
-
-    _create_db(migrate_cmd)
-    call_command('cms', 'check')
+    try:
+        import cms
+        _create_db(migrate_cmd)
+        call_command('cms', 'check')
+    except ImportError:
+        print(u"cms_check available only if django CMS is installed")
 
 
 def makemigrations(application, merge=False, extra_applications=None):

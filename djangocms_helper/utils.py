@@ -29,6 +29,9 @@ DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
 DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
 
 
+from . import HELPER_FILE
+
+
 def load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
@@ -194,7 +197,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     try:
         extra_settings_file = args.get('--extra-settings')
         if not extra_settings_file:
-            extra_settings_file = 'cms_helper.py'
+            extra_settings_file = HELPER_FILE
         if extra_settings_file[-3:] != '.py':
             extra_settings_file = '%s.py' % extra_settings_file
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
@@ -229,7 +232,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
                 'mptt' not in default_settings['INSTALLED_APPS']):
             default_settings['INSTALLED_APPS'].append('mptt')
     else:
-        if 'mptt' not in default_settings['INSTALLED_APPS']:
+        if ('cms' in default_settings['INSTALLED_APPS'] and
+                'mptt' not in default_settings['INSTALLED_APPS']):
             default_settings['INSTALLED_APPS'].append('mptt')
 
     # Support for custom user models
