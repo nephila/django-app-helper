@@ -4,3 +4,5 @@ __version__ = '0.6.0.post1'
 __author__ = 'Iacopo Spalletti <i.spalletti@nephila.it>'
 __all__ = ['runner']
  
+
+HELPER_FILE = 'cms_helper.py'
