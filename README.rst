@@ -29,12 +29,18 @@ It's a modified version of django CMS's own ``develop.py`` script, modified
 to handle generic plugins development process.
 
 
+warning
+=======
+Since version 0.7 django CMS is no more a hard dependency; install it
+manually to enable ``--cms`` option
+
 Common options
 ==============
 
 * ``--cms``: Loads configuration to properly run a django CMS-based application;
 * ``--extra-settings``: Path to a helper file to set extra settings; see
-  `Customizing settings`_ for details;
+  `Settings section <http://djangocms-helper.readthedocs.org/en/develop/settings.html>`_
+  for details;
 
 *****
 Usage
@@ -50,6 +56,15 @@ The basic command structure is::
 
 where **<application>** is the django application name and **<command>** is one
 of the available commands. Optins vary for each command.
+
+******
+Runner
+******
+
+By using the integrated runned in the settings file you'll be able to run
+the commands without invoking ``djangocms-helper``: see
+`Integrate runner <http://djangocms-helper.readthedocs.org/en/develop/runner.html>`_
+for reference.
 
 ************
 Installation
@@ -90,5 +105,5 @@ Thanks
 ======
 
 The general logic and part of the code of the whole application is heavily taken from
-`django CMS's <https://github.com/divio/django-cms`_ own `develop.py` so all the contributors
- deserve a huge thanks for their work.
+`django CMS's <https://github.com/divio/django-cms>`_ own `develop.py` so all the contributors
+deserve a huge thanks for their work.

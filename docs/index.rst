@@ -46,11 +46,14 @@ Installing from source::
 Requirements
 ============
 
-* django CMS 3.0 (django CMS 3.0.4 is required for pyflake command), optional; required only
-  to work with ``--cms`` option
+* django CMS 3.0 (django CMS 3.0.4 is required for pyflake command), optional;
+  required only to work with ``--cms`` option
 * docopt
 * tox
 * dj-database-url
+
+.. warning:: Since version 0.7 django CMS is no more a hard dependency; install it
+             manually to enable ``--cms`` option
 
 
 .. toctree::
@@ -63,3 +66,4 @@ Requirements
    basetest
    development
    contributing
+   history
