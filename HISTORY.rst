@@ -3,6 +3,12 @@
 History
 -------
 
+0.7.0 (2015-01-22)
+++++++++++++++++++
+
+* Fix an error which prevents the runner to discover the settings
+* django CMS is no more a dependency, install it manually to enable django CMS support
+
 0.6.0 (2015-01-10)
 ++++++++++++++++++
 

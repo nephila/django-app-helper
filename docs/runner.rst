@@ -55,3 +55,8 @@ If you don't need django CMS, you can use a runner function with no CMS attached
 
     if __name__ == "__main__":
         run()
+
+
+.. warning:: The runner **must** be invoked from the **settings** file.
+             The runner takes care of setting up the file in which is
+             invoked as the ``extra_settings`` file.
