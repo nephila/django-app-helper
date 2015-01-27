@@ -269,9 +269,14 @@ def core(args, application):
                         runner = args['--runner']
                     else:
                         if DJANGO_1_5:
-                            runner = 'django.test.simple.DjangoTestSuiteRunner'
+                            try:
+                                import discover_runner
+                                runner = 'discover_runner.DiscoverRunner'
+                            except ImportError:
+                                runner = 'django.test.simple.DjangoTestSuiteRunner'
                         else:
                             runner = 'django.test.runner.DiscoverRunner'
+
                     # make "Address already in use" errors less likely, see Django
                     # docs for more details on this env variable.
                     os.environ.setdefault(
