@@ -142,7 +142,29 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     import dj_database_url
     from .default_settings import get_default_settings
 
-    if args['--cms']:
+    try:
+        extra_settings_file = args.get('--extra-settings')
+        if not extra_settings_file:
+            extra_settings_file = HELPER_FILE
+        if extra_settings_file[-3:] != '.py':
+            extra_settings_file = '%s.py' % extra_settings_file
+        extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
+    except (IOError, AttributeError):
+        extra_settings = None
+    default_name = ':memory:' if not args['server'] else 'local.sqlite'
+    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    migrate = args.get('--migrate', False)
+    configs = {
+        'DATABASES': {'default': dj_database_url.parse(db_url)},
+        'STATIC_ROOT': STATIC_ROOT,
+        'MEDIA_ROOT': MEDIA_ROOT,
+        'USE_TZ': True,
+        'SOUTH_TESTS_MIGRATE': migrate,
+        'USE_CMS': args['--cms'],
+        'BASE_APPLICATION': application
+    }
+
+    if configs['USE_CMS'] or getattr(extra_settings, 'USE_CMS', False):
         CMS_APPS = [
             'cms',
             'menus',
@@ -191,29 +213,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
-    default_name = ':memory:' if not args['server'] else 'local.sqlite'
 
-    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
-    migrate = args.get('--migrate', False)
-    configs = {
-        'DATABASES': {'default': dj_database_url.parse(db_url)},
-        'STATIC_ROOT': STATIC_ROOT,
-        'MEDIA_ROOT': MEDIA_ROOT,
-        'USE_TZ': True,
-        'SOUTH_TESTS_MIGRATE': migrate,
-        'USE_CMS': args['--cms'],
-        'BASE_APPLICATION': application
-    }
     default_settings.update(configs)
-    try:
-        extra_settings_file = args.get('--extra-settings')
-        if not extra_settings_file:
-            extra_settings_file = HELPER_FILE
-        if extra_settings_file[-3:] != '.py':
-            extra_settings_file = '%s.py' % extra_settings_file
-        extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
-    except (IOError, AttributeError):
-        extra_settings = None
 
     if extra_settings:
         apps = extra_settings.get('INSTALLED_APPS', [])
