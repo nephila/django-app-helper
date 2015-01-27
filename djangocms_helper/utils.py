@@ -174,9 +174,20 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_1_7_MIGRATIONS = {
             'cms': 'cms.migrations_django',
             'menus': 'menus.migrations_django',
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+            'filer': 'filer.migrations_django',
+            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
+            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
+            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
         }
     else:
-        CMS_1_7_MIGRATIONS = {}
+        CMS_1_7_MIGRATIONS = {
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+            'filer': 'filer.migrations_django',
+            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
+            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
+            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
+        }
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
