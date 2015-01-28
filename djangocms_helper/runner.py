@@ -12,39 +12,46 @@ def run(app, argv=sys.argv):
 
     :param app: application
     """
-    from .main import main
     if len(argv) == 1:
+        # test argument is given if not argument is passed
         argv.append('test')
     if app not in argv:
+        # app is automatically added if not present
         argv.insert(1, app)
-    # This is a hackish to get the caller file which is the file
-    # which contains the HELPER_SETTINGS
-    helper = os.path.abspath(inspect.getframeinfo(inspect.stack()[1][0]).filename)
-    if os.path.basename(helper) != HELPER_FILE and '--extra-settings=%s' % helper not in argv:
-        argv.append('--extra-settings=%s' % helper)
-    main()
+    runner(argv)
 
 
 def cms(app, argv=sys.argv):
     """
-    Function to invoke to run commands in a django CMS environment
+    Function to invoke to run commanvds in a django CMS environment
 
     :param app: application
     """
     try:
-        import cms
+        import cms  # NOQA
     except ImportError:
         print(u"runner.cms is available only if django CMS is installed")
-    from .main import main
     if len(argv) == 1:
+        # test argument is given if not argument is passed
         argv.append('test')
     if app not in argv:
+        # app is automatically added if not present
         argv.insert(1, app)
     if '--cms' not in argv:
+        # this is the cms runner, just add the cms argument
         argv.insert(2, '--cms')
-    # This is a hackish to get the caller file which is the file
+    runner(argv)
+
+
+def runner(argv):
+    from .main import main
+
+    # This is a hackish way to get the caller file which is the file
     # which contains the HELPER_SETTINGS
-    helper = os.path.abspath(inspect.getframeinfo(inspect.stack()[1][0]).filename)
-    if os.path.basename(helper) != HELPER_FILE and '--extra-settings=%s' % helper not in argv:
+    helper = os.path.abspath(inspect.getframeinfo(inspect.stack()[2][0]).filename)
+    # check if extra settings has been passed
+    # if not, user the helper file
+    extra_settings = any(map(lambda x: x.startswith('--extra-settings='), argv))
+    if os.path.basename(helper) != HELPER_FILE and not extra_settings:
         argv.append('--extra-settings=%s' % helper)
-    main()
+    main(argv)
