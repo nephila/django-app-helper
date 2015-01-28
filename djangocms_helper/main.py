@@ -24,7 +24,7 @@ Usage:
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [<extra-applications>...]
+    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate]
@@ -118,20 +118,19 @@ def cms_check(migrate_cmd=False):
     """
     from django.core.management import call_command
     try:
-        import cms
+        import cms  # nopyflakes
         _create_db(migrate_cmd)
         call_command('cms', 'check')
     except ImportError:
         print(u"cms_check available only if django CMS is installed")
 
 
-def makemigrations(application, merge=False, extra_applications=None):
+def makemigrations(application, merge=False, dry_run=False, empty=False, extra_applications=None):
     """
     Generate migrations (for both south and django 1.7+)
     """
     from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
     from django.core.management import call_command
-    from .utils import captured_output
 
     apps = [application]
     if extra_applications:
@@ -150,19 +149,19 @@ def makemigrations(application, merge=False, extra_applications=None):
             except NoMigrations:
                 print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(app))
                 try:
-                    call_command('schemamigration', *(app,), initial=True)
+                    call_command('schemamigration', *(app,), initial=True, empty=empty)
                 except SystemExit:
                     pass
             except ImproperlyConfigured:
                 print('WARNING: The app: {0} could not be found.'.format(app))
             else:
                 try:
-                    call_command('schemamigration', *(app,), auto=True)
+                    call_command('schemamigration', *(app,), auto=True, empty=empty)
                 except SystemExit:
                     pass
     else:
         for app in apps:
-            call_command('makemigrations', *(app,), merge=merge)
+            call_command('makemigrations', *(app,), merge=merge, dry_run=dry_run, empty=empty)
 
 
 def generate_authors():
@@ -305,7 +304,9 @@ def core(args, application):
                 elif args['makemessages']:
                     makemessages(application)
                 elif args['makemigrations']:
-                    makemigrations(application, merge=args['--merge'], extra_applications=args['<extra-applications>'])
+                    makemigrations(application, merge=args['--merge'], dry_run=args['--dry-run'],
+                                   empty=args['--empty'],
+                                   extra_applications=args['<extra-applications>'])
                 elif args['pyflakes']:
                     return static_analisys(application)
                 elif args['authors']:

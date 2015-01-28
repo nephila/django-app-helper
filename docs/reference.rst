@@ -132,7 +132,7 @@ makemigrations
 
 ::
 
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [<extra-applications>...]
+    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--dry-run] [--empty] [<extra-applications>...]
 
 Updates the application migrations (south migrations or Django migrations
 according to the current installed Django version). For South, it automatically
@@ -142,6 +142,8 @@ Options
 -------
 
 * ``--merge``: Enable fixing of migration conflicts (for Django 1.7+ only)
+* ``--empty``: It generates an empty migration for customisations
+* ``--dry-run``: Does not create migrations file (for Django 1.7+ only)
 
 Arguments
 ---------

@@ -35,6 +35,8 @@ DEFAULT_ARGS = {
     '--cms': True,
     '--failfast': False,
     '--merge': False,
+    '--dry-run': False,
+    '--empty': False,
     '--bind': '',
     '--port': '',
     '<test-label>': '',
@@ -58,6 +60,12 @@ class CommandTests(unittest.TestCase):
         cls.application_2 = 'example2'
         with work_in(cls.basedir):
             with captured_output() as (out, err):
+                if LooseVersion(django.get_version()) >= LooseVersion('1.7'):
+                    cls.migration_example = os.path.abspath(os.path.join(cls.application, 'data', 'django_0001_initial.py'))
+                    cls.migration_partial = os.path.abspath(os.path.join(cls.application, 'data', 'django_0001_partial.py'))
+                else:
+                    cls.migration_example = os.path.abspath(os.path.join(cls.application, 'data', 'south_0001_initial.py'))
+                    cls.migration_partial = os.path.abspath(os.path.join(cls.application, 'data', 'south_0001_partial.py'))
                 cls.poexample = os.path.abspath(os.path.join(cls.application, 'data', 'django.po'))
                 cls.pofile = os.path.abspath(os.path.join(cls.application, 'locale', 'en', 'LC_MESSAGES', 'django.po'))
                 cls.mofile = os.path.abspath(os.path.join(cls.application, 'locale', 'en', 'LC_MESSAGES', 'django.mo'))
@@ -146,6 +154,37 @@ class CommandTests(unittest.TestCase):
         else:
             self.assertTrue('Create model ExampleModel1' in out.getvalue())
             self.assertTrue('Create model ExampleModel2' in out.getvalue())
+
+    def skip_test_makemigrations_update(self):
+        os.makedirs(self.migration_dir)
+        open(os.path.join(self.migration_dir, '__init__.py'), 'w')
+        shutil.copy(self.migration_partial, self.migration_file)
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['makemigrations'] = True
+                core(args, self.application)
+        if DJANGO_1_6:
+            #self.assertTrue('+ Added field test_field on example1.ExampleModel1' in err.getvalue())
+            self.assertTrue('You can now apply this migration' in err.getvalue())
+        else:
+            print(out.getvalue())
+            self.assertTrue('Migrations for \'example1\':' in out.getvalue())
+
+    def test_makemigrations_empty(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                os.makedirs(self.migration_dir)
+                open(os.path.join(self.migration_dir, '__init__.py'), 'w')
+                shutil.copy(self.migration_example, self.migration_file)
+                args = copy(DEFAULT_ARGS)
+                args['makemigrations'] = True
+                args['--empty'] = True
+                core(args, self.application)
+        if DJANGO_1_6:
+            self.assertTrue('You must now edit this migration' in err.getvalue())
+        else:
+            self.assertTrue('Migrations for \'example1\':' in out.getvalue())
 
     @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
                      reason='check only for Django < 1.7')
