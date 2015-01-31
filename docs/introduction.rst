@@ -17,7 +17,7 @@ Try it::
 
     djangocms-helper <myapp> test --cms  # change <myapp> to your application's actual name
 
-It'll spawn it's virtual project and run your tests in it. You should see some output along these
+It'll spawn its virtual project and run your tests in it. You should see some output along these
 lines (there may well be some other output before it gets to this stage)::
 
     Creating test database for alias 'default'...
@@ -87,7 +87,7 @@ Integrated runner
 
 In some contexts running commands by using the complete syntax can be clunky or unfeasible.
 
-django CMS Helper contains function that allow to run the commands with a much shorter syntax::
+django CMS Helper contains function that allows to run the commands with a much shorter syntax::
 
     python cms_helper.py
 

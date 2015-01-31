@@ -21,6 +21,16 @@ directory and providing the settings as a dictionary named ``HELPER_SETTINGS``::
         ...
     }
 
+An alternative, and possibly clearer form is::
+
+    HELPER_SETTINGS=dict(
+        INSTALLED_APPS=[
+            'any_django_app',
+        ],
+        ANY_SETTING=False,
+        ...
+    )
+
 The settings provided are then merged with the default ones (user-provided ones overrides
 the default, except ``INSTALLED_APPS``, ``TEMPLATE_CONTEXT_PROCESSORS`` and ``MIDDLEWARE_CLASSES``
 which are appended to the default ones.
@@ -97,3 +107,26 @@ Middlewares::
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
+
+On Django 1.7 ``MIGRATION_MODULES`` setting is added, according to the django CMS version used.
+
+When using Django CMS 3.0::
+
+    CMS_1_7_MIGRATIONS = {
+        'cms': 'cms.migrations_django',
+        'menus': 'menus.migrations_django',
+        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+        'filer': 'filer.migrations_django',
+        'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
+        'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
+        'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
+    }
+
+In django CMS develop (3.1)::
+
+        CMS_1_7_MIGRATIONS = {
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+            'filer': 'filer.migrations_django',
+            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
+            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
+            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',

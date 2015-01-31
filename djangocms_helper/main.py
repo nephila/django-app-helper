@@ -20,7 +20,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>]
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [options]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
@@ -37,6 +37,7 @@ Options:
     --cms                       Add support for CMS in the project configuration.
     --merge                     Merge migrations
     --failfast                  Stop tests on first failure.
+    --native                    Use the native test command, instead of the djangocms-helper on
     --nose-runner               Use django-nose as test runner
     --simple-runner             User DjangoTestSuiteRunner
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
@@ -269,9 +270,14 @@ def core(args, application):
                         runner = args['--runner']
                     else:
                         if DJANGO_1_5:
-                            runner = 'django.test.simple.DjangoTestSuiteRunner'
+                            try:
+                                import discover_runner
+                                runner = 'discover_runner.DiscoverRunner'
+                            except ImportError:
+                                runner = 'django.test.simple.DjangoTestSuiteRunner'
                         else:
                             runner = 'django.test.runner.DiscoverRunner'
+
                     # make "Address already in use" errors less likely, see Django
                     # docs for more details on this env variable.
                     os.environ.setdefault(
@@ -330,6 +336,10 @@ def main(argv=sys.argv):  # pragma: no cover
                 raise
             args = docopt(__doc__, argv[1:3], version=application_module.__version__)
         args['options'] = [argv[0]] + argv[2:]
+        if args['test'] and '--native' in args['options']:
+            args['test'] = False
+            args['<command>'] = 'test'
+            args['options'].remove('--native')
         core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)

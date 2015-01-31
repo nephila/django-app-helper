@@ -37,6 +37,7 @@ DEFAULT_ARGS = {
     '--merge': False,
     '--dry-run': False,
     '--empty': False,
+    '--native': False,
     '--bind': '',
     '--port': '',
     '<test-label>': '',
@@ -330,6 +331,22 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
         self.assertTrue('Ran 3 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason="Example test non discoverable in Python 2.6")
+    def test_testrun_native(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['<command>'] = 'test'
+                args['--cms'] = False
+                args['--native'] = True
+                args['--extra-settings'] = 'cms_helper_extra_runner.py'
+                core(args, self.application)
+        self.assertTrue('Ran 3 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):

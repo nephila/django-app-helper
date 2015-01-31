@@ -3,6 +3,15 @@
 History
 -------
 
+0.8.0 (unreleased)
+++++++++++++++++++
+
+* Add --native option to use native test command instead of djangocms-helper one
+* Use django-discover-runner on Django 1.5 if present
+* Better handling of runner options
+* Add support for empty/dry-run arguments to makemigrations
+* Add USE_CMS flag to settings when using django CMS configuration
+
 0.7.0 (2015-01-22)
 ++++++++++++++++++
 

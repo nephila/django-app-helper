@@ -142,7 +142,29 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     import dj_database_url
     from .default_settings import get_default_settings
 
-    if args['--cms']:
+    try:
+        extra_settings_file = args.get('--extra-settings')
+        if not extra_settings_file:
+            extra_settings_file = HELPER_FILE
+        if extra_settings_file[-3:] != '.py':
+            extra_settings_file = '%s.py' % extra_settings_file
+        extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
+    except (IOError, AttributeError):
+        extra_settings = None
+    default_name = ':memory:' if not args['server'] else 'local.sqlite'
+    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    migrate = args.get('--migrate', False)
+    configs = {
+        'DATABASES': {'default': dj_database_url.parse(db_url)},
+        'STATIC_ROOT': STATIC_ROOT,
+        'MEDIA_ROOT': MEDIA_ROOT,
+        'USE_TZ': True,
+        'SOUTH_TESTS_MIGRATE': migrate,
+        'USE_CMS': args['--cms'],
+        'BASE_APPLICATION': application
+    }
+
+    if configs['USE_CMS'] or getattr(extra_settings, 'USE_CMS', False):
         CMS_APPS = [
             'cms',
             'menus',
@@ -174,35 +196,25 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_1_7_MIGRATIONS = {
             'cms': 'cms.migrations_django',
             'menus': 'menus.migrations_django',
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+            'filer': 'filer.migrations_django',
+            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
+            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
+            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
         }
     else:
-        CMS_1_7_MIGRATIONS = {}
+        CMS_1_7_MIGRATIONS = {
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+            'filer': 'filer.migrations_django',
+            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
+            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
+            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
+        }
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
-    default_name = ':memory:' if not args['server'] else 'local.sqlite'
 
-    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
-    migrate = args.get('--migrate', False)
-    configs = {
-        'DATABASES': {'default': dj_database_url.parse(db_url)},
-        'STATIC_ROOT': STATIC_ROOT,
-        'MEDIA_ROOT': MEDIA_ROOT,
-        'USE_TZ': True,
-        'SOUTH_TESTS_MIGRATE': migrate,
-        'USE_CMS': args['--cms'],
-        'BASE_APPLICATION': application
-    }
     default_settings.update(configs)
-    try:
-        extra_settings_file = args.get('--extra-settings')
-        if not extra_settings_file:
-            extra_settings_file = HELPER_FILE
-        if extra_settings_file[-3:] != '.py':
-            extra_settings_file = '%s.py' % extra_settings_file
-        extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
-    except (IOError, AttributeError):
-        extra_settings = None
 
     if extra_settings:
         apps = extra_settings.get('INSTALLED_APPS', [])
@@ -214,8 +226,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
         if 'MIDDLEWARE_CLASSES' in extra_settings:
             del(extra_settings['MIDDLEWARE_CLASSES'])
-        if application in default_settings['INSTALLED_APPS'] and application in apps:
-            default_settings['INSTALLED_APPS'].remove(application)
         default_settings.update(extra_settings)
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
@@ -245,6 +255,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     if args['test']:
         default_settings['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
+    if application not in default_settings['INSTALLED_APPS']:
+        default_settings['INSTALLED_APPS'].append(application)
 
     _reset_django(settings)
     settings.configure(**default_settings)
