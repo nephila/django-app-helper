@@ -54,7 +54,9 @@ Runs the application's test suite in django CMS Helper's virtual environment.
 Arguments
 ---------
 
-* ``<test-label>``: a space-separated list of tests to run;
+* ``<test-label>``: a space-separated list of tests to run; test labels depends on the runner
+  test suite building protocol, please, refer to the runner documentation to know the
+  test label format;
 
 Options
 -------
@@ -67,6 +69,8 @@ Options
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
 * ``--nose-runner``: use django nose test suite
 * ``--simple-runner`` use Django DjangoTestSuiteRunner
+* ``--native`` use the native Django command: the use of this option is **incompatible** with
+  the options above.
 
 Test structure
 --------------
@@ -94,11 +98,15 @@ Depending on the used test runner you may need to setup your tests accordingly.
 
 Currently supported test runners are:
 
-* Django's DiscoverRunner (default)
-* Django's DjangoTestSuiteRunner (option ``--simple-runner``)
+* Django's DiscoverRunner (default on Django 1.6+)
+* Django's DjangoTestSuiteRunner (option ``--simple-runner``, default on Django 1.5)
 * Nose's NoseTestSuiteRunner (option ``--nose-runner``)
 
 You can also specify your own custom runner with the ``--runner`` option.
+
+.. note:: When running on Django 1.5,
+          `django-discover-runner <https://github.com/jezdez/django-discover-runner>`_
+          is used as default runner, if no other runner is provided.
 
 
 cms_check
