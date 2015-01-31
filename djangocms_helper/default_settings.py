@@ -14,7 +14,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'django.contrib.admin',
             'djangocms_helper.test_data',
             'django.contrib.messages',
-        ] + CMS_APP + [application],
+        ] + CMS_APP,
         'DATABASES': {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
