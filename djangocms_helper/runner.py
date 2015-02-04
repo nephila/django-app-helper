@@ -23,7 +23,7 @@ def run(app, argv=sys.argv):
 
 def cms(app, argv=sys.argv):
     """
-    Function to invoke to run commanvds in a django CMS environment
+    Function to invoke to run commands in a django CMS environment
 
     :param app: application
     """
