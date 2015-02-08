@@ -2,15 +2,15 @@
 djangocms-helper
 ================
 
-.. image:: https://pypip.in/v/djangocms-helper/badge.png
+.. image:: https://img.shields.io/pypi/v/djangocms-helper.svg
         :target: https://pypi.python.org/pypi/djangocms-helper
         :alt: Latest PyPI version
 
-.. image:: https://travis-ci.org/nephila/djangocms-helper.png?branch=master
+.. image:: https://img.shields.io/travis/nephila/djangocms-helper.svg
         :target: https://travis-ci.org/nephila/djangocms-helper
         :alt: Latest Travis CI build status
 
-.. image:: https://pypip.in/d/djangocms-helper/badge.png
+.. image:: https://img.shields.io/pypi/dm/djangocms-helper.svg
         :target: https://pypi.python.org/pypi/djangocms-helper
         :alt: Monthly downloads
 
