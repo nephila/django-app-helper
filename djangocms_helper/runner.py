@@ -12,12 +12,12 @@ def run(app, argv=sys.argv):
 
     :param app: application
     """
-    if len(argv) == 1:
-        # test argument is given if not argument is passed
-        argv.append('test')
-    if app not in argv:
+    if app not in argv[:2]:
         # app is automatically added if not present
         argv.insert(1, app)
+    if len(argv) < 3 and 'test' not in argv[:2]:
+        # test argument is given if not argument is passed
+        argv.insert(2, 'test')
     runner(argv)
 
 
@@ -31,15 +31,15 @@ def cms(app, argv=sys.argv):
         import cms  # NOQA
     except ImportError:
         print(u"runner.cms is available only if django CMS is installed")
-    if len(argv) == 1:
-        # test argument is given if not argument is passed
-        argv.append('test')
-    if app not in argv:
+    if app not in argv[:2]:
         # app is automatically added if not present
         argv.insert(1, app)
+    if len(argv) < 3 and 'test' not in argv[:2]:
+        # test argument is given if not argument is passed
+        argv.insert(2, 'test')
     if '--cms' not in argv:
         # this is the cms runner, just add the cms argument
-        argv.insert(2, '--cms')
+        argv.append('--cms')
     runner(argv)
 
 

@@ -151,7 +151,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
     except (IOError, AttributeError):
         extra_settings = None
-    default_name = ':memory:' if not args['server'] else 'local.sqlite'
+    default_name = ':memory:' if args['test'] else 'local.sqlite'
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
     migrate = args.get('--migrate', False)
     configs = {
