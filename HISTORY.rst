@@ -3,7 +3,7 @@
 History
 -------
 
-0.8.0 (unreleased)
+0.8.0 (2015-02-26)
 ++++++++++++++++++
 
 * Add --native option to use native test command instead of djangocms-helper one
