@@ -192,27 +192,39 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_PROCESSORS = []
         URLCONF = 'djangocms_helper.urls'
 
-    if CMS_30:
-        CMS_1_7_MIGRATIONS = {
-            'cms': 'cms.migrations_django',
-            'menus': 'menus.migrations_django',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
-            'filer': 'filer.migrations_django',
-            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
-            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
-            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
-        }
-    else:
-        CMS_1_7_MIGRATIONS = {
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
-            'filer': 'filer.migrations_django',
-            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
-            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
-            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
-        }
+    CMS_1_7_MIGRATIONS = {}
+    try:
+        import cms.migrations_django
+        CMS_1_7_MIGRATIONS['cms'] = 'cms.migrations_django'
+        CMS_1_7_MIGRATIONS['menus'] = 'menus.migrations_django'
+    except ImportError:
+        # we're using the Django 1.7 migrations
+        pass
+    try:
+        import djangocms_text_ckeditor.migrations_django
+        CMS_1_7_MIGRATIONS['djangocms_text_ckeditor'] = 'djangocms_text_ckeditor.migrations_django'
+    except ImportError:
+        # we're using the Django 1.7 migrations
+        pass
+    try:
+        import filer.migrations_django
+        CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
+    except ImportError:
+        # we're using the Django 1.7 migrations
+        pass
+    try:
+        import cmsplugin_filer_image.migrations_django
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
+    except ImportError:
+        # we're using the Django 1.7 migrations
+        pass
+
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
+
 
     default_settings.update(configs)
 
@@ -235,6 +247,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         default_settings['INSTALLED_APPS'].append('south')
     elif args['--cms']:
         default_settings['MIGRATION_MODULES'].update(CMS_1_7_MIGRATIONS)
+
     if CMS_31:
         if 'treebeard' not in default_settings['INSTALLED_APPS']:
             default_settings['INSTALLED_APPS'].append('treebeard')
@@ -245,6 +258,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         if ('cms' in default_settings['INSTALLED_APPS'] and
                 'mptt' not in default_settings['INSTALLED_APPS']):
             default_settings['INSTALLED_APPS'].append('mptt')
+    print(default_settings['MIGRATION_MODULES'])
 
     # Support for custom user models
     if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in os.environ:
