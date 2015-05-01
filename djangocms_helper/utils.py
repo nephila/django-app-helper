@@ -224,8 +224,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
                                             CMS_MIDDLEWARE, CMS_APP_STYLE,
                                             URLCONF, application)
-
-
     default_settings.update(configs)
 
     if extra_settings:
@@ -258,7 +256,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         if ('cms' in default_settings['INSTALLED_APPS'] and
                 'mptt' not in default_settings['INSTALLED_APPS']):
             default_settings['INSTALLED_APPS'].append('mptt')
-    print(default_settings['MIGRATION_MODULES'])
 
     # Support for custom user models
     if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in os.environ:
