@@ -17,6 +17,7 @@ from django.utils.six import StringIO
 
 try:
     import cms  # NOQA
+    CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:
@@ -27,6 +28,7 @@ DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
 DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
+DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
 
 
 from . import HELPER_FILE
@@ -209,7 +211,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     try:
         import filer.migrations_django
         CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
-    except ImportError:
+    except:
         # we're using the Django 1.7 migrations
         pass
     try:
