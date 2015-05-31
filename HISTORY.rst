@@ -3,6 +3,13 @@
 History
 -------
 
+0.8.1 (2015-05-31)
+++++++++++++++++++
+
+* Add basic support for Django 1.8 / django CMS develop
+* Code cleanups
+* Smarter migration layout detection
+
 0.8.0 (2015-03-22)
 ++++++++++++++++++
 
