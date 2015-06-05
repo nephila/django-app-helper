@@ -81,10 +81,11 @@ class BaseTestCase(TestCase):
             if main_data['publish']:
                 page.publish(self.languages[0])
             for lang in self.languages[1:]:
-                create_title(language=lang, title=page_data[lang]['title'],
-                             page=page)
-                if page_data[lang]['publish']:
-                    page.publish(lang)
+                if lang in page_data:
+                    create_title(language=lang, title=page_data[lang]['title'],
+                                 page=page)
+                    if page_data[lang]['publish']:
+                        page.publish(lang)
             pages.append(page.get_draft_object())
         return pages
 
