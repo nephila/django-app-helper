@@ -18,6 +18,7 @@ def run(app, argv=sys.argv):
     if len(argv) < 3 and 'test' not in argv[:2]:
         # test argument is given if not argument is passed
         argv.insert(2, 'test')
+        argv.append('--migrate')
     runner(argv)
 
 
@@ -37,6 +38,7 @@ def cms(app, argv=sys.argv):
     if len(argv) < 3 and 'test' not in argv[:2]:
         # test argument is given if not argument is passed
         argv.insert(2, 'test')
+        argv.append('--migrate')
     if '--cms' not in argv:
         # this is the cms runner, just add the cms argument
         argv.append('--cms')
