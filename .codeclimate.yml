@@ -1,0 +1,9 @@
+languages:
+  Ruby: true
+  JavaScript: true
+  PHP: true
+  Python: true
+exclude_paths:
+ - "djangocms_helper/test_data/*"
+ - "djangocms_helper/test_utils/*"
+ - "djangocms_helper/tests/*"
