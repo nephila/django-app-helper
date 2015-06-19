@@ -56,6 +56,7 @@ class CommandTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        os.environ.setdefault('DATABASE_URL', 'sqlite://localhost/:memory:')
         cls.basedir = os.path.abspath(os.path.join('djangocms_helper', 'test_utils'))
         cls.application = 'example1'
         cls.application_2 = 'example2'
@@ -169,7 +170,6 @@ class CommandTests(unittest.TestCase):
             #self.assertTrue('+ Added field test_field on example1.ExampleModel1' in err.getvalue())
             self.assertTrue('You can now apply this migration' in err.getvalue())
         else:
-            print(out.getvalue())
             self.assertTrue('Migrations for \'example1\':' in out.getvalue())
 
     def test_makemigrations_empty(self):
@@ -331,6 +331,7 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
         self.assertTrue('Ran 3 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
+
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason="Example test non discoverable in Python 2.6")
     def test_testrun_native(self):
