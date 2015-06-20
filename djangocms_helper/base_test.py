@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 import os.path
 
 from django.conf import settings
@@ -75,16 +76,23 @@ class BaseTestCase(TestCase):
         from cms.api import create_page, create_title
         pages = []
         for page_data in self._pages_data:
-            main_data = page_data[self.languages[0]]
-            page = create_page(main_data['title'], main_data['template'],
-                               language=self.languages[0])
-            if main_data['publish']:
-                page.publish(self.languages[0])
+            main_data = deepcopy(page_data[self.languages[0]])
+            if 'publish' in main_data:
+                main_data['published'] = main_data.pop('publish')
+            main_data['language'] = self.languages[0]
+            page = create_page(**main_data)
             for lang in self.languages[1:]:
                 if lang in page_data:
-                    create_title(language=lang, title=page_data[lang]['title'],
-                                 page=page)
-                    if page_data[lang]['publish']:
+                    publish = False
+                    title_data = deepcopy(page_data[lang])
+                    if 'publish' in title_data:
+                        publish = title_data.pop('publish')
+                    if 'published' in title_data:
+                        publish = title_data.pop('published')
+                    title_data['language'] = lang
+                    title_data['page'] = page
+                    create_title(**title_data)
+                    if publish:
                         page.publish(lang)
             pages.append(page.get_draft_object())
         return pages
