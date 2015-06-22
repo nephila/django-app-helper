@@ -15,7 +15,7 @@ import django
 from django.utils.encoding import force_text
 
 from ..main import core, _make_settings
-from ..utils import work_in, captured_output, DJANGO_1_6, temp_dir
+from ..utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_7, temp_dir
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -135,10 +135,16 @@ class CommandTests(unittest.TestCase):
                         self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
                         # New one is added
                         self.assertTrue('djangocms_admin_style' in local_settings.INSTALLED_APPS)
-                        # Existing application is kept
-                        self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
-                        # New one is added
-                        self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
+                        if DJANGO_1_7:
+                            # Existing application is kept
+                            self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
+                            # New one is added
+                            self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
+                        else:
+                            # Existing application is kept
+                            self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
+                            # New one is added
+                            self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
 
     def test_makemigrations(self):
         with work_in(self.basedir):
