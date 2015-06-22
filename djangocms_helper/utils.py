@@ -17,10 +17,12 @@ from django.utils.six import StringIO
 
 try:
     import cms  # NOQA
+    CMS = True
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:
+    CMS = False
     CMS_32 = False
     CMS_31 = False
     CMS_30 = False
@@ -250,16 +252,16 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     elif args['--cms']:
         default_settings['MIGRATION_MODULES'].update(CMS_1_7_MIGRATIONS)
 
-    if CMS_30:
-        if ('cms' in default_settings['INSTALLED_APPS'] and
-                'mptt' not in default_settings['INSTALLED_APPS']):
-            default_settings['INSTALLED_APPS'].append('mptt')
-    else:
-        if 'treebeard' not in default_settings['INSTALLED_APPS']:
-            default_settings['INSTALLED_APPS'].append('treebeard')
-        if ('filer' in default_settings['INSTALLED_APPS'] and
-                'mptt' not in default_settings['INSTALLED_APPS']):
-            default_settings['INSTALLED_APPS'].append('mptt')
+    if 'cms' in default_settings['INSTALLED_APPS']:
+        if CMS_30:
+            if 'mptt' not in default_settings['INSTALLED_APPS']:
+                default_settings['INSTALLED_APPS'].append('mptt')
+        else:
+            if 'treebeard' not in default_settings['INSTALLED_APPS']:
+                default_settings['INSTALLED_APPS'].append('treebeard')
+    if ('filer' in default_settings['INSTALLED_APPS'] and
+            'mptt' not in default_settings['INSTALLED_APPS']):
+        default_settings['INSTALLED_APPS'].append('mptt')
 
     if not DJANGO_1_7:
         default_settings['TEMPLATES'] = [
