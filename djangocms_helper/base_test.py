@@ -39,6 +39,7 @@ class BaseTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         from django.contrib.sites.models import Site
+        super(BaseTestCase, cls).setUpClass()
         cls.request_factory = RequestFactory()
         cls.user = create_user('admin', 'admin@admin.com', 'admin',
                                is_staff=True, is_superuser=True)
@@ -55,6 +56,7 @@ class BaseTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(BaseTestCase, cls).tearDownClass()
         User = get_user_model()
         User.objects.all().delete()
 
