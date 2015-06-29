@@ -41,6 +41,11 @@ setuptools.setup(
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
         'Development Status :: 4 - Beta',
+        'Framework :: Django',
+        'Framework :: Django :: 1.5',
+        'Framework :: Django :: 1.6',
+        'Framework :: Django :: 1.7',
+        'Framework :: Django :: 1.8',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',

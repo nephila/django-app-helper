@@ -17,10 +17,13 @@ from django.utils.six import StringIO
 
 try:
     import cms  # NOQA
+    CMS = True
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:
+    CMS = False
+    CMS_32 = False
     CMS_31 = False
     CMS_30 = False
 
@@ -29,6 +32,7 @@ DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
 DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
 DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
 DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
+DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion('1.10')
 
 
 from . import HELPER_FILE
@@ -248,19 +252,35 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     elif args['--cms']:
         default_settings['MIGRATION_MODULES'].update(CMS_1_7_MIGRATIONS)
 
-    if CMS_31:
-        if 'treebeard' not in default_settings['INSTALLED_APPS']:
-            default_settings['INSTALLED_APPS'].append('treebeard')
-        if ('filer' in default_settings['INSTALLED_APPS'] and 
-                'mptt' not in default_settings['INSTALLED_APPS']):
-            default_settings['INSTALLED_APPS'].append('mptt')
-    else:
-        if ('cms' in default_settings['INSTALLED_APPS'] and
-                'mptt' not in default_settings['INSTALLED_APPS']):
-            default_settings['INSTALLED_APPS'].append('mptt')
+    if 'cms' in default_settings['INSTALLED_APPS']:
+        if CMS_30:
+            if 'mptt' not in default_settings['INSTALLED_APPS']:
+                default_settings['INSTALLED_APPS'].append('mptt')
+        else:
+            if 'treebeard' not in default_settings['INSTALLED_APPS']:
+                default_settings['INSTALLED_APPS'].append('treebeard')
+    if ('filer' in default_settings['INSTALLED_APPS'] and
+            'mptt' not in default_settings['INSTALLED_APPS']):
+        default_settings['INSTALLED_APPS'].append('mptt')
+
+    if not DJANGO_1_7:
+        default_settings['TEMPLATES'] = [
+            {
+                'NAME': 'django',
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+                'OPTIONS': {
+                    'context_processors': default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
+                }
+            }
+        ]
+        if 'TEMPLATE_DIRS' in default_settings:
+            default_settings['TEMPLATES'][0]['DIRS'] = default_settings.pop('TEMPLATE_DIRS')
+        else:
+            default_settings['TEMPLATES'][0]['DIRS'] = []
 
     # Support for custom user models
-    if django.VERSION >= (1, 5) and 'AUTH_USER_MODEL' in os.environ:
+    if 'AUTH_USER_MODEL' in os.environ:
         custom_user_app = os.environ['AUTH_USER_MODEL'].rpartition('.')[0]
         custom_user_model = '.'.join(os.environ['AUTH_USER_MODEL'].split('.')[-2:])
         default_settings['INSTALLED_APPS'].insert(default_settings['INSTALLED_APPS'].index('cms'), custom_user_app)
@@ -275,7 +295,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     settings.configure(**default_settings)
     if not DJANGO_1_6:
         django.setup()
-    if 'south' in settings.INSTALLED_APPS:
+    elif 'south' in settings.INSTALLED_APPS:
         from south.management.commands import patch_for_test_db_setup
         patch_for_test_db_setup()
     reload_urls(settings)
