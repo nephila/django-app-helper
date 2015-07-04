@@ -182,7 +182,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_PROCESSORS = [
             'cms.context_processors.cms_settings',
             'sekizai.context_processors.sekizai',
-            'django.contrib.messages.context_processors.messages',
         ]
         CMS_MIDDLEWARE = [
             'cms.middleware.language.LanguageCookieMiddleware',

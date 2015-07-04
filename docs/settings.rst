@@ -64,6 +64,10 @@ Template context processors::
     'django.core.context_processors.media',
     'django.core.context_processors.static',
 
+
+.. note:: On Django 1.8 these are translated to the new path ``django.template.context_processors.*``
+
+
 Middlewares::
 
     'django.middleware.http.ConditionalGetMiddleware',
@@ -98,7 +102,6 @@ Template context processors::
 
     'cms.context_processors.cms_settings',
     'sekizai.context_processors.sekizai',
-    'django.contrib.messages.context_processors.messages',
 
 
 Middlewares::
