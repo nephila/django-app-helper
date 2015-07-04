@@ -98,6 +98,8 @@ Applications::
     'menus',
     'sekizai',
 
+When django CMS 3.1+ is used, ``treebeard`` is configured instead of ``mptt``.
+
 Template context processors::
 
     'cms.context_processors.cms_settings',
@@ -111,25 +113,6 @@ Middlewares::
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
 
-On Django 1.7 ``MIGRATION_MODULES`` setting is added, according to the django CMS version used.
-
-When using Django CMS 3.0::
-
-    CMS_1_7_MIGRATIONS = {
-        'cms': 'cms.migrations_django',
-        'menus': 'menus.migrations_django',
-        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
-        'filer': 'filer.migrations_django',
-        'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
-        'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
-        'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
-    }
-
-In django CMS develop (3.1)::
-
-        CMS_1_7_MIGRATIONS = {
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
-            'filer': 'filer.migrations_django',
-            'cmsplugin_filer_image': 'cmsplugin_filer_image.migrations_django',
-            'cmsplugin_filer_file': 'cmsplugin_filer_file.migrations_django',
-            'cmsplugin_filer_folder': 'cmsplugin_filer_folder.migrations_django',
+``djangocms-helper`` discovers automtically the South / Django migrations layout and configure
+the settings accordingly. As of the current version ``filer``, ``djangocms_text_ckeditor``,
+``cmplugin_filer`` are supported.
