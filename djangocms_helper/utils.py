@@ -182,7 +182,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_PROCESSORS = [
             'cms.context_processors.cms_settings',
             'sekizai.context_processors.sekizai',
-            'django.contrib.messages.context_processors.messages',
         ]
         CMS_MIDDLEWARE = [
             'cms.middleware.language.LanguageCookieMiddleware',
@@ -270,7 +269,10 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
                 'APP_DIRS': True,
                 'OPTIONS': {
-                    'context_processors': default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
+                    'context_processors': [
+                        template_processor.replace('django.core', 'django.template')
+                        for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
+                    ]
                 }
             }
         ]

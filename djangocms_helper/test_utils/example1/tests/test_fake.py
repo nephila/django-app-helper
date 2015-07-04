@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 try:
     from djangocms_helper.base_test import BaseTestCase
@@ -24,6 +28,20 @@ try:
             if 'cms' in settings.INSTALLED_APPS:
                 pages = self.get_pages()
                 self.assertEqual(len(pages), 2)
+
+        def test_get(self):
+            from django.conf import settings
+            if 'cms' not in settings.INSTALLED_APPS:
+                raise unittest.SkipTest('django CMS not available, skipping test')
+            from cms.api import add_plugin
+            pages = self.get_pages()
+            add_plugin(placeholder=pages[0].placeholders.get(slot='content'),
+                       plugin_type='FakePlugin', language='en')
+            pages[0].publish('en')
+            response = self.client.get('/en/')
+            self.assertContains(response, 'fake text')
+            self.assertContains(response, 'body{font-weight: bold;}')
+            self.assertContains(response, 'Page title')
 
         def test_requests(self):
             from django.conf import settings
