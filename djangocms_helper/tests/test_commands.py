@@ -142,9 +142,9 @@ class CommandTests(unittest.TestCase):
                             self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
                         else:
                             # Existing application is kept
-                            self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
+                            self.assertTrue('django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
                             # New one is added
-                            self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
+                            self.assertTrue('django.template.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
 
     def test_makemigrations(self):
         with work_in(self.basedir):
@@ -317,7 +317,7 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 3 tests in' in err.getvalue())
+        self.assertTrue('Ran 4 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -335,7 +335,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 3 tests in' in err.getvalue())
+        self.assertTrue('Ran 4 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -353,7 +353,7 @@ class CommandTests(unittest.TestCase):
                 args['--native'] = True
                 args['--extra-settings'] = 'cms_helper_extra_runner.py'
                 core(args, self.application)
-        self.assertTrue('Ran 3 tests in' in err.getvalue())
+        self.assertTrue('Ran 4 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):
