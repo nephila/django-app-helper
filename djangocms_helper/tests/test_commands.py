@@ -6,6 +6,8 @@ import os
 import os.path
 import shutil
 import sys
+from djangocms_helper.default_settings import get_boilerplates_settings
+
 try:
     import unittest2 as unittest
 except ImportError:
@@ -35,6 +37,7 @@ DEFAULT_ARGS = {
     '--cms': True,
     '--failfast': False,
     '--merge': False,
+    '--boilerplate': False,
     '--dry-run': False,
     '--empty': False,
     '--native': False,
@@ -125,6 +128,7 @@ class CommandTests(unittest.TestCase):
                         # Testing that cms_helper.py in custom project is loaded
                         self.assertEqual(local_settings.TIME_ZONE, 'Europe/Rome')
 
+                        args['--boilerplate'] = True
                         args['--extra-settings'] = 'cms_helper_extra.py'
                         local_settings = _make_settings(args, self.application,
                                                         settings,
@@ -135,16 +139,36 @@ class CommandTests(unittest.TestCase):
                         self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
                         # New one is added
                         self.assertTrue('djangocms_admin_style' in local_settings.INSTALLED_APPS)
+
+                        boilerplate_settings = get_boilerplates_settings()
+
                         if DJANGO_1_7:
+                            # Check the loaders
+                            self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATE_LOADERS)
                             # Existing application is kept
                             self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
                             # New one is added
                             self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
+                            # Check for aldryn boilerplates
+                            for name, value in boilerplate_settings.items():
+                                if type(value) in (list, tuple):
+                                    self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
+                                else:
+                                    self.assertTrue(value in getattr(local_settings, name))
                         else:
                             # Existing application is kept
                             self.assertTrue('django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
                             # New one is added
                             self.assertTrue('django.template.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
+                            # Check for aldryn boilerplates
+                            for name, value in boilerplate_settings.items():
+                                if not name.startswith('TEMPLATE'):
+                                    if type(value) in (list, tuple):
+                                        self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
+                                    else:
+                                        self.assertTrue(value in getattr(local_settings, name))
+                                elif name == 'TEMPLATE_CONTEXT_PROCESSORS':
+                                    self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['context_processors']).intersection(set(value)))
 
     def test_makemigrations(self):
         with work_in(self.basedir):
@@ -265,12 +289,15 @@ class CommandTests(unittest.TestCase):
     def test_any_command_check(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                pass
                 args = copy(DEFAULT_ARGS)
                 args['<command>'] = 'check'
                 args['options'] = ['helper', 'check', '--extra-settings=cms_helper_extra.py']
                 core(args, self.application)
-        self.assertTrue('no issues' in out.getvalue())
+        if DJANGO_1_7:
+            # Django 1.7 complains about the test runner ... go figure ...
+            self.assertTrue('1 issue' in err.getvalue())
+        else:
+            self.assertTrue('no issues' in out.getvalue())
 
     def test_any_command_compilemessages(self):
         with work_in(os.path.join(self.basedir, self.application)):
