@@ -285,12 +285,12 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             {
                 'NAME': 'django',
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'APP_DIRS': True,
                 'OPTIONS': {
                     'context_processors': [
                         template_processor.replace('django.core', 'django.template')
                         for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
-                    ]
+                    ],
+                    'loaders': default_settings.pop('TEMPLATE_LOADERS')
                 }
             }
         ]

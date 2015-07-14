@@ -156,6 +156,8 @@ class CommandTests(unittest.TestCase):
                                 else:
                                     self.assertTrue(value in getattr(local_settings, name))
                         else:
+                            # Check the loaders
+                            self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
                             # Existing application is kept
                             self.assertTrue('django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
                             # New one is added
@@ -169,6 +171,8 @@ class CommandTests(unittest.TestCase):
                                         self.assertTrue(value in getattr(local_settings, name))
                                 elif name == 'TEMPLATE_CONTEXT_PROCESSORS':
                                     self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['context_processors']).intersection(set(value)))
+                                elif name == 'TEMPLATE_LOADERS':
+                                    self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['loaders']).intersection(set(value)))
 
     def test_makemigrations(self):
         with work_in(self.basedir):
