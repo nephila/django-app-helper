@@ -112,15 +112,7 @@ def _reset_django(settings):
     """
     if settings._wrapped != empty:
         clear_url_caches()
-        if DJANGO_1_5:
-            from django.db.models.loading import cache as apps
-            apps.app_store = SortedDict()
-            apps.loaded = False
-            apps.handled = {}
-            apps.postponed = []
-            apps.nesting_level = 0
-            apps._get_models_cache = {}
-        elif DJANGO_1_6:
+        if DJANGO_1_6:
             from django.db.models.loading import cache as apps
             apps.app_store = SortedDict()
             apps.loaded = False

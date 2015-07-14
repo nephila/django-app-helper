@@ -11,7 +11,7 @@ from django.utils.encoding import force_text
 from django.utils.importlib import import_module
 
 from . import __version__
-from .utils import (work_in, DJANGO_1_6, DJANGO_1_5, temp_dir, _make_settings,
+from .utils import (work_in, DJANGO_1_6, temp_dir, _make_settings,
                     create_user, _create_db, get_user_model)
 
 __doc__ = '''django CMS applications development helper script.
@@ -108,10 +108,7 @@ def makemessages(application):
     from django.core.management import call_command
 
     with work_in(application):
-        if DJANGO_1_5:
-            call_command('makemessages', locale='en')
-        else:
-            call_command('makemessages', locale=('en',))
+        call_command('makemessages', locale=('en',))
 
 
 def cms_check(migrate_cmd=False):
@@ -270,14 +267,7 @@ def core(args, application):
                     elif args['--runner']:
                         runner = args['--runner']
                     else:
-                        if DJANGO_1_5:
-                            try:
-                                import discover_runner
-                                runner = 'discover_runner.DiscoverRunner'
-                            except ImportError:
-                                runner = 'django.test.simple.DjangoTestSuiteRunner'
-                        else:
-                            runner = 'django.test.runner.DiscoverRunner'
+                        runner = 'django.test.runner.DiscoverRunner'
 
                     # make "Address already in use" errors less likely, see Django
                     # docs for more details on this env variable.
