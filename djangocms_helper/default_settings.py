@@ -21,6 +21,14 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
                 'NAME': ':memory:',
             }
         },
+        'TEMPLATE_LOADERS': [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        ],
+        'STATICFILES_FINDERS': [
+            'django.contrib.staticfiles.finders.FileSystemFinder',
+            'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        ],
         'TEMPLATE_CONTEXT_PROCESSORS': [
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
@@ -53,4 +61,21 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             ('page.html', 'Normal page'),
         ),
         'MIGRATION_MODULES': {},
+    }
+
+def get_boilerplates_settings():
+    return {
+        'STATICFILES_FINDERS': [
+            'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
+        ],
+        'TEMPLATE_LOADERS': [
+            'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
+        ],
+        'TEMPLATE_CONTEXT_PROCESSORS': [
+            'aldryn_boilerplates.context_processors.boilerplate',
+        ],
+        'ALDRYN_BOILERPLATE_NAME': 'bootstrap3',
+        'INSTALLED_APPS': [
+            'aldryn_boilerplates'
+        ]
     }

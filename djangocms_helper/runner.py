@@ -6,7 +6,7 @@ import sys
 from . import HELPER_FILE
 
 
-def run(app, argv=sys.argv):
+def run(app, argv=sys.argv, extra_args=None):
     """
     Function to invoke to run commands in a plain django environment
 
@@ -20,10 +20,12 @@ def run(app, argv=sys.argv):
         argv.insert(2, 'test')
     if 'test' in argv and not '--migrate' in argv:
         argv.append('--migrate')
+    if extra_args:
+        argv.extend(extra_args)
     runner(argv)
 
 
-def cms(app, argv=sys.argv):
+def cms(app, argv=sys.argv, extra_args=None):
     """
     Function to invoke to run commands in a django CMS environment
 
@@ -44,6 +46,8 @@ def cms(app, argv=sys.argv):
         argv.append('--cms')
     if 'test' in argv and not '--migrate' in argv:
         argv.append('--migrate')
+    if extra_args:
+        argv.extend(extra_args)
     runner(argv)
 
 

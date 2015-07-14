@@ -146,7 +146,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     :return:
     """
     import dj_database_url
-    from .default_settings import get_default_settings
+    from .default_settings import get_default_settings, get_boilerplates_settings
 
     try:
         extra_settings_file = args.get('--extra-settings')
@@ -261,6 +261,24 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if ('filer' in default_settings['INSTALLED_APPS'] and
             'mptt' not in default_settings['INSTALLED_APPS']):
         default_settings['INSTALLED_APPS'].append('mptt')
+
+    if args['--boilerplate']:
+        boilerplate_settings = get_boilerplates_settings()
+
+        for item in boilerplate_settings['STATICFILES_FINDERS']:
+            if item not in default_settings['STATICFILES_FINDERS']:
+                default_settings['STATICFILES_FINDERS'].insert(default_settings['STATICFILES_FINDERS'].index('django.contrib.staticfiles.finders.AppDirectoriesFinder'), item)
+        del boilerplate_settings['STATICFILES_FINDERS']
+
+        for item in boilerplate_settings['TEMPLATE_LOADERS']:
+            if item not in default_settings['TEMPLATE_LOADERS']:
+                default_settings['TEMPLATE_LOADERS'].insert(default_settings['TEMPLATE_LOADERS'].index('django.template.loaders.app_directories.Loader'), item)
+        del boilerplate_settings['TEMPLATE_LOADERS']
+
+        for setting in ('INSTALLED_APPS', 'TEMPLATE_CONTEXT_PROCESSORS'):
+            default_settings[setting].extend(boilerplate_settings[setting])
+            del boilerplate_settings[setting]
+        default_settings.update(boilerplate_settings)
 
     if not DJANGO_1_7:
         default_settings['TEMPLATES'] = [
