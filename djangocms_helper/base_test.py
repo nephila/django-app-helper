@@ -236,7 +236,7 @@ class BaseTestCase(TestCase):
             mid.process_request(request)
         return request
 
-    def get_request(self, page, lang, user=None, path=None, use_middlewares=False):
+    def get_request(self, page, lang, user=None, path=None, use_middlewares=False, secure=False):
         """
         Create a GET request for the given page and language
 
@@ -245,13 +245,15 @@ class BaseTestCase(TestCase):
         :param user: current user
         :param path: path (if different from the current page path)
         :param use_middlewares: pass the request through configured middlewares.
+        :param secure: create HTTPS request
         :return: request
         """
         path = path or page and page.get_absolute_url(lang)
-        request = self.request_factory.get(path)
+        request = self.request_factory.get(path, secure=secure)
         return self._prepare_request(request, page, user, lang, use_middlewares)
 
-    def post_request(self, page, lang, data, user=None, path=None, use_middlewares=False):
+    def post_request(self, page, lang, data, user=None, path=None, use_middlewares=False,
+                     secure=False):
         """
         Create a POST request for the given page and language with CSRF disabled
 
@@ -261,14 +263,15 @@ class BaseTestCase(TestCase):
         :param user: current user
         :param path: path (if different from the current page path)
         :param use_middlewares: pass the request through configured middlewares.
+        :param secure: create HTTPS request
         :return: request
         """
         path = path or page and page.get_absolute_url(lang)
-        request = self.request_factory.post(path, data)
+        request = self.request_factory.post(path, data, secure=secure)
         return self._prepare_request(request, page, user, lang, use_middlewares)
 
     def get_page_request(self, page, user, path=None, edit=False, lang='en',
-                         use_middlewares=False):
+                         use_middlewares=False, secure=False):
         """
         Create a GET request for the given page suitable for use the
         django CMS toolbar
@@ -282,6 +285,7 @@ class BaseTestCase(TestCase):
         :param edit: whether enabling editing mode
         :param lang: request language
         :param use_middlewares: pass the request through configured middlewares.
+        :param secure: create HTTPS request
         :return: request
         """
         from cms.utils.conf import get_cms_setting
@@ -289,7 +293,7 @@ class BaseTestCase(TestCase):
         path = path or page and page.get_absolute_url(lang)
         if edit:
             path = '{0}?{1}'.format(path, edit_on)
-        request = self.request_factory.get(path)
+        request = self.request_factory.get(path, secure=secure)
         return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True)
 
     def create_image(self, mode='RGB', size=(800, 600)):
