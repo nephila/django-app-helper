@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 import os.path
+import shutil
+import sys
+from contextlib import contextmanager
+from copy import deepcopy
+from tempfile import mkdtemp
 
 from django.conf import settings
+from django.core.handlers.base import BaseHandler
+from django.core.urlresolvers import clear_url_caches
 from django.http import SimpleCookie
 from django.test import TestCase, RequestFactory
 from django.utils.six import StringIO
@@ -71,19 +77,23 @@ class BaseTestCase(TestCase):
         return self._pages_data
 
     def get_pages(self):
+        return self.create_pages(self._pages_data, self.languages)
+
+    @staticmethod
+    def create_pages(source, languages):
         """
         Build pages according to the pages data provided by :py:meth:`get_pages_data`
         and returns the list of the draft version of each
         """
         from cms.api import create_page, create_title
         pages = []
-        for page_data in self._pages_data:
-            main_data = deepcopy(page_data[self.languages[0]])
+        for page_data in source:
+            main_data = deepcopy(page_data[languages[0]])
             if 'publish' in main_data:
                 main_data['published'] = main_data.pop('publish')
-            main_data['language'] = self.languages[0]
+            main_data['language'] = languages[0]
             page = create_page(**main_data)
-            for lang in self.languages[1:]:
+            for lang in languages[1:]:
                 if lang in page_data:
                     publish = False
                     title_data = deepcopy(page_data[lang])
@@ -99,7 +109,46 @@ class BaseTestCase(TestCase):
             pages.append(page.get_draft_object())
         return pages
 
-    def get_request(self, page, lang):
+    @staticmethod
+    def reload_urlconf(urlconf=None):
+        if 'cms.urls' in sys.modules:
+            reload(sys.modules['cms.urls'])
+        if urlconf is None:
+            urlconf = settings.ROOT_URLCONF
+        if urlconf in sys.modules:
+            reload(sys.modules[urlconf])
+        clear_url_caches()
+        try:
+            from cms.appresolver import clear_app_resolvers, get_app_patterns
+            clear_app_resolvers()
+            get_app_patterns()
+        except ImportError:
+            pass
+
+    def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False):
+        request.current_page = page
+        request.user = user
+        request.session = {}
+        request.cookies = SimpleCookie()
+        request.errors = StringIO()
+        request.LANGUAGE_CODE = lang
+        if page:
+            request.current_page = page
+        # Let's use middleware in case requested, otherwise just use CMS toolbar if needed
+        if use_middlewares:
+            handler = BaseHandler()
+            handler.load_middleware()
+            for middleware_method in handler._request_middleware:
+                if middleware_method(request):
+                    raise Exception(u'Couldn\'t create request mock object -'
+                                    u'request middleware returned a response')
+        elif use_toolbar:
+            from cms.middleware.toolbar import ToolbarMiddleware
+            mid = ToolbarMiddleware()
+            mid.process_request(request)
+        return request
+
+    def get_request(self, page, lang, user=None, path=None, use_middlewares=False):
         """
         Create a GET request for the given page and language
 
@@ -107,61 +156,57 @@ class BaseTestCase(TestCase):
         :param lang: request language
         :return: request
         """
-        request = self.request_factory.get(page.get_path(lang))
-        request.current_page = page
-        request.user = self.user
-        request.session = {}
-        request.cookies = SimpleCookie()
-        request.errors = StringIO()
-        return request
+        path = path or page and page.get_absolute_url(lang)
+        request = self.request_factory.get(path)
+        return self._prepare_request(request, page, user, lang, use_middlewares)
 
-    def post_request(self, page, lang, data):
+    def post_request(self, page, lang, data, user=None, path=None, use_middlewares=False):
         """
         Create a POST request for the given page and language with CSRF disabled
 
         :param page: current page object
         :param lang: request language
+        :param data: POST payload
+        :param user: current user
+        :param path: path (if different from the current page path)
+        :param use_middlewares: whether go through all configured middlewares.
         :return: request
         """
-        request = self.request_factory.post(page.get_path(lang), data)
-        request.current_page = page
-        request.user = self.user
-        request.session = {}
-        request.cookies = SimpleCookie()
-        request.errors = StringIO()
-        request._dont_enforce_csrf_checks = True
-        return request
+        path = path or page and page.get_absolute_url(lang)
+        request = self.request_factory.post(path, data)
+        return self._prepare_request(request, page, user, lang, use_middlewares)
 
-    def get_page_request(self, page, user, path=None, edit=False, lang='en'):
+    def get_page_request(self, page, user, path=None, edit=False, lang='en', use_middlewares=False):
         """
         Createds a GET request for the given page suitable for use the
         django CMS toolbar
 
+        This method requires django CMS installed to work. It will raise an ImportError otherwise;
+        not a big deal as this method makes sense only in a django CMS environment
+
         :param page: current page object
         :param user: current user
         :param path: path (if different from the current page path)
-        :param edit: editing mode
+        :param edit: whether enabling editing mode
         :param lang: request language
+        :param use_middlewares: whether go through all configured middlewares.
         :return: request
         """
-        from cms.middleware.toolbar import ToolbarMiddleware
-        path = path or page and page.get_absolute_url()
+        from cms.utils.conf import get_cms_setting
+        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        path = path or page and page.get_absolute_url(lang)
         if edit:
-            path += '?edit'
-        request = RequestFactory().get(path)
-        request.session = {}
-        request.user = user
-        request.LANGUAGE_CODE = lang
-        if edit:
-            request.GET = {'edit': None}
-        else:
-            request.GET = {'edit_off': None}
-        request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
-        return request
+            path = '{0}?{1}'.format(path, edit_on)
+        request = self.request_factory.get(path)
+        return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True)
 
     def reload_model(self, obj):
+        """
+        Reload a models instance from database
+        :param obj: model instance to reload
+        :return:
+        """
         return obj.__class__.objects.get(pk=obj.pk)
 
     def create_image(self, mode='RGB', size=(800, 600)):
@@ -224,3 +269,14 @@ class BaseTestCase(TestCase):
         self.filer_image = Image.objects.create(owner=self.user, file=file_obj,
                                                 original_filename=self.image_name)
         return self.filer_image
+
+    @contextmanager
+    def temp_dir(self):
+        """
+        Context manager to operate on a temporary directory
+        :return:
+        """
+        name = mkdtemp()
+        yield name
+        shutil.rmtree(name)
+
