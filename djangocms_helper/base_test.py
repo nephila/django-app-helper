@@ -12,6 +12,7 @@ from django.core.urlresolvers import clear_url_caches
 from django.http import SimpleCookie
 from django.test import TestCase, RequestFactory
 from django.utils.six import StringIO
+from django.utils.six.moves import reload_module
 
 from .utils import create_user, get_user_model
 
@@ -112,11 +113,11 @@ class BaseTestCase(TestCase):
     @staticmethod
     def reload_urlconf(urlconf=None):
         if 'cms.urls' in sys.modules:
-            reload(sys.modules['cms.urls'])
+            reload_module(sys.modules['cms.urls'])
         if urlconf is None:
             urlconf = settings.ROOT_URLCONF
         if urlconf in sys.modules:
-            reload(sys.modules[urlconf])
+            reload_module(sys.modules[urlconf])
         clear_url_caches()
         try:
             from cms.appresolver import clear_app_resolvers, get_app_patterns
