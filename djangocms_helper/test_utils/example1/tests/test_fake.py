@@ -49,11 +49,11 @@ try:
                 pages = self.get_pages()
 
                 request = self.get_request(pages[1], 'en')
-                self.assertEqual(request.path, u'/second-page')
+                self.assertEqual(request.path, u'/en/second-page/')
                 self.assertEqual(request.META['REQUEST_METHOD'], 'GET')
 
                 request = self.post_request(pages[1], 'en', data={'payload': 1})
-                self.assertEqual(request.path, u'/second-page')
+                self.assertEqual(request.path, u'/en/second-page/')
                 self.assertEqual(request.META['REQUEST_METHOD'], 'POST')
                 self.assertEqual(request.POST.get('payload'), u'1')
 
