@@ -1,6 +1,6 @@
 """djangocms-helper - Helpers for django CMS plugin development"""
 
-__version__ = '0.8.2dev1'
+__version__ = '0.9.0.dev1'
 __author__ = 'Iacopo Spalletti <i.spalletti@nephila.it>'
 __all__ = ['runner']
  

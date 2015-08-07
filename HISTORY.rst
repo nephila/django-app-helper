@@ -3,6 +3,16 @@
 History
 -------
 
+0.9.0 (unreleased)
+++++++++++++++++++
+
+* Remove support for Django 1.5
+* Fix support for Django 1.8
+* Minor BaseTestCase refactoring
+* Add aldryn-boilerplates support
+* Fix treebeard support
+* Minor fixes
+
 0.8.1 (2015-05-31)
 ++++++++++++++++++
 
