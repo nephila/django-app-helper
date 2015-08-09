@@ -35,6 +35,10 @@ The settings provided are then merged with the default ones (user-provided ones 
 the default, except ``INSTALLED_APPS``, ``TEMPLATE_CONTEXT_PROCESSORS`` and ``MIDDLEWARE_CLASSES``
 which are appended to the default ones.
 
+A special ``TOP_INSTALLED_APPS`` settings exists: items in this setting will be inserted on top
+of ``INSTALLED_APPS`` (e.g.: to override templates and static files from standard applications
+configured by djangocms-helper).
+
 ================
 default settings
 ================

@@ -225,15 +225,20 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     if extra_settings:
         apps = extra_settings.get('INSTALLED_APPS', [])
+        apps_top = extra_settings.get('TOP_INSTALLED_APPS', [])
         template_processors = extra_settings.get('TEMPLATE_CONTEXT_PROCESSORS', [])
         middleware = extra_settings.get('MIDDLEWARE_CLASSES', [])
         if 'INSTALLED_APPS' in extra_settings:
             del(extra_settings['INSTALLED_APPS'])
+        if 'TOP_INSTALLED_APPS' in extra_settings:
+            del(extra_settings['TOP_INSTALLED_APPS'])
         if 'TEMPLATE_CONTEXT_PROCESSORS' in extra_settings:
             del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
         if 'MIDDLEWARE_CLASSES' in extra_settings:
             del(extra_settings['MIDDLEWARE_CLASSES'])
         default_settings.update(extra_settings)
+        for app in apps_top:
+            default_settings['INSTALLED_APPS'].insert(0, app)
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
         default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
