@@ -3,13 +3,14 @@
 History
 -------
 
-0.9.0 (unreleased)
+0.9.0 (XXXX-XX-XX)
 ++++++++++++++++++
 
-* Remove support for Django 1.5
-* Fix support for Django 1.8
+* Complete support for Django 1.8 / django CMS develop
+* Support for alryn-boilerplates settings
+* Migrations are now enabled by default during tests
 * Minor BaseTestCase refactoring
-* Add aldryn-boilerplates support
+* Remove support for Django 1.5
 * Fix treebeard support
 * Minor fixes
 
