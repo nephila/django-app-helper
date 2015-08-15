@@ -3,8 +3,8 @@
 
 def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
                          CMS_APP_STYLE, URLCONF, application):
-    return {
-        'INSTALLED_APPS': [
+    return dict(
+        INSTALLED_APPS=[
             'django.contrib.contenttypes',
             'django.contrib.auth',
             'django.contrib.sessions',
@@ -15,21 +15,21 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'djangocms_helper.test_data',
             'django.contrib.messages',
         ] + CMS_APP,
-        'DATABASES': {
+        DATABASES={
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
                 'NAME': ':memory:',
             }
         },
-        'TEMPLATE_LOADERS': [
+        TEMPLATE_LOADERS=[
             'django.template.loaders.filesystem.Loader',
             'django.template.loaders.app_directories.Loader',
         ],
-        'STATICFILES_FINDERS': [
+        STATICFILES_FINDERS=[
             'django.contrib.staticfiles.finders.FileSystemFinder',
             'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         ],
-        'TEMPLATE_CONTEXT_PROCESSORS': [
+        TEMPLATE_CONTEXT_PROCESSORS=[
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
             'django.core.context_processors.i18n',
@@ -40,7 +40,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'django.core.context_processors.media',
             'django.core.context_processors.static',
         ] + CMS_PROCESSORS,
-        'MIDDLEWARE_CLASSES': [
+        MIDDLEWARE_CLASSES=[
             'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -49,19 +49,24 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.common.CommonMiddleware',
         ] + CMS_MIDDLEWARE,
-        'ROOT_URLCONF': URLCONF,
-        'SITE_ID': 1,
-        'LANGUAGE_CODE': 'en',
-        'LANGUAGES': (('en', 'English'),),
-        'STATIC_URL': '/static/',
-        'MEDIA_URL': '/media/',
-        'DEBUG': True,
-        'CMS_TEMPLATES': (
+        ROOT_URLCONF=URLCONF,
+        SITE_ID=1,
+        LANGUAGE_CODE='en',
+        LANGUAGES=(('en', 'English'),),
+        STATIC_URL='/static/',
+        MEDIA_URL='/media/',
+        DEBUG=True,
+        CMS_TEMPLATES=(
             ('fullwidth.html', 'Fullwidth'),
             ('page.html', 'Normal page'),
         ),
-        'MIGRATION_MODULES': {},
-    }
+        PASSWORD_HASHERS=(
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+        ),
+        MIGRATION_MODULES={},
+        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+    )
+
 
 def get_boilerplates_settings():
     return {
