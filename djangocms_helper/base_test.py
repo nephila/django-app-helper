@@ -7,10 +7,12 @@ from copy import deepcopy
 from tempfile import mkdtemp
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import clear_url_caches
 from django.http import SimpleCookie
 from django.test import TestCase, RequestFactory
+from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 from django.utils.six.moves import reload_module
 
@@ -127,14 +129,14 @@ class BaseTestCase(TestCase):
             pass
 
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False):
-        request.current_page = page
+        request.current_page = SimpleLazyObject(lambda: page)
+        if not user:
+            user = AnonymousUser()
         request.user = user
         request.session = {}
         request.cookies = SimpleCookie()
         request.errors = StringIO()
         request.LANGUAGE_CODE = lang
-        if page:
-            request.current_page = page
         # Let's use middleware in case requested, otherwise just use CMS toolbar if needed
         if use_middlewares:
             handler = BaseHandler()
