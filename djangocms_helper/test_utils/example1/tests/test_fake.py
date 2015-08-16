@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+from djangocms_helper.utils import create_user
+
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 
 try:
+    from django.contrib.auth.models import AnonymousUser
     from djangocms_helper.base_test import BaseTestCase
 
     class FakeTests(BaseTestCase):
@@ -42,6 +45,35 @@ try:
             self.assertContains(response, 'fake text')
             self.assertContains(response, 'body{font-weight: bold;}')
             self.assertContains(response, 'Page title')
+
+        def test_create_user(self):
+            from django.conf import settings
+            if 'cms' not in settings.INSTALLED_APPS:
+                raise unittest.SkipTest('django CMS not available, skipping test')
+            user = create_user('random', 'random@example.com', 'random',
+                               base_cms_permissions=True, permissions=['add_placeholder'])
+            self._login_context = self.login_user_context(user)
+            self._login_context.user.has_perm('add_placeholdr')
+            self._login_context.user.has_perm('add_text')
+
+        def test_login_context(self):
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, AnonymousUser())
+
+            self._login_context = self.login_user_context(self.user)
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, self.user)
+            self._login_context.__exit__(None, None, None)
+
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, AnonymousUser())
+
+            with self.login_user_context(self.user):
+                request = self.get_request(None, 'en', path='/en')
+                self.assertTrue(request.user, self.user)
+
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, AnonymousUser())
 
         def test_requests(self):
             from django.conf import settings

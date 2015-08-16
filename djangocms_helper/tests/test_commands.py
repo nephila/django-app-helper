@@ -6,7 +6,6 @@ import os
 import os.path
 import shutil
 import sys
-from djangocms_helper.default_settings import get_boilerplates_settings
 
 try:
     import unittest2 as unittest
@@ -16,8 +15,10 @@ except ImportError:
 import django
 from django.utils.encoding import force_text
 
-from ..main import core, _make_settings
-from ..utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_7, temp_dir
+from djangocms_helper.default_settings import get_boilerplates_settings
+from djangocms_helper.main import core, _make_settings
+from djangocms_helper import runner
+from djangocms_helper.utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_7, temp_dir
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -348,7 +349,26 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 4 tests in' in err.getvalue())
+        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertEqual(exit.exception.code, 0)
+
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason="Example test non discoverable in Python 2.6")
+    def test_runner(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit:
+                    args = list()
+                    args.append('djangocms_helper')
+                    args.append('example1')
+                    args.append('test')
+                    args.append('--runner=runners.CapturedOutputRunner')
+                    runner.cms('example1', args)
+        self.assertTrue('Ran 6 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -366,7 +386,22 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 4 tests in' in err.getvalue())
+        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertEqual(exit.exception.code, 0)
+
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason="Example test non discoverable in Python 2.6")
+    def test_runner_nocms(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit:
+                    args = list()
+                    args.append('djangocms_helper')
+                    args.append('example1')
+                    args.append('test')
+                    args.append('--runner=runners.CapturedOutputRunner')
+                    runner.run('example1', args)
+        self.assertTrue('Ran 6 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -384,7 +419,7 @@ class CommandTests(unittest.TestCase):
                 args['--native'] = True
                 args['--extra-settings'] = 'cms_helper_extra_runner.py'
                 core(args, self.application)
-        self.assertTrue('Ran 4 tests in' in err.getvalue())
+        self.assertTrue('Ran 6 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):

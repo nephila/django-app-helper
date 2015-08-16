@@ -21,7 +21,7 @@ try:
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
-except ImportError:
+except ImportError:  # pragma: nocover
     CMS = False
     CMS_32 = False
     CMS_31 = False
@@ -356,22 +356,36 @@ def get_user_model():
     return get_user_model()
 
 
-def create_user(username, email, password, is_staff=False, is_superuser=False):
+def create_user(username, email, password, is_staff=False, is_superuser=False,
+                base_cms_permissions=False, permissions=None):
+    from django.contrib.auth.models import Permission
     User = get_user_model()
-    usr = User()
+    user = User()
 
     if User.USERNAME_FIELD != 'email':
-        setattr(usr, User.USERNAME_FIELD, username)
+        setattr(user, User.USERNAME_FIELD, username)
 
-    usr.email = email
-    usr.set_password(password)
+    user.email = email
+    user.set_password(password)
     if is_superuser:
-        usr.is_superuser = True
+        user.is_superuser = True
     if is_superuser or is_staff:
-        usr.is_staff = True
-    usr.is_active = True
-    usr.save()
-    return usr
+        user.is_staff = True
+    user.is_active = True
+    user.save()
+    if user.is_staff and not is_superuser and base_cms_permissions:
+        user.user_permissions.add(Permission.objects.get(codename='add_text'))
+        user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+        user.user_permissions.add(Permission.objects.get(codename='change_text'))
+        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
+
+        user.user_permissions.add(Permission.objects.get(codename='add_page'))
+        user.user_permissions.add(Permission.objects.get(codename='change_page'))
+        user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+    if is_staff and not is_superuser and permissions:
+        for permission in permissions:
+            user.user_permissions.add(Permission.objects.get(codename=permission))
+    return user
 
 
 def get_user_model_labels():
@@ -380,3 +394,23 @@ def get_user_model_labels():
     user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
     user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
     return user_orm_label, user_model_label
+
+
+class UserLoginContext(object):
+    def __init__(self, testcase, user, password=None):
+        self.testcase = testcase
+        self.user = user
+        if password is None:
+            password = getattr(user, get_user_model().USERNAME_FIELD)
+        self.password = password
+
+    def __enter__(self):
+        loginok = self.testcase.client.login(username=getattr(self.user,
+                                                              get_user_model().USERNAME_FIELD),
+                                             password=self.password)
+        self.testcase.assertTrue(loginok)
+        self.testcase._login_context = self
+
+    def __exit__(self, exc, value, tb):
+        self.testcase._login_context = None
+        self.testcase.client.logout()

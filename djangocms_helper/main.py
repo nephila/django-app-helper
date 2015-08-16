@@ -333,8 +333,10 @@ def main(argv=sys.argv):  # pragma: no cover
             args = docopt(__doc__, argv[1:3], version=application_module.__version__)
         args['--cms'] = '--cms' in argv
         for arg in argv:
-            if arg.startswith('--extra-settings'):
+            if arg.startswith('--extra-settings='):
                 args['--extra-settings'] = arg.split('=')[1]
+            if arg.startswith('--runner='):
+                args['--runner'] = arg.split('=')[1]
         args['options'] = [argv[0]] + argv[2:]
         if args['test'] and '--native' in args['options']:
             args['test'] = False
