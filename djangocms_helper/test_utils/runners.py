@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
-try:
-    from django.test.runner import DiscoverRunner
-except ImportError:
-    from discover_runner import DiscoverRunner
+
+from django.test.runner import DiscoverRunner
 from django.utils import unittest
 
 

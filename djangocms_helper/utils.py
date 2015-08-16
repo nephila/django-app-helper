@@ -21,7 +21,7 @@ try:
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
-except ImportError:
+except ImportError:  # pragma: nocover
     CMS = False
     CMS_32 = False
     CMS_31 = False
