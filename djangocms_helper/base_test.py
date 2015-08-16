@@ -16,7 +16,7 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 from django.utils.six.moves import reload_module
 
-from .utils import create_user, get_user_model
+from .utils import create_user, get_user_model, UserLoginContext
 
 
 class BaseTestCase(TestCase):
@@ -31,6 +31,7 @@ class BaseTestCase(TestCase):
     user_normal = None
     site_1 = None
     languages = None
+    _login_context = None
 
     """
     List of pages data for the different languages
@@ -69,6 +70,14 @@ class BaseTestCase(TestCase):
         User = get_user_model()
         User.objects.all().delete()
 
+    def login_user_context(self, user, password=None):
+        """
+        Context manager to make logged in requests
+        :param user: user username
+        :param password: user password (if omitted, username is used)
+        """
+        return UserLoginContext(self, user, password)
+
     def get_pages_data(self):
         """
         Construct a list of pages in the different languages available for the
@@ -80,6 +89,10 @@ class BaseTestCase(TestCase):
         return self._pages_data
 
     def get_pages(self):
+        """
+        Create pages using self._pages_data and self.languages
+        :return: list of created pages
+        """
         return self.create_pages(self._pages_data, self.languages)
 
     @staticmethod
@@ -131,7 +144,10 @@ class BaseTestCase(TestCase):
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False):
         request.current_page = SimpleLazyObject(lambda: page)
         if not user:
-            user = AnonymousUser()
+            if self._login_context:
+                user = self._login_context.user
+            else:
+                user = AnonymousUser()
         request.user = user
         request.session = {}
         request.cookies = SimpleCookie()

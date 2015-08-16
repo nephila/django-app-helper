@@ -348,7 +348,7 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 4 tests in' in err.getvalue())
+        self.assertTrue('Ran 5 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -366,7 +366,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 4 tests in' in err.getvalue())
+        self.assertTrue('Ran 5 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -384,7 +384,7 @@ class CommandTests(unittest.TestCase):
                 args['--native'] = True
                 args['--extra-settings'] = 'cms_helper_extra_runner.py'
                 core(args, self.application)
-        self.assertTrue('Ran 4 tests in' in err.getvalue())
+        self.assertTrue('Ran 5 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):

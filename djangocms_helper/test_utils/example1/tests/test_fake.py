@@ -5,6 +5,7 @@ except ImportError:
     import unittest
 
 try:
+    from django.contrib.auth.models import AnonymousUser
     from djangocms_helper.base_test import BaseTestCase
 
     class FakeTests(BaseTestCase):
@@ -42,6 +43,25 @@ try:
             self.assertContains(response, 'fake text')
             self.assertContains(response, 'body{font-weight: bold;}')
             self.assertContains(response, 'Page title')
+
+        def test_login_context(self):
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, AnonymousUser())
+
+            self._login_context = self.login_user_context(self.user)
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, self.user)
+            self._login_context.__exit__(None, None, None)
+
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, AnonymousUser())
+
+            with self.login_user_context(self.user):
+                request = self.get_request(None, 'en', path='/en')
+                self.assertTrue(request.user, self.user)
+
+            request = self.get_request(None, 'en', path='/en')
+            self.assertTrue(request.user, AnonymousUser())
 
         def test_requests(self):
             from django.conf import settings

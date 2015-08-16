@@ -13,6 +13,7 @@ History
 * Remove support for Django 1.5
 * Fix treebeard support
 * Minor fixes
+* Adds login_user_context method to BaseTestCase
 
 0.8.1 (2015-05-31)
 ++++++++++++++++++
