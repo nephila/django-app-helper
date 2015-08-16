@@ -14,7 +14,7 @@ from . import __version__
 from .utils import (work_in, DJANGO_1_6, temp_dir, _make_settings,
                     create_user, _create_db, get_user_model)
 
-__doc__ = '''django CMS applications development helper script.
+__doc__ = """django CMS applications development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
@@ -48,7 +48,7 @@ Options:
     --port=<port>                               Port to listen on [default: 8000].
     --bind=<bind>                               Interface to bind to [default: 127.0.0.1].
     <extra-applications>                        Comma separated list of applications to create migrations for
-'''
+"""  # NOQA # nopyflakes
 
 
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]):
@@ -117,7 +117,7 @@ def cms_check(migrate_cmd=False):
     """
     from django.core.management import call_command
     try:
-        import cms  # nopyflakes
+        import cms  # NOQA # nopyflakes
         _create_db(migrate_cmd)
         call_command('cms', 'check')
     except ImportError:
@@ -146,7 +146,8 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
                 if not Migrations(app):
                     raise NoMigrations(app)
             except NoMigrations:
-                print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(app))
+                print('ATTENTION: No migrations found for {0}, '
+                      'creating initial migrations.'.format(app))
                 try:
                     call_command('schemamigration', *(app,), initial=True, empty=empty)
                 except SystemExit:
@@ -218,9 +219,11 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
         _create_db(migrate_cmd)
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
-            usr = create_user('admin', 'admin@admin.com', 'admin', is_staff=True, is_superuser=True)
+            usr = create_user('admin', 'admin@admin.com', 'admin', is_staff=True,
+                              is_superuser=True)
             print('')
-            print('A admin user (username: %s, password: admin) has been created.' % usr.get_username())
+            print('A admin user (username: %s, password: admin)'
+                  'has been created.' % usr.get_username())
             print('')
     from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()
@@ -257,7 +260,9 @@ def core(args, application):
 
             if args['<command>']:
                 from django.core.management import execute_from_command_line
-                options = [option for option in args['options'] if option != '--cms' and '--extra-settings' not in option]
+                options = [option for option in args['options'] if (
+                    option != '--cms' and '--extra-settings' not in option
+                )]
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 execute_from_command_line(options)
 

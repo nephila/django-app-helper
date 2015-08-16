@@ -18,7 +18,7 @@ def run(app, argv=sys.argv, extra_args=None):
     if len(argv) < 3 and 'test' not in argv[:2]:
         # test argument is given if not argument is passed
         argv.insert(2, 'test')
-    if 'test' in argv and not '--migrate' in argv:
+    if 'test' in argv and '--migrate' not in argv:
         argv.append('--migrate')
     if extra_args:
         argv.extend(extra_args)
@@ -32,7 +32,7 @@ def cms(app, argv=sys.argv, extra_args=None):
     :param app: application
     """
     try:
-        import cms  # NOQA
+        import cms  # NOQA  # nopyflakes
     except ImportError:
         print(u"runner.cms is available only if django CMS is installed")
     if app not in argv[:2]:
@@ -44,7 +44,7 @@ def cms(app, argv=sys.argv, extra_args=None):
     if '--cms' not in argv:
         # this is the cms runner, just add the cms argument
         argv.append('--cms')
-    if 'test' in argv and not '--migrate' in argv:
+    if 'test' in argv and '--migrate' not in argv:
         argv.append('--migrate')
     if extra_args:
         argv.extend(extra_args)
