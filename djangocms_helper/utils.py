@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
+
 import contextlib
 from distutils.version import LooseVersion
 import os
@@ -191,26 +193,26 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     CMS_1_7_MIGRATIONS = {}
     try:
-        import cms.migrations_django
+        import cms.migrations_django  # NOQA # nopyflakes
         CMS_1_7_MIGRATIONS['cms'] = 'cms.migrations_django'
         CMS_1_7_MIGRATIONS['menus'] = 'menus.migrations_django'
     except ImportError:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import djangocms_text_ckeditor.migrations_django
+        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes
         CMS_1_7_MIGRATIONS['djangocms_text_ckeditor'] = 'djangocms_text_ckeditor.migrations_django'
     except ImportError:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import filer.migrations_django
+        import filer.migrations_django  # NOQA # nopyflakes
         CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
     except:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import cmsplugin_filer_image.migrations_django
+        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes
         CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
@@ -264,12 +266,22 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
         for item in boilerplate_settings['STATICFILES_FINDERS']:
             if item not in default_settings['STATICFILES_FINDERS']:
-                default_settings['STATICFILES_FINDERS'].insert(default_settings['STATICFILES_FINDERS'].index('django.contrib.staticfiles.finders.AppDirectoriesFinder'), item)
+                default_settings['STATICFILES_FINDERS'].insert(
+                    default_settings['STATICFILES_FINDERS'].index(
+                        'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+                    ),
+                    item
+                )
         del boilerplate_settings['STATICFILES_FINDERS']
 
         for item in boilerplate_settings['TEMPLATE_LOADERS']:
             if item not in default_settings['TEMPLATE_LOADERS']:
-                default_settings['TEMPLATE_LOADERS'].insert(default_settings['TEMPLATE_LOADERS'].index('django.template.loaders.app_directories.Loader'), item)
+                default_settings['TEMPLATE_LOADERS'].insert(
+                    default_settings['TEMPLATE_LOADERS'].index(
+                        'django.template.loaders.app_directories.Loader'
+                    ),
+                    item
+                )
         del boilerplate_settings['TEMPLATE_LOADERS']
 
         for setting in ('INSTALLED_APPS', 'TEMPLATE_CONTEXT_PROCESSORS'):
@@ -279,17 +291,15 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     if not DJANGO_1_7:
         default_settings['TEMPLATES'] = [
-            {
-                'NAME': 'django',
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'OPTIONS': {
-                    'context_processors': [
-                        template_processor.replace('django.core', 'django.template')
-                        for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
-                    ],
-                    'loaders': default_settings.pop('TEMPLATE_LOADERS')
-                }
-            }
+            {'NAME': 'django',
+             'BACKEND': 'django.template.backends.django.DjangoTemplates',
+             'OPTIONS': {
+                 'context_processors': [
+                     template_processor.replace('django.core', 'django.template')
+                     for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
+                 ],
+                 'loaders': default_settings.pop('TEMPLATE_LOADERS')
+             }}
         ]
         if 'TEMPLATE_DIRS' in default_settings:
             default_settings['TEMPLATES'][0]['DIRS'] = default_settings.pop('TEMPLATE_DIRS')
@@ -300,7 +310,10 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if 'AUTH_USER_MODEL' in os.environ:
         custom_user_app = os.environ['AUTH_USER_MODEL'].rpartition('.')[0]
         custom_user_model = '.'.join(os.environ['AUTH_USER_MODEL'].split('.')[-2:])
-        default_settings['INSTALLED_APPS'].insert(default_settings['INSTALLED_APPS'].index('cms'), custom_user_app)
+        default_settings['INSTALLED_APPS'].insert(
+            default_settings['INSTALLED_APPS'].index('cms'),
+            custom_user_app
+        )
         default_settings['AUTH_USER_MODEL'] = custom_user_model
 
     if args['test']:

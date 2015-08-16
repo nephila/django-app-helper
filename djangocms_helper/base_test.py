@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
+
 import os.path
 import shutil
 import sys
@@ -195,7 +197,8 @@ class BaseTestCase(TestCase):
         request = self.request_factory.post(path, data)
         return self._prepare_request(request, page, user, lang, use_middlewares)
 
-    def get_page_request(self, page, user, path=None, edit=False, lang='en', use_middlewares=False):
+    def get_page_request(self, page, user, path=None, edit=False, lang='en',
+                         use_middlewares=False):
         """
         Createds a GET request for the given page suitable for use the
         django CMS toolbar
@@ -213,7 +216,6 @@ class BaseTestCase(TestCase):
         """
         from cms.utils.conf import get_cms_setting
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         path = path or page and page.get_absolute_url(lang)
         if edit:
             path = '{0}?{1}'.format(path, edit_on)
@@ -298,4 +300,3 @@ class BaseTestCase(TestCase):
         name = mkdtemp()
         yield name
         shutil.rmtree(name)
-

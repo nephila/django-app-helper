@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, with_statement
-from copy import copy
-from distutils.version import LooseVersion
+from __future__ import absolute_import, print_function, unicode_literals
+
 import os
 import os.path
 import shutil
 import sys
+from copy import copy
+from distutils.version import LooseVersion
 
 try:
     import unittest2 as unittest
