@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function, with_statement
+from __future__ import absolute_import, print_function, unicode_literals
 import contextlib
 import os
 import subprocess
