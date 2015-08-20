@@ -3,11 +3,11 @@
 History
 -------
 
-0.9.0 (XXXX-XX-XX)
+0.9.0 (2015-08-20)
 ++++++++++++++++++
 
 * Complete support for Django 1.8 / django CMS develop
-* Support for alryn-boilerplates settings
+* Support for aldryn-boilerplates settings
 * Migrations are now enabled by default during tests
 * Minor BaseTestCase refactoring
 * Remove support for Django 1.5
