@@ -264,6 +264,10 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if args['--boilerplate']:
         boilerplate_settings = get_boilerplates_settings()
 
+        # Do not override helper settings with defaults.
+        if 'ALDRYN_BOILERPLATE_NAME' in default_settings.keys():
+            del boilerplate_settings['ALDRYN_BOILERPLATE_NAME']
+
         for item in boilerplate_settings['STATICFILES_FINDERS']:
             if item not in default_settings['STATICFILES_FINDERS']:
                 default_settings['STATICFILES_FINDERS'].insert(
