@@ -431,3 +431,18 @@ class UserLoginContext(object):
     def __exit__(self, exc, value, tb):
         self.testcase._login_context = None
         self.testcase.client.logout()
+
+
+def ensure_unicoded_and_unique(args_list):
+    """
+    Iterate over args_list, make it unicode if needed and ensure that there
+    are no duplicates.
+    Returns list of unicoded arguments in the same order.
+    """
+    unicoded_args = []
+    for argument in args_list:
+        argument = (unicode(argument)
+                    if type(argument) == str else argument)
+        if argument not in unicoded_args:
+            unicoded_args.append(argument)
+    return unicoded_args
