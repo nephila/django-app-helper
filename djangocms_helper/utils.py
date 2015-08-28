@@ -15,6 +15,7 @@ from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
 from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
+from django.utils import six
 from django.utils.six import StringIO
 
 try:
@@ -441,8 +442,8 @@ def ensure_unicoded_and_unique(args_list):
     """
     unicoded_args = []
     for argument in args_list:
-        argument = (unicode(argument)
-                    if type(argument) == str else argument)
+        argument = (six.u(argument)
+                    if not isinstance(argument, six.text_type) else argument)
         if argument not in unicoded_args:
             unicoded_args.append(argument)
     return unicoded_args
