@@ -12,7 +12,8 @@ from django.utils.importlib import import_module
 
 from . import __version__
 from .utils import (work_in, DJANGO_1_6, temp_dir, _make_settings,
-                    create_user, _create_db, get_user_model)
+                    create_user, _create_db, get_user_model,
+                    ensure_unicoded_and_unique)
 
 __doc__ = """django CMS applications development helper script.
 
@@ -324,12 +325,15 @@ def main(argv=sys.argv):  # pragma: no cover
     # Command is executed in the main directory of the plugin, and we must
     # include it in the current path for the imports to work
     sys.path.insert(0, '.')
-
+    # ensure that argv, are unique and the same type as doc string
+    argv = ensure_unicoded_and_unique(argv)
     if len(argv) > 1:
         application = argv[1]
         application_module = import_module(application)
         try:
-            args = docopt(__doc__, version=application_module.__version__)
+            # by default docopt uses sys.argv[1:]; ensure correct args passed
+            args = docopt(__doc__, argv=argv[1:],
+                          version=application_module.__version__)
             if argv[2] == 'help':
                 raise DocoptExit()
         except DocoptExit:
