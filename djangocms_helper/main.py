@@ -331,7 +331,8 @@ def main(argv=sys.argv):  # pragma: no cover
         application = argv[1]
         application_module = import_module(application)
         try:
-            args = docopt(__doc__, argv=argv,
+            # by default docopt uses sys.argv[1:]; ensure correct args passed
+            args = docopt(__doc__, argv=argv[1:],
                           version=application_module.__version__)
             if argv[2] == 'help':
                 raise DocoptExit()
