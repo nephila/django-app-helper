@@ -2,7 +2,7 @@
 """djangocms-helper - Helpers for django CMS plugin development"""
 from __future__ import absolute_import, print_function, unicode_literals
 
-__version__ = '0.9.1.dev1'
+__version__ = '0.9.1'
 __author__ = 'Iacopo Spalletti <i.spalletti@nephila.it>'
 __all__ = ['runner']
 
