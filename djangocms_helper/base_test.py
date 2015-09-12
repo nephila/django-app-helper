@@ -13,6 +13,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.base import BaseHandler
 from django.core.urlresolvers import clear_url_caches
 from django.http import SimpleCookie
+from django.template import RequestContext
+from django.template.loader import get_template
 from django.test import TestCase, RequestFactory
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
@@ -143,6 +145,39 @@ class BaseTestCase(TestCase):
         except ImportError:
             pass
 
+    def get_plugin_context(self, page, lang, plugin, edit=False):
+        """
+        Returns a context suitable for CMSPlugin.render_plugin / render_placeholder
+
+        :param page: Page object
+        :param lang: Current language
+        :param plugin: Plugin instance
+        :param edit: Enable edit mode for rendering
+        :return: PluginContext instance
+        """
+        from cms.plugin_rendering import PluginContext
+        request = self.get_page_request(page, self.user, lang=lang, edit=edit)
+        return PluginContext({'request': request}, plugin, plugin.placeholder)
+
+    def render_plugin(self, page, lang, plugin):
+        """
+        Renders a single plugin using
+
+        :param page: Page object
+        :param lang: Current language
+        :param plugin: Plugin instance
+        :return: PluginContext instance
+        """
+        request = self.get_request(page, lang)
+        context = RequestContext(request)
+        try:
+            template = get_template(page.get_template()).template
+            with context.bind_template(template):
+                rendered = plugin.render_plugin(context, plugin.placeholder)
+        except AttributeError:
+            rendered = plugin.render_plugin(context, plugin.placeholder)
+        return rendered
+
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False):
         request.current_page = SimpleLazyObject(lambda: page)
         if not user:
@@ -155,6 +190,8 @@ class BaseTestCase(TestCase):
         request.cookies = SimpleCookie()
         request.errors = StringIO()
         request.LANGUAGE_CODE = lang
+        if request.method == 'POST':
+            request._dont_enforce_csrf_checks = True
         # Let's use middleware in case requested, otherwise just use CMS toolbar if needed
         if use_middlewares:
             handler = BaseHandler()
@@ -175,6 +212,9 @@ class BaseTestCase(TestCase):
 
         :param page: current page object
         :param lang: request language
+        :param user: current user
+        :param path: path (if different from the current page path)
+        :param use_middlewares: pass the request through configured middlewares.
         :return: request
         """
         path = path or page and page.get_absolute_url(lang)
@@ -190,7 +230,7 @@ class BaseTestCase(TestCase):
         :param data: POST payload
         :param user: current user
         :param path: path (if different from the current page path)
-        :param use_middlewares: whether go through all configured middlewares.
+        :param use_middlewares: pass the request through configured middlewares.
         :return: request
         """
         path = path or page and page.get_absolute_url(lang)
@@ -200,7 +240,7 @@ class BaseTestCase(TestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang='en',
                          use_middlewares=False):
         """
-        Createds a GET request for the given page suitable for use the
+        Create a GET request for the given page suitable for use the
         django CMS toolbar
 
         This method requires django CMS installed to work. It will raise an ImportError otherwise;
@@ -211,7 +251,7 @@ class BaseTestCase(TestCase):
         :param path: path (if different from the current page path)
         :param edit: whether enabling editing mode
         :param lang: request language
-        :param use_middlewares: whether go through all configured middlewares.
+        :param use_middlewares: pass the request through configured middlewares.
         :return: request
         """
         from cms.utils.conf import get_cms_setting
@@ -250,6 +290,9 @@ class BaseTestCase(TestCase):
         return image
 
     def create_django_image_obj(self):
+        return self.create_django_image_object()
+
+    def create_django_image_object(self):
         """
         Create a django image file object suitable for FileField
         It also sets the following attributes:
@@ -286,7 +329,7 @@ class BaseTestCase(TestCase):
         """
         from filer.models import Image
 
-        file_obj = self.create_django_image_obj()
+        file_obj = self.create_django_image_object()
         self.filer_image = Image.objects.create(owner=self.user, file=file_obj,
                                                 original_filename=self.image_name)
         return self.filer_image
