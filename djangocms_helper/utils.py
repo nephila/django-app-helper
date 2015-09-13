@@ -2,21 +2,24 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import contextlib
-from distutils.version import LooseVersion
 import os
 import random
 import shutil
 import stat
 import sys
+from distutils.version import LooseVersion
 from tempfile import mkdtemp
 
 import django
 from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
+from django.utils import six
 from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
-from django.utils import six
 from django.utils.six import StringIO
+from django.utils.six.moves import reload_module
+
+from . import HELPER_FILE
 
 try:
     import cms  # NOQA
@@ -38,9 +41,6 @@ DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
 DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion('1.10')
 
 
-from . import HELPER_FILE
-
-
 def load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
@@ -52,7 +52,7 @@ def load_from_file(module_path):
     imported = None
     if module_path:
         with open(module_path, 'r') as openfile:
-            imported = load_module("mod", openfile, module_path,
+            imported = load_module('mod', openfile, module_path,
                                    ('imported', 'r', PY_SOURCE))
     return imported
 
@@ -153,7 +153,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     except (IOError, AttributeError):
         extra_settings = None
     default_name = ':memory:' if args['test'] else 'local.sqlite'
-    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    db_url = os.environ.get('DATABASE_URL', 'sqlite://localhost/%s' % default_name)
     migrate = args.get('--migrate', False)
     configs = {
         'DATABASES': {'default': dj_database_url.parse(db_url)},
@@ -322,7 +322,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         default_settings['AUTH_USER_MODEL'] = custom_user_model
 
     if args['test']:
-        default_settings['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
+        default_settings['SESSION_ENGINE'] = 'django.contrib.sessions.backends.cache'
     if application not in default_settings['INSTALLED_APPS']:
         default_settings['INSTALLED_APPS'].append(application)
 
@@ -333,34 +333,39 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     elif 'south' in settings.INSTALLED_APPS:
         from south.management.commands import patch_for_test_db_setup
         patch_for_test_db_setup()
-    reload_urls(settings)
+    reload_urls(settings, cms_apps=False)
     return settings
 
 
-def reload_urls(settings):
-    url_modules = [
-        settings.ROOT_URLCONF,
-    ]
-
+def reload_urls(settings, urlconf=None, cms_apps=True):
+    if 'cms.urls' in sys.modules:
+        reload_module(sys.modules['cms.urls'])
+    if urlconf is None:
+        urlconf = settings.ROOT_URLCONF
+    if urlconf in sys.modules:
+        reload_module(sys.modules[urlconf])
     clear_url_caches()
-
-    for module in url_modules:
-        if module in sys.modules:
-            del sys.modules[module]
+    if cms_apps:
+        try:
+            from cms.appresolver import clear_app_resolvers, get_app_patterns
+            clear_app_resolvers()
+            get_app_patterns()
+        except ImportError:
+            pass
 
 
 def _create_db(migrate_cmd=False):
     if DJANGO_1_6:
         if migrate_cmd:
-            call_command("syncdb", interactive=False, verbosity=1, database='default')
-            call_command("migrate", interactive=False, verbosity=1, database='default')
+            call_command('syncdb', interactive=False, verbosity=1, database='default')
+            call_command('migrate', interactive=False, verbosity=1, database='default')
         else:
-            call_command("syncdb", interactive=False, verbosity=1, database='default',
+            call_command('syncdb', interactive=False, verbosity=1, database='default',
                          migrate=False, migrate_all=True)
-            call_command("migrate", interactive=False, verbosity=1, database='default',
+            call_command('migrate', interactive=False, verbosity=1, database='default',
                          fake=True)
     else:
-        call_command("migrate")
+        call_command('migrate')
 
 
 def get_user_model():

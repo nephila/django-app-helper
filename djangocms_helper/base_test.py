@@ -2,25 +2,20 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
-import shutil
-import sys
 from contextlib import contextmanager
 from copy import deepcopy
-from tempfile import mkdtemp
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.base import BaseHandler
-from django.core.urlresolvers import clear_url_caches
 from django.http import SimpleCookie
 from django.template import RequestContext
 from django.template.loader import get_template
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
-from django.utils.six.moves import reload_module
 
-from .utils import create_user, get_user_model, UserLoginContext
+from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
 
 class BaseTestCase(TestCase):
@@ -74,6 +69,25 @@ class BaseTestCase(TestCase):
         User = get_user_model()
         User.objects.all().delete()
 
+    @contextmanager
+    def temp_dir(self):
+        """
+        Context manager to operate on a temporary directory
+        """
+        yield temp_dir()
+
+    def reload_model(self, obj):
+        """
+        Reload a models instance from database
+        :param obj: model instance to reload
+        :return: the reloaded model instance
+        """
+        return obj.__class__.objects.get(pk=obj.pk)
+
+    @staticmethod
+    def reload_urlconf(urlconf=None):
+        reload_urls(settings, urlconf)
+
     def login_user_context(self, user, password=None):
         """
         Context manager to make logged in requests
@@ -82,11 +96,28 @@ class BaseTestCase(TestCase):
         """
         return UserLoginContext(self, user, password)
 
+    def create_user(username, email, password, is_staff=False, is_superuser=False,
+                    base_cms_permissions=False, permissions=None):
+        """
+        Creates a user with the given properties
+
+        :param username: Username
+        :param email: Email
+        :param password: password
+        :param is_staff: Staff status
+        :param is_superuser: Superuser status
+        :param base_cms_permissions: Base django CMS permissions
+        :param permissions: Other permissions
+        :return: User instance
+        """
+        return create_user(username, email, password, is_staff, is_superuser, base_cms_permissions,
+                           permissions)
+
     def get_pages_data(self):
         """
         Construct a list of pages in the different languages available for the
-         project. Default implementation is to return the :py:attr:`_pages_data`
-         attribute
+        project. Default implementation is to return the :py:attr:`_pages_data`
+        attribute
 
         :return: list of pages data
         """
@@ -129,22 +160,6 @@ class BaseTestCase(TestCase):
             pages.append(page.get_draft_object())
         return pages
 
-    @staticmethod
-    def reload_urlconf(urlconf=None):
-        if 'cms.urls' in sys.modules:
-            reload_module(sys.modules['cms.urls'])
-        if urlconf is None:
-            urlconf = settings.ROOT_URLCONF
-        if urlconf in sys.modules:
-            reload_module(sys.modules[urlconf])
-        clear_url_caches()
-        try:
-            from cms.appresolver import clear_app_resolvers, get_app_patterns
-            clear_app_resolvers()
-            get_app_patterns()
-        except ImportError:
-            pass
-
     def get_plugin_context(self, page, lang, plugin, edit=False):
         """
         Returns a context suitable for CMSPlugin.render_plugin / render_placeholder
@@ -161,7 +176,7 @@ class BaseTestCase(TestCase):
 
     def render_plugin(self, page, lang, plugin):
         """
-        Renders a single plugin using
+        Renders a single plugin using CMSPlugin.render_plugin
 
         :param page: Page object
         :param lang: Current language
@@ -198,8 +213,8 @@ class BaseTestCase(TestCase):
             handler.load_middleware()
             for middleware_method in handler._request_middleware:
                 if middleware_method(request):
-                    raise Exception(u'Couldn\'t create request mock object -'
-                                    u'request middleware returned a response')
+                    raise Exception('Couldn\'t create request mock object -'
+                                    'request middleware returned a response')
         elif use_toolbar:
             from cms.middleware.toolbar import ToolbarMiddleware
             mid = ToolbarMiddleware()
@@ -261,14 +276,6 @@ class BaseTestCase(TestCase):
             path = '{0}?{1}'.format(path, edit_on)
         request = self.request_factory.get(path)
         return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True)
-
-    def reload_model(self, obj):
-        """
-        Reload a models instance from database
-        :param obj: model instance to reload
-        :return:
-        """
-        return obj.__class__.objects.get(pk=obj.pk)
 
     def create_image(self, mode='RGB', size=(800, 600)):
         """
@@ -333,13 +340,3 @@ class BaseTestCase(TestCase):
         self.filer_image = Image.objects.create(owner=self.user, file=file_obj,
                                                 original_filename=self.image_name)
         return self.filer_image
-
-    @contextmanager
-    def temp_dir(self):
-        """
-        Context manager to operate on a temporary directory
-        :return:
-        """
-        name = mkdtemp()
-        yield name
-        shutil.rmtree(name)

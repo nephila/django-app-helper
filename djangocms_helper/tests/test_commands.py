@@ -8,18 +8,19 @@ import sys
 from copy import copy
 from distutils.version import LooseVersion
 
+import django
+from django.utils.encoding import force_text
+
+from djangocms_helper import runner
+from djangocms_helper.default_settings import get_boilerplates_settings
+from djangocms_helper.main import _make_settings, core
+from djangocms_helper.utils import DJANGO_1_6, DJANGO_1_7, captured_output, temp_dir, work_in
+
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 
-import django
-from django.utils.encoding import force_text
-
-from djangocms_helper.default_settings import get_boilerplates_settings
-from djangocms_helper.main import core, _make_settings
-from djangocms_helper import runner
-from djangocms_helper.utils import work_in, captured_output, DJANGO_1_6, DJANGO_1_7, temp_dir
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -341,7 +342,7 @@ class CommandTests(unittest.TestCase):
                 core(args, self.application)
 
     @unittest.skipIf(sys.version_info < (2, 7),
-                     reason="Example test non discoverable in Python 2.6")
+                     reason='Example test non discoverable in Python 2.6')
     def test_testrun(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -354,7 +355,7 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
-                     reason="Example test non discoverable in Python 2.6")
+                     reason='Example test non discoverable in Python 2.6')
     def test_runner(self):
         try:
             import cms
@@ -373,7 +374,7 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
-                     reason="Example test non discoverable in Python 2.6")
+                     reason='Example test non discoverable in Python 2.6')
     def test_testrun_nocms(self):
         try:
             import cms
@@ -391,7 +392,7 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
-                     reason="Example test non discoverable in Python 2.6")
+                     reason='Example test non discoverable in Python 2.6')
     def test_runner_nocms(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -406,7 +407,7 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
-                     reason="Example test non discoverable in Python 2.6")
+                     reason='Example test non discoverable in Python 2.6')
     def test_testrun_native(self):
         try:
             import cms

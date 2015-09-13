@@ -36,7 +36,7 @@ def cms(app, argv=sys.argv, extra_args=None):
     try:
         import cms  # NOQA  # nopyflakes
     except ImportError:
-        print(u"runner.cms is available only if django CMS is installed")
+        print('runner.cms is available only if django CMS is installed')
     if app not in argv[:2]:
         # app is automatically added if not present
         argv.insert(1, app)

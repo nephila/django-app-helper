@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, print_function, unicode_literals
+
 import contextlib
 import os
 import subprocess
 import sys
 import warnings
 
-from docopt import docopt, DocoptExit
 from django.utils.encoding import force_text
 from django.utils.importlib import import_module
+from docopt import DocoptExit, docopt
 
 from . import __version__
-from .utils import (work_in, DJANGO_1_6, temp_dir, _make_settings,
-                    create_user, _create_db, get_user_model,
-                    ensure_unicoded_and_unique)
+from .utils import (
+    DJANGO_1_6, _create_db, _make_settings, create_user, ensure_unicoded_and_unique,
+    get_user_model, temp_dir, work_in,
+)
+
 
 __doc__ = """django CMS applications development helper script.
 
@@ -54,7 +57,7 @@ Options:
 
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]):
     warnings.filterwarnings(
-        'error', r"DateTimeField received a naive datetime",
+        'error', r'DateTimeField received a naive datetime',
         RuntimeWarning, r'django\.db\.models\.fields')
     from django.conf import settings
     from django.test.utils import get_runner
@@ -122,7 +125,7 @@ def cms_check(migrate_cmd=False):
         _create_db(migrate_cmd)
         call_command('cms', 'check')
     except ImportError:
-        print(u"cms_check available only if django CMS is installed")
+        print('cms_check available only if django CMS is installed')
 
 
 def makemigrations(application, merge=False, dry_run=False, empty=False, extra_applications=None):
@@ -141,7 +144,7 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
         from south.migration import Migrations
 
         if merge:
-            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6 and below')
+            raise DjangoRuntimeWarning('Option not implemented for Django 1.6 and below')
         for app in apps:
             try:
                 if not Migrations(app):
@@ -169,11 +172,11 @@ def generate_authors():
     """
     Updates the authors list
     """
-    print("Generating AUTHORS")
+    print('Generating AUTHORS')
 
     # Get our list of authors
-    print("Collecting author names")
-    r = subprocess.Popen(["git", "log", "--use-mailmap", "--format=%aN"],
+    print('Collecting author names')
+    r = subprocess.Popen(['git', 'log', '--use-mailmap', '--format=%aN'],
                          stdout=subprocess.PIPE)
     seen_authors = []
     authors = []
@@ -197,7 +200,7 @@ def generate_authors():
     authors = sorted(authors, key=lambda x: x.lower())
 
     # Write our authors to the AUTHORS file
-    print(u"Authors (%s):\n\n\n* %s" % (len(authors), u"\n* ".join(authors)))
+    print('Authors (%s):\n\n\n* %s' % (len(authors), '\n* '.join(authors)))
 
 
 def static_analisys(application):
@@ -210,13 +213,13 @@ def static_analisys(application):
         application_module = import_module(application)
         assert pyflakes((application_module,)) == 0
     except ImportError:
-        print(u"Static analisys available only if django CMS is installed")
+        print('Static analisys available only if django CMS is installed')
 
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
     from django.utils import autoreload
 
-    if os.environ.get("RUN_MAIN") != "true":
+    if os.environ.get('RUN_MAIN') != 'true':
         _create_db(migrate_cmd)
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
@@ -251,7 +254,7 @@ def core(args, application):
 
     # configure django
     warnings.filterwarnings(
-        'error', r"DateTimeField received a naive datetime",
+        'error', r'DateTimeField received a naive datetime',
         RuntimeWarning, r'django\.db\.models\.fields')
 
     with temp_dir() as STATIC_ROOT:
