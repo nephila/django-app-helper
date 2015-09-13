@@ -205,19 +205,19 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         # we're using the Django 1.7 migrations
         pass
     try:
-        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes
+        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes # pragma: nocache
         CMS_1_7_MIGRATIONS['djangocms_text_ckeditor'] = 'djangocms_text_ckeditor.migrations_django'
     except ImportError:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import filer.migrations_django  # NOQA # nopyflakes
+        import filer.migrations_django  # NOQA # nopyflakes # pragma: nocache
         CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
     except:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes
+        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes # pragma: nocache
         CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
@@ -225,9 +225,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         # we're using the Django 1.7 migrations
         pass
 
-    default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS,
-                                            CMS_MIDDLEWARE, CMS_APP_STYLE,
-                                            URLCONF, application)
+    default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE,
+                                            CMS_APP_STYLE, URLCONF, application)
     default_settings.update(configs)
 
     if extra_settings:
@@ -378,13 +377,7 @@ def _create_db(migrate_cmd=False):
 
 
 def get_user_model():
-    # Django 1.5+ compatibility
-    if django.VERSION >= (1, 5):
-        from django.contrib.auth import get_user_model
-    else:
-        from django.contrib.auth.models import User
-        User.USERNAME_FIELD = 'username'
-        get_user_model = lambda: User
+    from django.contrib.auth import get_user_model
     return get_user_model()
 
 
