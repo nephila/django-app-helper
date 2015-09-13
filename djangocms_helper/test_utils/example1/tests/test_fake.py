@@ -105,6 +105,15 @@ try:
                 self.assertEqual(user_orm_label, 'auth.User')
                 self.assertEqual(user_model_label, 'auth.user')
 
+        def test_create_image(self):
+            from filer.models import Image
+
+            image = self.create_filer_image_object()
+            self.assertEqual(image.original_filename, self.image_name)
+            self.assertEqual(image.width, 800)
+            self.assertEqual(image.height, 600)
+            self.assertEqual(Image.objects.count(), 1)
+
 except Exception:
     from unittest2 import TestCase
 
