@@ -291,6 +291,7 @@ class CommandTests(unittest.TestCase):
                 shutil.copy(self.poexample, self.pofile)
                 args = copy(DEFAULT_ARGS)
                 args['cms_check'] = True
+                args['--extra-settings'] = 'cms_helper.py'
                 args['--migrate'] = False
                 core(args, self.application)
             self.assertTrue('Installation okay' in out.getvalue())
@@ -357,7 +358,7 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertTrue('Ran 7 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -376,7 +377,7 @@ class CommandTests(unittest.TestCase):
                     args.append('test')
                     args.append('--runner=runners.CapturedOutputRunner')
                     runner.cms('example1', args)
-        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertTrue('Ran 7 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -394,7 +395,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertTrue('Ran 7 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -409,7 +410,7 @@ class CommandTests(unittest.TestCase):
                     args.append('test')
                     args.append('--runner=runners.CapturedOutputRunner')
                     runner.run('example1', args)
-        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertTrue('Ran 7 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -427,7 +428,7 @@ class CommandTests(unittest.TestCase):
                 args['--native'] = True
                 args['--extra-settings'] = 'cms_helper_extra_runner.py'
                 core(args, self.application)
-        self.assertTrue('Ran 6 tests in' in err.getvalue())
+        self.assertTrue('Ran 7 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):
