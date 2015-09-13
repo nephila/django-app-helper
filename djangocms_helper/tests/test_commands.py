@@ -140,8 +140,14 @@ class CommandTests(unittest.TestCase):
                         self.assertEqual(local_settings.TIME_ZONE, 'Europe/Paris')
                         # Existing application is kept
                         self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
-                        # New one is added
-                        self.assertTrue('djangocms_admin_style' in local_settings.INSTALLED_APPS)
+                        # New ones are added both on top and in random positions
+                        self.assertEqual('djangocms_admin_style', local_settings.INSTALLED_APPS[0])
+                        self.assertTrue('some_app' in local_settings.INSTALLED_APPS)
+
+                        # Ditto for middlewares
+                        self.assertTrue('django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE_CLASSES)
+                        self.assertEqual('top_middleware', local_settings.MIDDLEWARE_CLASSES[0])
+                        self.assertTrue('some_middleware' in local_settings.MIDDLEWARE_CLASSES)
 
                         boilerplate_settings = get_boilerplates_settings()
 

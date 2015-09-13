@@ -9,6 +9,7 @@ History
 * Add support for apphooks and parent pages in BaseTestCase.create_pages
 * If pages contains apphook, urlconf is reloaded automatically
 * Improve documentation
+* Add support for top-positioned MIDDLEWARE_CLASSES
 * Code cleanup
 
 0.9.1 (2015-08-30)

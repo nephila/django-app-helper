@@ -235,6 +235,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         apps_top = extra_settings.get('TOP_INSTALLED_APPS', [])
         template_processors = extra_settings.get('TEMPLATE_CONTEXT_PROCESSORS', [])
         middleware = extra_settings.get('MIDDLEWARE_CLASSES', [])
+        middleware_top = extra_settings.get('TOP_MIDDLEWARE_CLASSES', [])
         if 'INSTALLED_APPS' in extra_settings:
             del(extra_settings['INSTALLED_APPS'])
         if 'TOP_INSTALLED_APPS' in extra_settings:
@@ -243,12 +244,16 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
         if 'MIDDLEWARE_CLASSES' in extra_settings:
             del(extra_settings['MIDDLEWARE_CLASSES'])
+        if 'TOP_MIDDLEWARE_CLASSES' in extra_settings:
+            del(extra_settings['TOP_MIDDLEWARE_CLASSES'])
         default_settings.update(extra_settings)
         for app in apps_top:
             default_settings['INSTALLED_APPS'].insert(0, app)
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
         default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
+        for middleware in middleware_top:
+            default_settings['MIDDLEWARE_CLASSES'].insert(0, middleware)
 
     if DJANGO_1_6:
         default_settings['INSTALLED_APPS'].append('south')

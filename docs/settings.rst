@@ -43,11 +43,14 @@ to make easier to customise the configuration:
 * ``TEMPLATE_CONTEXT_PROCESSORS``
 * ``MIDDLEWARE_CLASSES``
 
-An extra setting is:
+Other extra setting:
 
 * ``TOP_INSTALLED_APPS``: items in this setting will be inserted on top of ``INSTALLED_APPS``
   (e.g.: to control the templates and static files override from standard applications
   configured by djangocms-helper).
+
+* ``TOP_MIDDLEWARE_CLASSES``: items in this setting will be inserted on top of
+  ``MIDDLEWARE_CLASSES``.
 
 Django 1.8 support
 ==================
