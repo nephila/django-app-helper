@@ -14,12 +14,16 @@ import django
 from django.core.management import call_command
 from django.core.urlresolvers import clear_url_caches
 from django.utils import six
-from django.utils.datastructures import SortedDict
 from django.utils.functional import empty
 from django.utils.six import StringIO
 from django.utils.six.moves import reload_module
 
 from . import HELPER_FILE
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 try:
     import cms  # NOQA
@@ -117,7 +121,7 @@ def _reset_django(settings):
         clear_url_caches()
         if DJANGO_1_6:
             from django.db.models.loading import cache as apps
-            apps.app_store = SortedDict()
+            apps.app_store = OrderedDict()
             apps.loaded = False
             apps.handled = set()
             apps.postponed = []
