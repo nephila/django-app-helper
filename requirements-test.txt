@@ -1,5 +1,4 @@
 -r requirements.txt
-django-discover-runner
 coverage
 coveralls
 wheel

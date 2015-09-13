@@ -1,12 +1,5 @@
-Helper classes and functions
-============================
+Base test class
+===============
 
-BaseTestCase
-^^^^^^^^^^^^
-
-TODO
-
-Functions
-^^^^^^^^^
-
-TODO
+.. automodule:: djangocms_helper.base_test
+    :members:

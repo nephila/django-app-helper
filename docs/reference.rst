@@ -100,14 +100,9 @@ Depending on the used test runner you may need to setup your tests accordingly.
 Currently supported test runners are:
 
 * Django's DiscoverRunner (default on Django 1.6+)
-* Django's DjangoTestSuiteRunner (option ``--simple-runner``, default on Django 1.5)
 * Nose's NoseTestSuiteRunner (option ``--nose-runner``)
 
 You can also specify your own custom runner with the ``--runner`` option.
-
-.. note:: When running on Django 1.5,
-          `django-discover-runner <https://github.com/jezdez/django-discover-runner>`_
-          is used as default runner, if no other runner is provided.
 
 
 cms_check
@@ -121,8 +116,8 @@ Runs the django CMS ``cms check`` command.
 
 Example: ``djangocms-helper some_application cms_check``
 
-compilemessages and update messages
-===================================
+update and compile locales
+==========================
 
 ::
 
