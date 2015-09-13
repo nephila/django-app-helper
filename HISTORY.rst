@@ -3,6 +3,13 @@
 History
 -------
 
+0.9.2 (XXXX-XX-XX)
+++++++++++++++++++
+
+* Add support for apphooks and parent pages in BaseTestCase.create_pages
+* If pages contains apphook, urlconf is reloaded automatically
+* Code cleanup
+
 0.9.1 (2015-08-30)
 ++++++++++++++++++
 
