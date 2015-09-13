@@ -127,7 +127,6 @@ try:
             context = self.get_plugin_context(pages[0], 'en', plugin, edit=False)
             rendered_1 = plugin.render_plugin(context, placeholder)
             rendered_2 = self.render_plugin(pages[0], 'en', plugin)
-            print(rendered_1, rendered_2)
             self.assertEqual(rendered_1, rendered_2)
 
 except Exception:

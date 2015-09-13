@@ -11,8 +11,8 @@ HELPER_SETTINGS = {
     'TIME_ZONE': 'Europe/Rome',
     'INSTALLED_APPS': [
         'example2',
-        'filer',
         'easy_thumbnails',
+        'filer',
     ] + text_plugin,
     'CMS_LANGUAGES': {
         1: [
