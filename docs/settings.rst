@@ -31,13 +31,31 @@ An alternative, and possibly clearer form is::
         ...
     )
 
-The settings provided are then merged with the default ones (user-provided ones overrides
-the default, except ``INSTALLED_APPS``, ``TEMPLATE_CONTEXT_PROCESSORS`` and ``MIDDLEWARE_CLASSES``
-which are appended to the default ones.
+By default any setting option provided in ``cms_helper.py`` will override the default ones.
 
-A special ``TOP_INSTALLED_APPS`` settings exists: items in this setting will be inserted on top
-of ``INSTALLED_APPS`` (e.g.: to override templates and static files from standard applications
-configured by djangocms-helper).
+Special settings
+================
+
+The following settings will not override the defaults ones, but they are appended to the defaults
+to make easier to customise the configuration:
+
+* ``INSTALLED_APPS``
+* ``TEMPLATE_CONTEXT_PROCESSORS``
+* ``MIDDLEWARE_CLASSES``
+
+An extra setting is:
+
+* ``TOP_INSTALLED_APPS``: items in this setting will be inserted on top of ``INSTALLED_APPS``
+  (e.g.: to control the templates and static files override from standard applications
+  configured by djangocms-helper).
+
+Django 1.8 support
+==================
+
+All ``TEMPLATES_`` settings from Django 1.6/1.7 are automatically translated to Django 1.8
+``TEMPLATE`` setting. To support both, just use the **old** names, and ``djangocms-helper``
+will take care of converting.
+
 
 ================
 default settings
@@ -80,7 +98,6 @@ Middlewares::
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.doc.XViewMiddleware',
     'django.middleware.common.CommonMiddleware',
 
 

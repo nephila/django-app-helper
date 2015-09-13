@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from copy import deepcopy
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
 from django.template import RequestContext
@@ -204,6 +203,8 @@ class BaseTestCase(TestCase):
         return rendered
 
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False):
+        from django.contrib.auth.models import AnonymousUser
+
         request.current_page = SimpleLazyObject(lambda: page)
         if not user:
             if self._login_context:
