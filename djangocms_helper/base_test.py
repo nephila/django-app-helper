@@ -15,7 +15,9 @@ from django.test import RequestFactory, TestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 
-from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
+from .utils import (
+    OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
+)
 
 
 class BaseTestCase(TestCase):
@@ -137,13 +139,17 @@ class BaseTestCase(TestCase):
         and returns the list of the draft version of each
         """
         from cms.api import create_page, create_title
-        pages = []
+        pages = OrderedDict()
+        has_apphook = False
         for page_data in source:
             main_data = deepcopy(page_data[languages[0]])
             if 'publish' in main_data:
                 main_data['published'] = main_data.pop('publish')
             main_data['language'] = languages[0]
+            if main_data.get('parent', None):
+                main_data['parent'] = pages[main_data['parent']]
             page = create_page(**main_data)
+            has_apphook = has_apphook or 'apphook' in main_data
             for lang in languages[1:]:
                 if lang in page_data:
                     publish = False
@@ -157,8 +163,11 @@ class BaseTestCase(TestCase):
                     create_title(**title_data)
                     if publish:
                         page.publish(lang)
-            pages.append(page.get_draft_object())
-        return pages
+            page = page.get_draft_object()
+            pages[page.get_slug(languages[0])] = page
+        if has_apphook:
+            reload_urls(settings, cms_apps=True)
+        return list(pages.values())
 
     def get_plugin_context(self, page, lang, plugin, edit=False):
         """
@@ -174,16 +183,17 @@ class BaseTestCase(TestCase):
         request = self.get_page_request(page, self.user, lang=lang, edit=edit)
         return PluginContext({'request': request}, plugin, plugin.placeholder)
 
-    def render_plugin(self, page, lang, plugin):
+    def render_plugin(self, page, lang, plugin, edit=False):
         """
         Renders a single plugin using CMSPlugin.render_plugin
 
         :param page: Page object
         :param lang: Current language
         :param plugin: Plugin instance
-        :return: PluginContext instance
+        :param edit: Enable edit mode for rendering
+        :return: Rendered plugin
         """
-        request = self.get_request(page, lang)
+        request = self.get_page_request(page, self.user, lang=lang, edit=edit)
         context = RequestContext(request)
         try:
             template = get_template(page.get_template()).template
