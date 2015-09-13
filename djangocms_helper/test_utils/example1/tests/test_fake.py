@@ -114,6 +114,22 @@ try:
             self.assertEqual(image.height, 600)
             self.assertEqual(Image.objects.count(), 1)
 
+        def test_render_plugin(self):
+            from django.conf import settings
+            if 'cms' not in settings.INSTALLED_APPS:
+                raise unittest.SkipTest('django CMS not available, skipping test')
+
+            from cms.api import add_plugin
+            pages = self.get_pages()
+            placeholder = pages[0].placeholders.get(slot='content')
+            plugin = add_plugin(placeholder=placeholder, plugin_type='FakePlugin', language='en')
+            pages[0].publish('en')
+            context = self.get_plugin_context(pages[0], 'en', plugin, edit=False)
+            rendered_1 = plugin.render_plugin(context, placeholder)
+            rendered_2 = self.render_plugin(pages[0], 'en', plugin)
+            print(rendered_1, rendered_2)
+            self.assertEqual(rendered_1, rendered_2)
+
 except Exception:
     from unittest2 import TestCase
 
