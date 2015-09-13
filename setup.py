@@ -30,6 +30,7 @@ setuptools.setup(
         'dj-database-url',
         'pyflakes',
         'south',
+        'django',
     ],
     entry_points={
         'console_scripts': [
@@ -42,7 +43,6 @@ setuptools.setup(
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
         'Development Status :: 4 - Beta',
         'Framework :: Django',
-        'Framework :: Django :: 1.5',
         'Framework :: Django :: 1.6',
         'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
