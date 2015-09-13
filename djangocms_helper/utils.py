@@ -424,7 +424,7 @@ def get_user_model_labels():
     User = get_user_model()
 
     user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
-    user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
+    user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
     return user_orm_label, user_model_label
 
 

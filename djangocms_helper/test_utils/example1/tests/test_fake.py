@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from djangocms_helper.utils import create_user
+import os
 
 try:
     import unittest2 as unittest
@@ -9,13 +9,16 @@ except ImportError:
 try:
     from django.contrib.auth.models import AnonymousUser
     from djangocms_helper.base_test import BaseTestCase
+    from djangocms_helper.utils import get_user_model_labels
 
     class FakeTests(BaseTestCase):
         _pages_data = (
             {'en': {'title': 'Page title', 'template': 'page.html', 'publish': True},
              'fr': {'title': 'Titre', 'publish': True},
              'it': {'title': 'Titolo pagina', 'publish': False}},
-            {'en': {'title': 'Second page', 'template': 'page.html', 'publish': True},
+            {'en': {'title': 'Second page', 'template': 'page.html', 'publish': True,
+                    'parent': 'page-title', 'apphook': 'Example'
+                    },
              'fr': {'title': 'Deuxieme', 'publish': True},
              'it': {'title': 'Seconda pagina', 'publish': False}},
         )
@@ -50,8 +53,9 @@ try:
             from django.conf import settings
             if 'cms' not in settings.INSTALLED_APPS:
                 raise unittest.SkipTest('django CMS not available, skipping test')
-            user = create_user('random', 'random@example.com', 'random',
-                               base_cms_permissions=True, permissions=['add_placeholder'])
+            user = self.create_user(username='random', email='random@example.com',
+                                    password='random', is_staff=True,
+                                    base_cms_permissions=True, permissions=['add_placeholder'])
             self._login_context = self.login_user_context(user)
             self._login_context.user.has_perm('add_placeholdr')
             self._login_context.user.has_perm('add_text')
@@ -94,6 +98,56 @@ try:
                 self.assertEqual(request.path, '/en/second-page/')
                 self.assertTrue(request.toolbar)
                 self.assertEqual(request.META['REQUEST_METHOD'], 'GET')
+
+        def test_get_user_model(self):
+            if 'AUTH_USER_MODEL' not in os.environ:
+                user_orm_label, user_model_label = get_user_model_labels()
+                self.assertEqual(user_orm_label, 'auth.User')
+                self.assertEqual(user_model_label, 'auth.user')
+
+        def test_create_image(self):
+            from filer.models import Image
+
+            image = self.create_filer_image_object()
+            self.assertEqual(image.original_filename, self.image_name)
+            self.assertEqual(image.width, 800)
+            self.assertEqual(image.height, 600)
+            self.assertEqual(Image.objects.count(), 1)
+
+        def test_render_plugin(self):
+            from django.conf import settings
+            if 'cms' not in settings.INSTALLED_APPS:
+                raise unittest.SkipTest('django CMS not available, skipping test')
+
+            from cms.api import add_plugin
+            sample_text = '\nfake text\nPage title\n'
+            pages = self.get_pages()
+            placeholder = pages[0].placeholders.get(slot='content')
+            plugin = add_plugin(placeholder=placeholder, plugin_type='FakePlugin', language='en')
+            pages[0].publish('en')
+            context = self.get_plugin_context(pages[0], 'en', plugin, edit=False)
+            rendered_1 = plugin.render_plugin(context, placeholder)
+            rendered_2 = self.render_plugin(pages[0], 'en', plugin)
+            self.assertEqual(rendered_1, rendered_2)
+            self.assertEqual(rendered_1, sample_text)
+
+        def test_request(self):
+            from django.conf import settings
+            if 'cms' not in settings.INSTALLED_APPS:
+                raise unittest.SkipTest('django CMS not available, skipping test')
+
+            pages = self.get_pages()
+
+            request = self.get_request(pages[1], 'en')
+            self.assertIsNone(getattr(request, 'toolbar', None))
+
+            request = self.get_page_request(pages[1], self.user)
+            self.assertIsNotNone(getattr(request, 'toolbar', None))
+
+            request = self.get_request(pages[1], 'en', use_middlewares=True)
+            self.assertIsNotNone(getattr(request, 'toolbar', None))
+            self.assertIsNotNone(getattr(request, '_messages', None))
+
 except Exception:
     from unittest2 import TestCase
 

@@ -97,7 +97,7 @@ class BaseTestCase(TestCase):
         """
         return UserLoginContext(self, user, password)
 
-    def create_user(username, email, password, is_staff=False, is_superuser=False,
+    def create_user(self, username, email, password, is_staff=False, is_superuser=False,
                     base_cms_permissions=False, permissions=None):
         """
         Creates a user with the given properties
