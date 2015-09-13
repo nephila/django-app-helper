@@ -14,7 +14,7 @@ djangocms-helper
         :target: https://pypi.python.org/pypi/djangocms-helper
         :alt: Monthly downloads
 
-.. image:: https://coveralls.io/repos/nephila/djangocms-helper/badge.png
+.. image:: https://img.shields.io/coveralls/nephila/djangocms-helper/master.svg
         :target: https://coveralls.io/r/nephila/djangocms-helper
         :alt: Test coverage
 
