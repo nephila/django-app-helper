@@ -154,12 +154,12 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
                       'creating initial migrations.'.format(app))
                 try:
                     call_command('schemamigration', *(app,), initial=True, empty=empty)
-                except SystemExit:  # pragma: nocache
+                except SystemExit:  # pragma: no cover
                     pass
-            except ImproperlyConfigured:  # pragma: nocache
+            except ImproperlyConfigured:  # pragma: no cover
                 print('WARNING: The app: {0} could not be found.'.format(app))
             else:
-                try:  # pragma: nocache
+                try:  # pragma: no cover
                     call_command('schemamigration', *(app,), auto=True, empty=empty)
                 except SystemExit:
                     pass

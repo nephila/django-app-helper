@@ -31,7 +31,7 @@ try:
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
-except ImportError:  # pragma: nocover
+except ImportError:  # pragma: no cover
     CMS = False
     CMS_32 = False
     CMS_31 = False
@@ -205,19 +205,19 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         # we're using the Django 1.7 migrations
         pass
     try:
-        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes # pragma: nocache
+        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes # pragma: no cover
         CMS_1_7_MIGRATIONS['djangocms_text_ckeditor'] = 'djangocms_text_ckeditor.migrations_django'
     except ImportError:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import filer.migrations_django  # NOQA # nopyflakes # pragma: nocache
+        import filer.migrations_django  # NOQA # nopyflakes # pragma: no cover
         CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
     except:
         # we're using the Django 1.7 migrations
         pass
     try:
-        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes # pragma: nocache
+        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes # pragma: no cover
         CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
