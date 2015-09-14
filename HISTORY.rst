@@ -3,7 +3,7 @@
 History
 -------
 
-0.9.2 (XXXX-XX-XX)
+0.9.2 (2015-09-14)
 ++++++++++++++++++
 
 * Add support for apphooks and parent pages in BaseTestCase.create_pages
