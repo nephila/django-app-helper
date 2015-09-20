@@ -112,6 +112,15 @@ def make_temp_dir():
     return mkdtemp()
 
 
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return 'notmigrations'
+
+
 def _reset_django(settings):
     """
     Hackish way to reset the django instance settings and AppConfig
@@ -158,13 +167,11 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         extra_settings = None
     default_name = ':memory:' if args['test'] else 'local.sqlite'
     db_url = os.environ.get('DATABASE_URL', 'sqlite://localhost/%s' % default_name)
-    migrate = args.get('--migrate', False)
     configs = {
         'DATABASES': {'default': dj_database_url.parse(db_url)},
         'STATIC_ROOT': STATIC_ROOT,
         'MEDIA_ROOT': MEDIA_ROOT,
         'USE_TZ': True,
-        'SOUTH_TESTS_MIGRATE': migrate,
         'USE_CMS': args['--cms'],
         'BASE_APPLICATION': application
     }
@@ -227,6 +234,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE,
                                             CMS_APP_STYLE, URLCONF, application)
+    migrate = args.get('--migrate') or not args.get('--no-migrate')
+    configs['SOUTH_TESTS_MIGRATE'] = migrate
     default_settings.update(configs)
 
     if extra_settings:
@@ -333,6 +342,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         default_settings['SESSION_ENGINE'] = 'django.contrib.sessions.backends.cache'
     if application not in default_settings['INSTALLED_APPS']:
         default_settings['INSTALLED_APPS'].append(application)
+
+    if not DJANGO_1_6 and not migrate:
+        default_settings['MIGRATION_MODULES'] = DisableMigrations()
 
     _reset_django(settings)
     settings.configure(**default_settings)
