@@ -362,7 +362,7 @@ class CommandTests(unittest.TestCase):
                     args['test'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 10 tests in' in err.getvalue())
+        self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -381,7 +381,7 @@ class CommandTests(unittest.TestCase):
                     args.append('test')
                     args.append('--runner=runners.CapturedOutputRunner')
                     runner.cms('example1', args)
-        self.assertTrue('Ran 10 tests in' in err.getvalue())
+        self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -395,7 +395,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 10 tests in' in err.getvalue())
+        self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -411,7 +411,7 @@ class CommandTests(unittest.TestCase):
                     args.append('--extra-settings=cms_helper.py')
                     args.append('--runner=runners.CapturedOutputRunner')
                     runner.run('example1', args)
-        self.assertTrue('Ran 10 tests in' in err.getvalue())
+        self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -429,7 +429,7 @@ class CommandTests(unittest.TestCase):
                 args['--native'] = True
                 args['--extra-settings'] = 'cms_helper_extra_runner.py'
                 core(args, self.application)
-        self.assertTrue('Ran 10 tests in' in err.getvalue())
+        self.assertTrue('Ran 12 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):

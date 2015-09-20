@@ -38,3 +38,11 @@ HELPER_SETTINGS = {
     },
     'FILE_UPLOAD_TEMP_DIR': mkdtemp(),
 }
+
+
+def run():
+    from djangocms_helper import runner
+    runner.cms('example1')
+
+if __name__ == "__main__":
+    run()
