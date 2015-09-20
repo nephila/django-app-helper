@@ -298,6 +298,22 @@ class CommandTests(unittest.TestCase):
             self.assertFalse('[WARNING]' in out.getvalue())
             self.assertFalse('[ERROR]' in out.getvalue())
 
+    def test_cms_check_nocms(self):
+        try:
+            import cms
+            raise unittest.SkipTest('django CMS available, skipping test')
+        except ImportError:
+            pass
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['cms_check'] = True
+                args['--extra-settings'] = 'cms_helper.py'
+                args['--migrate'] = False
+                core(args, self.application)
+            self.assertTrue('cms_check available only if django CMS is installed' in out.getvalue())
+
     @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
                      reason='check command available in Django 1.7+ only')
     def test_any_command_check(self):
@@ -347,6 +363,19 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['pyflakes'] = True
                 core(args, self.application)
+
+    def test_pyflakes_nocms(self):
+        try:
+            import cms
+            raise unittest.SkipTest('django CMS available, skipping test')
+        except ImportError:
+            pass
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['pyflakes'] = True
+                core(args, self.application)
+            self.assertTrue('Static analisys available only if django CMS is installed' in out.getvalue())
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
