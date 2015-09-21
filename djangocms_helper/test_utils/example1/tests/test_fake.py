@@ -138,15 +138,93 @@ try:
 
             pages = self.get_pages()
 
-            request = self.get_request(pages[1], 'en')
+            request = self.get_request(pages[1], lang='en')
             self.assertIsNone(getattr(request, 'toolbar', None))
 
-            request = self.get_page_request(pages[1], self.user)
+            request = self.get_page_request(pages[1], user=self.user)
             self.assertIsNotNone(getattr(request, 'toolbar', None))
 
             request = self.get_request(pages[1], 'en', use_middlewares=True)
             self.assertIsNotNone(getattr(request, 'toolbar', None))
             self.assertIsNotNone(getattr(request, '_messages', None))
+
+        def test_request_full_middlewares(self):
+            # naked request
+            request = self.get_request(
+                page=None, lang='en', user=None, path='/en/second-page/',
+                use_middlewares=True
+            )
+            self.assertEqual(request.user, AnonymousUser())
+            with self.assertRaises(AttributeError):
+                self.assertTrue(request.current_page.pk)
+            self.assertIsNotNone(getattr(request, '_messages', None))
+
+            # passing user
+            request = self.get_request(
+                page=None, lang='en', user=self.user, path='/en/second-page/',
+                use_middlewares=True
+            )
+            self.assertEqual(request.user, self.user)
+            with self.assertRaises(AttributeError):
+                self.assertTrue(request.current_page.pk)
+            self.assertIsNotNone(getattr(request, '_messages', None))
+
+            # logged in user
+            with self.login_user_context(self.user):
+                request = self.get_request(
+                    page=None, lang='en', user=None, path='/en/second-page/',
+                    use_middlewares=True
+                )
+                self.assertEqual(request.user, self.user)
+                with self.assertRaises(AttributeError):
+                    self.assertTrue(request.current_page.pk)
+
+        def test_request_full_middlewares_cms(self):
+            from django.conf import settings
+            if 'cms' not in settings.INSTALLED_APPS:
+                raise unittest.SkipTest('django CMS not available, skipping test')
+
+            pages = self.get_pages()
+            # naked request, page and language is derived from path
+            request = self.get_request(
+                page=None, lang=None, user=None, path='/en/second-page/',
+                use_middlewares=True
+            )
+            self.assertEqual(request.user, AnonymousUser())
+            self.assertEqual(request.LANGUAGE_CODE, 'en')
+            self.assertEqual(request.current_page.get_absolute_url(), pages[1].get_absolute_url())
+            self.assertIsNotNone(getattr(request, '_messages', None))
+
+            # naked request, page and language is derived from path, user is logged in
+            request = self.get_request(
+                page=None, lang=None, user=self.user, path='/en/second-page/',
+                use_middlewares=True
+            )
+            self.assertEqual(request.user, self.user)
+            self.assertEqual(request.LANGUAGE_CODE, 'en')
+            self.assertEqual(request.current_page.get_absolute_url(), pages[1].get_absolute_url())
+            self.assertIsNotNone(getattr(request, '_messages', None))
+
+            # naked request, path is derived from path
+            request = self.get_request(
+                page=pages[1], lang='en', user=self.user,
+                use_middlewares=True
+            )
+            self.assertEqual(request.user, self.user)
+            self.assertEqual(request.path_info, '/en/second-page/')
+            self.assertEqual(request.LANGUAGE_CODE, 'en')
+            self.assertEqual(request.current_page.get_absolute_url(), pages[1].get_absolute_url())
+            self.assertIsNotNone(getattr(request, '_messages', None))
+
+            # logged in user through context manager
+            with self.login_user_context(self.user):
+                request = self.get_request(
+                    page=None, lang=None, user=None, path='/en/second-page/',
+                    use_middlewares=True
+                )
+                self.assertEqual(request.user, self.user)
+                self.assertEqual(request.current_page.get_absolute_url(), pages[1].get_absolute_url())
+
 
 except Exception:
     from unittest2 import TestCase
