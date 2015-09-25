@@ -28,11 +28,12 @@ process.
 It's a modified version of django CMS's own ``develop.py`` script, modified
 to handle generic plugins development process.
 
+Supported versions
+==================
 
-warning
-=======
-Since version 0.7 django CMS is no more a hard dependency; install it
-manually to enable ``--cms`` option
+Python: 2.6, 2.7, 3.3, 3.4, 3.5
+Django: 1.6 to 1.9
+django CMS: 3.0 to 3.2
 
 Common options
 ==============
