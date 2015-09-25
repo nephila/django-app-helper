@@ -32,7 +32,9 @@ Supported versions
 ==================
 
 Python: 2.6, 2.7, 3.3, 3.4, 3.5
+
 Django: 1.6 to 1.9
+
 django CMS: 3.0 to 3.2
 
 Common options
