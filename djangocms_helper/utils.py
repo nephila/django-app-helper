@@ -211,24 +211,24 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     except ImportError:
         # we're using the Django 1.7 migrations
         pass
-    try:
-        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes # pragma: no cover
+    try:  # pragma: no cover
+        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes
         CMS_1_7_MIGRATIONS['djangocms_text_ckeditor'] = 'djangocms_text_ckeditor.migrations_django'
-    except ImportError:
+    except ImportError:  # pragma: no cover
         # we're using the Django 1.7 migrations
         pass
-    try:
+    try:  # pragma: no cover
         import filer.migrations_django  # NOQA # nopyflakes # pragma: no cover
         CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
-    except:
+    except ImportError:  # pragma: no cover
         # we're using the Django 1.7 migrations
         pass
-    try:
-        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes # pragma: no cover
+    try:  # pragma: no cover
+        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes
         CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
-    except ImportError:
+    except ImportError:  # pragma: no cover
         # we're using the Django 1.7 migrations
         pass
 
