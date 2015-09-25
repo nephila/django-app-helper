@@ -212,7 +212,11 @@ def static_analisys(application):
     try:
         from cms.test_utils.util.static_analysis import pyflakes
         application_module = import_module(application)
-        assert pyflakes((application_module,)) == 0
+        report = pyflakes((application_module,))
+        if type(report) == tuple:
+            assert report[0] == 0
+        else:
+            assert report == 0
     except ImportError:
         print('Static analisys available only if django CMS is installed')
 
