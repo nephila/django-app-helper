@@ -225,9 +225,12 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         pass
     try:  # pragma: no cover
         import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
         CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_link'] = 'cmsplugin_filer_link.migrations_django'
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_teaser'] = 'cmsplugin_filer_teaser.migrations_django'
+        CMS_1_7_MIGRATIONS['cmsplugin_filer_video'] = 'cmsplugin_filer_video.migrations_django'
     except ImportError:  # pragma: no cover
         # we're using the Django 1.7 migrations
         pass
