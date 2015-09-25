@@ -65,7 +65,8 @@ Options
 * ``--runner-options=<option1>,<option2>``: comma separated list of command
   line options for the test runner: e.g. ``--runner-options=--with-coverage,--cover-package=my_package``
 * ``--failfast``: whether to stop at first test failure;
-* ``--migrate``: whether to apply south migrations when running tests;
+* ``--migrate``: use migrations (default);
+* ``--no-migrate``: skip migrations;
 * ``--boilerplate``: adds ``aldryn-boilerplates`` configuration to settings;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
 * ``--nose-runner``: use django nose test suite
