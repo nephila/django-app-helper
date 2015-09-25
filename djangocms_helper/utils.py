@@ -104,7 +104,7 @@ def make_temp_dir():
         if os.stat('/dev/shm').st_mode & stat.S_IWGRP:
             dirname = 'djangocms-helpder-%s' % random.randint(1, 1000000)
             path = os.path.join('/dev/shm', dirname)
-            while os.path.exists(path):
+            while os.path.exists(path):  # pragma: no cover
                 dirname = 'djangocms-helpder-%s' % random.randint(1, 1000000)
                 path = os.path.join('/dev/shm', dirname)
                 os.mkdir(path)

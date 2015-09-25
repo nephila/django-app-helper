@@ -67,7 +67,7 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]
     TestRunner = get_runner(settings)
 
     # Monkeypatching sys.argv to avoid passing to nose unwanted arguments
-    if test_runner == 'django_nose.NoseTestSuiteRunner':
+    if test_runner == 'django_nose.NoseTestSuiteRunner':  # pragma: no cover
         sys.argv = sys.argv[:2]
         if failfast:
             sys.argv.append('-x')
