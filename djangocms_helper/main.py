@@ -93,6 +93,11 @@ def test(test_labels, application, failfast=False, test_runner=None,
                 test_labels = [application]
             else:
                 test_labels = ['%s.tests' % application]
+    try:
+        import faulthandler
+        faulthandler.enable()
+    except ImportError:
+        pass
     return _test_run_worker(test_labels, test_runner, failfast, runner_options)
 
 

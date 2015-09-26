@@ -3,6 +3,15 @@
 History
 -------
 
+0.9.3 (XXXX-XX-XX)
+++++++++++++++++++
+
+* Add support for Django 1.9, django CMS 3.2, Python 3.5
+* Add support for faulthandler (if present)
+* Fix error in detecting migrations layout for cmsplugin-filer
+* Add --no-migrate option
+* Improve request mocking
+
 0.9.2 (2015-09-14)
 ++++++++++++++++++
 
