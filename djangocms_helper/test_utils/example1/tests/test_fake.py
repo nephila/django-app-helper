@@ -148,6 +148,9 @@ try:
             self.assertIsNotNone(getattr(request, 'toolbar', None))
             self.assertIsNotNone(getattr(request, '_messages', None))
 
+            request = self.get_request(pages[1], 'en', secure=True)
+            self.assertTrue(request.is_secure())
+
         def test_request_full_middlewares(self):
             # naked request
             request = self.get_request(

@@ -203,7 +203,8 @@ class BaseTestCase(TestCase):
             rendered = plugin.render_plugin(context, plugin.placeholder)
         return rendered
 
-    def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False):
+    def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False,
+                         secure=False):
         from django.contrib.auth.models import AnonymousUser
 
         request.current_page = SimpleLazyObject(lambda: page)
@@ -215,6 +216,9 @@ class BaseTestCase(TestCase):
         request.user = user
         request._cached_user = user
         request.session = {}
+        if secure:
+            request.environ['SERVER_PORT'] = str('443')
+            request.environ['wsgi.url_scheme'] = str('https')
         if user.is_authenticated():
             request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
         request.cookies = SimpleCookie()
@@ -250,7 +254,7 @@ class BaseTestCase(TestCase):
         """
         path = path or page and page.get_absolute_url(lang)
         request = self.request_factory.get(path, secure=secure)
-        return self._prepare_request(request, page, user, lang, use_middlewares)
+        return self._prepare_request(request, page, user, lang, use_middlewares, secure=secure)
 
     def post_request(self, page, lang, data, user=None, path=None, use_middlewares=False,
                      secure=False):
@@ -268,7 +272,7 @@ class BaseTestCase(TestCase):
         """
         path = path or page and page.get_absolute_url(lang)
         request = self.request_factory.post(path, data, secure=secure)
-        return self._prepare_request(request, page, user, lang, use_middlewares)
+        return self._prepare_request(request, page, user, lang, use_middlewares, secure=secure)
 
     def get_page_request(self, page, user, path=None, edit=False, lang='en',
                          use_middlewares=False, secure=False):
@@ -294,7 +298,8 @@ class BaseTestCase(TestCase):
         if edit:
             path = '{0}?{1}'.format(path, edit_on)
         request = self.request_factory.get(path, secure=secure)
-        return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True)
+        return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True,
+                                     secure=secure)
 
     def create_image(self, mode='RGB', size=(800, 600)):
         """
