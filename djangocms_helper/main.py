@@ -8,7 +8,6 @@ import sys
 import warnings
 
 from django.utils.encoding import force_text
-from django.utils.importlib import import_module
 from docopt import DocoptExit, docopt
 
 from . import __version__
@@ -211,7 +210,7 @@ def static_analisys(application):
     """
     try:
         from cms.test_utils.util.static_analysis import pyflakes
-        application_module = import_module(application)
+        application_module = __import__(application)
         report = pyflakes((application_module,))
         if type(report) == tuple:
             assert report[0] == 0
@@ -337,7 +336,7 @@ def main(argv=sys.argv):  # pragma: no cover
     argv = ensure_unicoded_and_unique(argv)
     if len(argv) > 1:
         application = argv[1]
-        application_module = import_module(application)
+        application_module = __import__(application)
         try:
             # by default docopt uses sys.argv[1:]; ensure correct args passed
             args = docopt(__doc__, argv=argv[1:],
