@@ -3,6 +3,15 @@
 History
 -------
 
+0.9.3 (XXXX-XX-XX)
+++++++++++++++++++
+
+* Add --no-migrate option to skip migrations
+* Add secure argument to generate HTTPS requests
+* Better request mocking
+* Fix test on django CMS 3.2 (develop)
+* Add support for Python 3.5
+
 0.9.2 (2015-09-14)
 ++++++++++++++++++
 
