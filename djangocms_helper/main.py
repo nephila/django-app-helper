@@ -8,6 +8,7 @@ import sys
 import warnings
 
 from django.utils.encoding import force_text
+from django.utils.six import text_type
 from docopt import DocoptExit, docopt
 
 from . import __version__
@@ -92,6 +93,8 @@ def test(test_labels, application, failfast=False, test_runner=None,
                 test_labels = [application]
             else:
                 test_labels = ['%s.tests' % application]
+    elif type(test_labels) is text_type:
+        test_labels = [test_labels]
     return _test_run_worker(test_labels, test_runner, failfast, runner_options)
 
 
