@@ -396,6 +396,24 @@ class CommandTests(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
+    def test_runner_wrong(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+        with work_in(self.basedir):
+            with captured_output():
+                with self.assertRaises(ImportError):
+                    args = list()
+                    args.append('djangocms_helper')
+                    args.append('example1')
+                    args.append('test')
+                    args.append('--runner=runners.CapturedOutputRunner')
+                    args.append('whatever')
+                    runner.cms('example1', args)
+
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason='Example test non discoverable in Python 2.6')
     def test_runner(self):
         try:
             import cms
@@ -409,6 +427,7 @@ class CommandTests(unittest.TestCase):
                     args.append('example1')
                     args.append('test')
                     args.append('--runner=runners.CapturedOutputRunner')
+                    args.append('tests')
                     runner.cms('example1', args)
         self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
