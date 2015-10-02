@@ -14,6 +14,7 @@ from django.template.loader import get_template
 from django.test import RequestFactory, TestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
+from mock import patch
 
 from .utils import (
     OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
@@ -364,3 +365,15 @@ class BaseTestCase(TestCase):
         self.filer_image = Image.objects.create(owner=self.user, file=file_obj,
                                                 original_filename=self.image_name)
         return self.filer_image
+
+    @contextmanager
+    def captured_output(self):
+        """
+        Context manager that patches stdout / stderr with StringIO and return the instances.
+        Use it to test output
+
+        :return: stdout, stderr wrappers
+        """
+        with patch('sys.stdout', new_callable=StringIO) as out:
+            with patch('sys.stderr', new_callable=StringIO) as err:
+                yield out, err
