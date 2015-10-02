@@ -81,6 +81,9 @@ try:
 
         def test_requests(self):
             from django.conf import settings
+            print('visible string')
+            with self.captured_output() as (out, err):
+                print('hidden string')
             if 'cms' in settings.INSTALLED_APPS:
                 pages = self.get_pages()
 

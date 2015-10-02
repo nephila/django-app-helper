@@ -31,6 +31,7 @@ setuptools.setup(
         'pyflakes',
         'south',
         'django',
+        'mock',
     ],
     entry_points={
         'console_scripts': [
