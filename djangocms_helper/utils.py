@@ -3,9 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import contextlib
 import os
-import random
 import shutil
-import stat
 import sys
 from distutils.version import LooseVersion
 from tempfile import mkdtemp
@@ -17,6 +15,7 @@ from django.utils import six
 from django.utils.functional import empty
 from django.utils.six import StringIO
 from django.utils.six.moves import reload_module
+from mock import patch
 
 from . import HELPER_FILE
 
@@ -82,13 +81,9 @@ def work_in(dirname=None):
 
 @contextlib.contextmanager
 def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
+    with patch('sys.stdout', new_callable=StringIO) as out:
+        with patch('sys.stderr', new_callable=StringIO) as err:
+            yield out, err
 
 
 # Borrowed from django CMS codebase
