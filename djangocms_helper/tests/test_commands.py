@@ -445,6 +445,8 @@ class CommandTests(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.8'),
+                     reason='Simple runner not available in Django > 1.8')
     def test_runner_simple(self):
         try:
             import cms
