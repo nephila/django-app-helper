@@ -7,6 +7,7 @@ import shutil
 import sys
 from copy import copy
 from distutils.version import LooseVersion
+from tempfile import mkdtemp
 
 import django
 from django.utils.encoding import force_text
@@ -45,6 +46,7 @@ DEFAULT_ARGS = {
     '--dry-run': False,
     '--empty': False,
     '--native': False,
+    '--persistent': False,
     '--bind': '',
     '--port': '',
     '<test-label>': '',
@@ -364,6 +366,8 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['pyflakes'] = True
                 core(args, self.application)
+        self.assertFalse(os.path.exists(args['STATIC_ROOT']))
+        self.assertFalse(os.path.exists(args['MEDIA_ROOT']))
 
     def test_pyflakes_nocms(self):
         try:
@@ -377,6 +381,8 @@ class CommandTests(unittest.TestCase):
                 args['pyflakes'] = True
                 core(args, self.application)
             self.assertTrue('Static analisys available only if django CMS is installed' in out.getvalue())
+        self.assertFalse(os.path.exists(args['STATIC_ROOT']))
+        self.assertFalse(os.path.exists(args['MEDIA_ROOT']))
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
@@ -390,10 +396,13 @@ class CommandTests(unittest.TestCase):
                 with self.assertRaises(SystemExit) as exit:
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
+                    args['--persistent'] = mkdtemp()
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
         self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
+        self.assertTrue(os.path.exists(args['STATIC_ROOT']))
+        self.assertTrue(os.path.exists(args['MEDIA_ROOT']))
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
@@ -442,6 +451,73 @@ class CommandTests(unittest.TestCase):
         self.assertFalse('hidden string' in err.getvalue())
         self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
+
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason='Example test non discoverable in Python 2.6')
+    def test_runner_cms_exception(self):
+        try:
+            import cms
+            raise unittest.SkipTest('django CMS available, skipping test')
+        except ImportError:
+            pass
+        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    with self.assertRaises(ImportError) as exit:
+                        args = list()
+                        args.append('djangocms_helper')
+                        runner.cms('example1', args)
+
+    @unittest.skipIf(sys.version_info < (2, 7),
+                     reason='Example test non discoverable in Python 2.6')
+    def test_runner_cms_exception(self):
+        try:
+            import cms
+            raise unittest.SkipTest('django CMS available, skipping test')
+        except ImportError:
+            pass
+        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    with self.assertRaises(ImportError) as exit:
+                        args = list()
+                        args.append('djangocms_helper')
+                        runner.cms('example1', args)
+
+    def test_runner_cms_argv(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+
+        def fake_runner(argv):
+            return argv
+
+        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    args = list()
+                    args.append('djangocms_helper')
+                    with patch('djangocms_helper.runner.runner', fake_runner):
+                        data = runner.cms('example1', args)
+                    self.assertEqual(data, ['djangocms_helper', 'example1', 'test', '--cms'])
+
+    def test_runner_argv(self):
+        def fake_runner(argv):
+            return argv
+
+        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    args = list()
+                    args.append('djangocms_helper')
+                    with patch('djangocms_helper.runner.runner', fake_runner):
+                        data = runner.run('example1', args)
+                    self.assertEqual(data, [u'djangocms_helper', u'example1', u'test'])
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')

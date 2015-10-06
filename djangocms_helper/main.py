@@ -14,7 +14,7 @@ from docopt import DocoptExit, docopt
 from . import __version__
 from .utils import (
     DJANGO_1_6, _create_db, _make_settings, create_user, ensure_unicoded_and_unique,
-    get_user_model, temp_dir, work_in,
+    get_user_model, persistent_dir, temp_dir, work_in,
 )
 
 
@@ -31,7 +31,7 @@ Usage:
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate]
+    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent[=path]]
     djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate]
 
 Options:
@@ -46,6 +46,7 @@ Options:
     --nose-runner               Use django-nose as test runner
     --simple-runner             User DjangoTestSuiteRunner
     --boilerplate               Add support for aldryn-boilerplates
+    --persistent[=path]         Use persistent storage
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
@@ -263,9 +264,20 @@ def core(args, application):
     warnings.filterwarnings(
         'error', r'DateTimeField received a naive datetime',
         RuntimeWarning, r'django\.db\.models\.fields')
+    if args['--persistent']:
+        create_dir = persistent_dir
+        if args['--persistent'] is not True:
+            parent_path = args['--persistent']
+        else:
+            parent_path = 'data'
+    else:
+        create_dir = temp_dir
+        parent_path = '/dev/shm'
 
-    with temp_dir() as STATIC_ROOT:
-        with temp_dir() as MEDIA_ROOT:
+    with create_dir('static', parent_path) as STATIC_ROOT:
+        with create_dir('media', parent_path) as MEDIA_ROOT:
+            args['MEDIA_ROOT'] = MEDIA_ROOT
+            args['STATIC_ROOT'] = STATIC_ROOT
             if args['cms_check']:
                 args['--cms'] = True
 
@@ -337,13 +349,14 @@ def main(argv=sys.argv):  # pragma: no cover
     sys.path.insert(0, '.')
     # ensure that argv, are unique and the same type as doc string
     argv = ensure_unicoded_and_unique(argv)
+    print(argv)
     if len(argv) > 1:
         application = argv[1]
         application_module = __import__(application)
+        print(application_module, application)
         try:
             # by default docopt uses sys.argv[1:]; ensure correct args passed
-            args = docopt(__doc__, argv=argv[1:],
-                          version=application_module.__version__)
+            args = docopt(__doc__, argv=argv[1:], version=application_module.__version__)
             if argv[2] == 'help':
                 raise DocoptExit()
         except DocoptExit:

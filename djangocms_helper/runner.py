@@ -22,7 +22,7 @@ def run(app, argv=sys.argv, extra_args=None):
         argv.insert(2, 'test')
     if extra_args:
         argv.extend(extra_args)
-    runner(argv)
+    return runner(argv)
 
 
 def cms(app, argv=sys.argv, extra_args=None):
@@ -35,6 +35,7 @@ def cms(app, argv=sys.argv, extra_args=None):
         import cms  # NOQA  # nopyflakes
     except ImportError:
         print('runner.cms is available only if django CMS is installed')
+        raise
     if app not in argv[:2]:
         # app is automatically added if not present
         argv.insert(1, app)
@@ -46,7 +47,7 @@ def cms(app, argv=sys.argv, extra_args=None):
         argv.append('--cms')
     if extra_args:
         argv.extend(extra_args)
-    runner(argv)
+    return runner(argv)
 
 
 def runner(argv):
@@ -60,4 +61,4 @@ def runner(argv):
     extra_settings = any(map(lambda x: x.startswith('--extra-settings='), argv))
     if os.path.basename(helper) != HELPER_FILE and not extra_settings:
         argv.append('--extra-settings=%s' % helper)
-    main(argv)
+    return main(argv)
