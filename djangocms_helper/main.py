@@ -31,7 +31,7 @@ Usage:
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent]
+    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent[=path]]
     djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate]
 
 Options:
@@ -46,7 +46,7 @@ Options:
     --nose-runner               Use django-nose as test runner
     --simple-runner             User DjangoTestSuiteRunner
     --boilerplate               Add support for aldryn-boilerplates
-    --persistent                Use persistent storage
+    --persistent[=path]         Use persistent storage
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
@@ -266,11 +266,16 @@ def core(args, application):
         RuntimeWarning, r'django\.db\.models\.fields')
     if args['--persistent']:
         create_dir = persistent_dir
+        if args['--persistent'] is not True:
+            parent_path = args['--persistent']
+        else:
+            parent_path = 'data'
     else:
         create_dir = temp_dir
+        parent_path = '/dev/shm'
 
-    with create_dir() as STATIC_ROOT:
-        with create_dir() as MEDIA_ROOT:
+    with create_dir('static', parent_path) as STATIC_ROOT:
+        with create_dir('media', parent_path) as MEDIA_ROOT:
             args['MEDIA_ROOT'] = MEDIA_ROOT
             args['STATIC_ROOT'] = STATIC_ROOT
             if args['cms_check']:
