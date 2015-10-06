@@ -93,6 +93,10 @@ def temp_dir():
     yield name
     shutil.rmtree(name)
 
+@contextlib.contextmanager
+def persistent_dir():
+    name = make_temp_dir()
+    yield name
 
 def make_temp_dir():
     if os.path.exists('/dev/shm/'):

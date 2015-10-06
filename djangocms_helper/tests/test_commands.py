@@ -45,6 +45,7 @@ DEFAULT_ARGS = {
     '--dry-run': False,
     '--empty': False,
     '--native': False,
+    '--persistent': False,
     '--bind': '',
     '--port': '',
     '<test-label>': '',
@@ -364,6 +365,8 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['pyflakes'] = True
                 core(args, self.application)
+        self.assertFalse(os.path.exists(args['STATIC_ROOT']))
+        self.assertFalse(os.path.exists(args['MEDIA_ROOT']))
 
     def test_pyflakes_nocms(self):
         try:
@@ -377,6 +380,8 @@ class CommandTests(unittest.TestCase):
                 args['pyflakes'] = True
                 core(args, self.application)
             self.assertTrue('Static analisys available only if django CMS is installed' in out.getvalue())
+        self.assertFalse(os.path.exists(args['STATIC_ROOT']))
+        self.assertFalse(os.path.exists(args['MEDIA_ROOT']))
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
@@ -390,10 +395,13 @@ class CommandTests(unittest.TestCase):
                 with self.assertRaises(SystemExit) as exit:
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
+                    args['--persistent'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
         self.assertTrue('Ran 12 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
+        self.assertTrue(os.path.exists(args['STATIC_ROOT']))
+        self.assertTrue(os.path.exists(args['MEDIA_ROOT']))
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
