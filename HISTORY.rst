@@ -3,7 +3,7 @@
 History
 -------
 
-0.9.3 (XXXX-XX-XX)
+0.9.3 (2015-10-07)
 ++++++++++++++++++
 
 * Add --no-migrate option to skip migrations
