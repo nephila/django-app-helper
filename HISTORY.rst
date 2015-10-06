@@ -11,6 +11,7 @@ History
 * Better request mocking
 * Fix test on django CMS 3.2 (develop)
 * Add support for Python 3.5
+* Add --persistent option for persistent storage
 
 0.9.2 (2015-09-14)
 ++++++++++++++++++
