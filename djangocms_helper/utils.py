@@ -102,7 +102,7 @@ def make_temp_dir(suffix='', container='/dev/shm/'):
 
 @contextlib.contextmanager
 def persistent_dir(suffix, container='data'):
-    name = os.path.join(container, suffix)
+    name = os.path.abspath(os.path.join(container, suffix))
     if not os.path.exists(name):
         os.makedirs(name)
     yield name

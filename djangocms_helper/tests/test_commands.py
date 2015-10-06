@@ -7,6 +7,7 @@ import shutil
 import sys
 from copy import copy
 from distutils.version import LooseVersion
+from tempfile import mkdtemp
 
 import django
 from django.utils.encoding import force_text
@@ -395,7 +396,7 @@ class CommandTests(unittest.TestCase):
                 with self.assertRaises(SystemExit) as exit:
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
-                    args['--persistent'] = True
+                    args['--persistent'] = mkdtemp()
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
         self.assertTrue('Ran 12 tests in' in err.getvalue())

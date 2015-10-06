@@ -68,8 +68,8 @@ Options
 * ``--migrate``: use migrations (default);
 * ``--persistent``: use persistent storage for media and static; if given without arguments the
                     storage is created in ``data`` directory in the root of the application; if
-                    argument is provided, the given path is used as parent for ``media`` and
-                    ``static``;
+                    argument is provided, it's used as parent path (either absolute or relative)
+                    for ``media`` and ``static``;
 * ``--no-migrate``: skip migrations;
 * ``--boilerplate``: adds ``aldryn-boilerplates`` configuration to settings;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
