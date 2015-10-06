@@ -349,13 +349,14 @@ def main(argv=sys.argv):  # pragma: no cover
     sys.path.insert(0, '.')
     # ensure that argv, are unique and the same type as doc string
     argv = ensure_unicoded_and_unique(argv)
+    print(argv)
     if len(argv) > 1:
         application = argv[1]
         application_module = __import__(application)
+        print(application_module, application)
         try:
             # by default docopt uses sys.argv[1:]; ensure correct args passed
-            args = docopt(__doc__, argv=argv[1:],
-                          version=application_module.__version__)
+            args = docopt(__doc__, argv=argv[1:], version=application_module.__version__)
             if argv[2] == 'help':
                 raise DocoptExit()
         except DocoptExit:
