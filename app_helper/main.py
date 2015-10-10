@@ -49,7 +49,7 @@ Options:
     --boilerplate               Add support for aldryn-boilerplates
     --persistent[=path]         Use persistent storage
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
-    --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
+    --extra-settings=</path/to/settings.py>     Filesystem path to a custom app_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
     --runner-options=<option1>,<option2>        Comma separated list of command line options for the test runner
     --port=<port>                               Port to listen on [default: 8000].

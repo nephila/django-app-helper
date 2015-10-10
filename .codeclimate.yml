@@ -4,6 +4,7 @@ languages:
   PHP: false
   Python: true
 exclude_paths:
- - 'djangocms_helper/test_data/*'
- - 'djangocms_helper/test_utils/*'
- - 'djangocms_helper/tests/*'
+ - "app_helper/test_data/*"
+ - "app_helper/test_utils/*"
+ - "app_helper/tests/*"
+ - "app_helper/*"

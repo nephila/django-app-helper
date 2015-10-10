@@ -198,13 +198,13 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
         ]
-        URLCONF = 'djangocms_helper.urls'
+        URLCONF = 'app_helper.urls'
     else:
         CMS_APPS = []
         CMS_APP_STYLE = []
         CMS_MIDDLEWARE = []
         CMS_PROCESSORS = []
-        URLCONF = 'djangocms_helper.urls'
+        URLCONF = 'app_helper.urls'
 
     CMS_1_7_MIGRATIONS = {}
     try:

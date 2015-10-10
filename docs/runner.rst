@@ -2,8 +2,8 @@
 Integrated runner
 =================
 
-django CMS Helper provide a runner to invoke the commands without requiring the
-``djangocms-helper`` file; this can be useful to invoke tests with coverage or to
+Django App Helper provide a runner to invoke the commands without requiring the
+``django-app-helper`` file; this can be useful to invoke tests with coverage or to
 have a simpler syntax to remember.
 
 Typically you'd setup the runner function in the :ref:`extra settings file <extra-settings>`::
@@ -19,22 +19,22 @@ Typically you'd setup the runner function in the :ref:`extra settings file <extr
 
 
     def run():
-        from djangocms_helper import runner
+        from app_helper import runner
         runner.cms('my_app')
 
     if __name__ == "__main__":
         run()
 
 
-with the above code in place you can run any django CMS Helper command as::
+with the above code in place you can run any Django App Helper command as::
 
-    python cms_helper.py <command>
+    python app_helper.py <command>
 
 and adding the ``test_suite`` argument to ``setup.py``::
 
     setup(
         ...
-        test_suite='cms_helper.run',
+        test_suite='app_helper.run',
         ...
     )
 
@@ -50,7 +50,7 @@ If you don't need django CMS, you can use a runner function with no CMS attached
 
 
     def run():
-        from djangocms_helper import runner
+        from app_helper import runner
         runner.run('my_app')
 
     if __name__ == "__main__":
@@ -72,7 +72,7 @@ Sometimes you just want to properly setup a Django environment without running a
 
     def setup():
         import sys
-        from djangocms_helper import runner
+        from app_helper import runner
         runner.setup('my_app', sys.modules[__name__], use_cms=True)
 
 

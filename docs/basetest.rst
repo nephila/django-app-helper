@@ -1,5 +1,5 @@
 Base test class
 ===============
 
-.. automodule:: djangocms_helper.base_test
+.. automodule:: app_helper.base_test
     :members:

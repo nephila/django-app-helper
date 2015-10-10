@@ -41,13 +41,13 @@ HELPER_SETTINGS = {
 
 
 def run():
-    from djangocms_helper import runner
+    from app_helper import runner
     runner.cms('example1')
 
 
 def setup():
     import sys
-    from djangocms_helper import runner
+    from app_helper import runner
     runner.setup('example1', sys.modules[__name__], use_cms=True)
 
 if __name__ == "__main__":
