@@ -25,13 +25,14 @@ dj-database-url compatible value.
 
 Usage:
     djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [options]
-    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate] [--no-migrate] [--boilerplate]
+    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent[=path]]
+    djangocms-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate]
 
 Options:
@@ -257,6 +258,10 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
     })
 
 
+def setup_env(settings):
+    return settings
+
+
 def core(args, application):
     from django.conf import settings
 
@@ -325,8 +330,7 @@ def core(args, application):
                                             args['--runner-options'])
                         sys.exit(num_failures)
                 elif args['server']:
-                    server(args['--bind'], args['--port'],
-                           args.get('--migrate', True))
+                    server(args['--bind'], args['--port'], args.get('--migrate', True))
                 elif args['cms_check']:
                     cms_check(args.get('--migrate', True))
                 elif args['compilemessages']:
@@ -341,6 +345,8 @@ def core(args, application):
                     return static_analisys(application)
                 elif args['authors']:
                     return generate_authors()
+                elif args['setup']:
+                    return setup_env(settings)
 
 
 def main(argv=sys.argv):  # pragma: no cover
@@ -372,6 +378,6 @@ def main(argv=sys.argv):  # pragma: no cover
             args['test'] = False
             args['<command>'] = 'test'
             args['options'].remove('--native')
-        core(args=args, application=application)
+        return core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)

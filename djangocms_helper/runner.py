@@ -5,14 +5,14 @@ import inspect
 import os.path
 import sys
 
-from . import HELPER_FILE
-
 
 def run(app, argv=sys.argv, extra_args=None):
     """
-    Function to invoke to run commands in a plain django environment
+    Run commands in a plain django environment
 
     :param app: application
+    :param argv: arguments (default to sys.argv)
+    :param extra_args: list of extra arguments
     """
     if app not in argv[:2]:
         # app is automatically added if not present
@@ -27,9 +27,11 @@ def run(app, argv=sys.argv, extra_args=None):
 
 def cms(app, argv=sys.argv, extra_args=None):
     """
-    Function to invoke to run commands in a django CMS environment
+    Run commands in a django cMS environment
 
     :param app: application
+    :param argv: arguments (default to sys.argv)
+    :param extra_args: list of extra arguments
     """
     try:
         import cms  # NOQA  # nopyflakes
@@ -50,7 +52,27 @@ def cms(app, argv=sys.argv, extra_args=None):
     return runner(argv)
 
 
+def setup(app, helper_module, extra_args=None, use_cms=False):
+    """
+    Setup the Django / django CMS environment and return the environment settings.
+
+    :param app: application
+    :param helper_module: helper module
+    :param extra_args: list of extra arguments
+    :param use_cms: setup a django CMS environemtn
+    :return: Django settings module
+    """
+    helper = helper_module.__file__
+    argv = [os.path.basename(helper), app, 'setup', '--extra-settings={0}'.format(helper)]
+    if use_cms:
+        argv.append('--cms')
+    if extra_args:
+        argv.extend(extra_args)
+    return runner(argv)
+
+
 def runner(argv):
+    from . import HELPER_FILE
     from .main import main
 
     # This is a hackish way to get the caller file which is the file

@@ -55,8 +55,7 @@ def load_from_file(module_path):
     imported = None
     if module_path:
         with open(module_path, 'r') as openfile:
-            imported = load_module('mod', openfile, module_path,
-                                   ('imported', 'r', PY_SOURCE))
+            imported = load_module('mod', openfile, module_path, ('imported', 'r', PY_SOURCE))
     return imported
 
 
@@ -157,7 +156,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         if not extra_settings_file:
             extra_settings_file = HELPER_FILE
         if extra_settings_file[-3:] != '.py':
-            extra_settings_file = '%s.py' % extra_settings_file
+            filename, __ = os.path.splitext(extra_settings_file)
+            extra_settings_file = '{0}.py'.format(filename)
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
     except (IOError, AttributeError):
         extra_settings = None

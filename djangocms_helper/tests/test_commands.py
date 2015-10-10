@@ -519,6 +519,13 @@ class CommandTests(unittest.TestCase):
                         data = runner.run('example1', args)
                     self.assertEqual(data, [u'djangocms_helper', u'example1', u'test'])
 
+    def test_setup(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                from djangocms_helper.test_utils import cms_helper
+                settings = runner.setup('example1', cms_helper)
+        self.assertTrue('example2' in settings.INSTALLED_APPS)
+
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
     @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.8'),
