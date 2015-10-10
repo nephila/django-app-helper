@@ -519,12 +519,29 @@ class CommandTests(unittest.TestCase):
                         data = runner.run('example1', args)
                     self.assertEqual(data, [u'djangocms_helper', u'example1', u'test'])
 
-    def test_setup(self):
+    def test_setup_cms(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 from djangocms_helper.test_utils import cms_helper
-                settings = runner.setup('example1', cms_helper)
+                settings = runner.setup(
+                    'example1', cms_helper, use_cms=True, extra_args=['--boilerplate']
+                )
         self.assertTrue('example2' in settings.INSTALLED_APPS)
+        self.assertTrue('aldryn_boilerplates' in settings.INSTALLED_APPS)
+        self.assertTrue('cms' in settings.INSTALLED_APPS)
+
+    def test_setup_nocms(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                from djangocms_helper.test_utils import cms_helper
+                settings = runner.setup('example1', cms_helper, extra_args=[])
+        self.assertTrue('example2' in settings.INSTALLED_APPS)
+        self.assertFalse('aldryn_boilerplates' in settings.INSTALLED_APPS)
+        self.assertFalse('cms' in settings.INSTALLED_APPS)
 
     @unittest.skipIf(sys.version_info < (2, 7),
                      reason='Example test non discoverable in Python 2.6')
