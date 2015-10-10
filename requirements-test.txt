@@ -5,3 +5,4 @@ wheel
 tox>=1.8
 django-filer
 django-nose
+aldryn-boilerplates

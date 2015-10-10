@@ -76,7 +76,7 @@ Try a couple of the other commands; they're mostly self-explanatory::
 
     djangocms-helper <myapp> cms_check  # runs the django CMS check command
 
-Note that the last of these doesn't take the ``--cms`` option, because of course that is implied
+Note that the last of these doesn't require the ``--cms`` option, because of course that is implied
 anyway by ``cms_check``.
 
 
@@ -100,3 +100,21 @@ Or::
 to invoke a server.
 
 See :doc:`runner` for details.
+
+
+==================
+Sphinx integration
+==================
+
+When documenting a project using Sphinx autodoc, you mostly need a proper project setup, because
+the imports in your application's modules will trigger Django setup code anyway.
+
+Using the :ref:`naked_runner` it's easy to let helper setup an environment for you:
+
+* setup the :ref:`naked_runner`
+* add the following code to sphinx ``conf.py``::
+
+    sys.path.insert(0, os.path.abspath('..'))
+    import cms_helper
+    cms_helper.setup()
+

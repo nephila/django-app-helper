@@ -60,3 +60,22 @@ If you don't need django CMS, you can use a runner function with no CMS attached
 .. warning:: The runner **must** be invoked from the **settings** file.
              The runner takes care of setting up the file in which is
              invoked as the ``extra_settings`` file.
+
+.. _naked_runner:
+
+Naked setup
+===========
+
+Sometimes you just want to properly setup a Django environment without running any commands
+(e.g: when building Sphinx docs using autodoc). Naked setup allows to do so::
+
+
+    def setup():
+        import sys
+        from djangocms_helper import runner
+        runner.setup('my_app', sys.modules[__name__], use_cms=True)
+
+
+.. warning:: The runner **must** be invoked from the **settings** file.
+             The runner takes care of setting up the file in which is
+             invoked as the ``extra_settings`` file.

@@ -21,6 +21,7 @@ The utilities provided:
 * help manage Django and South migrations
 * perform static analysis using pyflakes
 * build an authors list automatically
+* setting up a Django environment
 
 django CMS Helper was created by Iacopo Spalletti.
 
