@@ -157,6 +157,7 @@ class CommandTests(unittest.TestCase):
                         if DJANGO_1_7:
                             # Check the loaders
                             self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATE_LOADERS)
+                            self.assertTrue('admin_tools.template_loaders.Loader' in local_settings.TEMPLATE_LOADERS)
                             # Existing application is kept
                             self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
                             # New one is added
@@ -170,6 +171,7 @@ class CommandTests(unittest.TestCase):
                         else:
                             # Check the loaders
                             self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
+                            self.assertTrue('admin_tools.template_loaders.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
                             # Existing application is kept
                             self.assertTrue('django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
                             # New one is added

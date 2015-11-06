@@ -41,6 +41,7 @@ to make easier to customise the configuration:
 
 * ``INSTALLED_APPS``
 * ``TEMPLATE_CONTEXT_PROCESSORS``
+* ``TEMPLATE_LOADERS``
 * ``MIDDLEWARE_CLASSES``
 
 Other extra setting:

@@ -3,6 +3,6 @@ coverage
 coveralls
 wheel
 tox>=1.8
-django-filer
+https://github.com/stefanfoulis/django-filer/archive/develop.zip
 django-nose
 aldryn-boilerplates

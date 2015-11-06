@@ -13,6 +13,9 @@ HELPER_SETTINGS = {
     'TEMPLATE_CONTEXT_PROCESSORS': [
         'django.core.context_processors.debug'
     ],
+    'TEMPLATE_LOADERS': [
+        'admin_tools.template_loaders.Loader',
+    ],
     'TOP_MIDDLEWARE_CLASSES': [
         'top_middleware',
     ],

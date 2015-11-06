@@ -138,6 +138,13 @@ def _reset_django(settings):
         clear_url_caches()
 
 
+def extend_settings(settings, extra_settings, key, insertion_point):
+    for item in extra_settings[key]:
+        if item not in settings[key]:
+            settings[key].insert(settings[key].index(insertion_point), item)
+    return settings
+
+
 def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     """
     Setup the Django settings
@@ -238,26 +245,18 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     default_settings.update(configs)
 
     if extra_settings:
-        apps = extra_settings.get('INSTALLED_APPS', [])
-        apps_top = extra_settings.get('TOP_INSTALLED_APPS', [])
-        template_processors = extra_settings.get('TEMPLATE_CONTEXT_PROCESSORS', [])
-        middleware = extra_settings.get('MIDDLEWARE_CLASSES', [])
-        middleware_top = extra_settings.get('TOP_MIDDLEWARE_CLASSES', [])
-        if 'INSTALLED_APPS' in extra_settings:
-            del(extra_settings['INSTALLED_APPS'])
-        if 'TOP_INSTALLED_APPS' in extra_settings:
-            del(extra_settings['TOP_INSTALLED_APPS'])
-        if 'TEMPLATE_CONTEXT_PROCESSORS' in extra_settings:
-            del(extra_settings['TEMPLATE_CONTEXT_PROCESSORS'])
-        if 'MIDDLEWARE_CLASSES' in extra_settings:
-            del(extra_settings['MIDDLEWARE_CLASSES'])
-        if 'TOP_MIDDLEWARE_CLASSES' in extra_settings:
-            del(extra_settings['TOP_MIDDLEWARE_CLASSES'])
+        apps = extra_settings.pop('INSTALLED_APPS', [])
+        apps_top = extra_settings.pop('TOP_INSTALLED_APPS', [])
+        template_processors = extra_settings.pop('TEMPLATE_CONTEXT_PROCESSORS', [])
+        template_loaders = extra_settings.pop('TEMPLATE_LOADERS', [])
+        middleware = extra_settings.pop('MIDDLEWARE_CLASSES', [])
+        middleware_top = extra_settings.pop('TOP_MIDDLEWARE_CLASSES', [])
         default_settings.update(extra_settings)
         for app in apps_top:
             default_settings['INSTALLED_APPS'].insert(0, app)
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
+        default_settings['TEMPLATE_LOADERS'].extend(template_loaders)
         default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
         for middleware in middleware_top:
             default_settings['MIDDLEWARE_CLASSES'].insert(0, middleware)
@@ -285,24 +284,16 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         if 'ALDRYN_BOILERPLATE_NAME' in default_settings.keys():
             del boilerplate_settings['ALDRYN_BOILERPLATE_NAME']
 
-        for item in boilerplate_settings['STATICFILES_FINDERS']:
-            if item not in default_settings['STATICFILES_FINDERS']:
-                default_settings['STATICFILES_FINDERS'].insert(
-                    default_settings['STATICFILES_FINDERS'].index(
-                        'django.contrib.staticfiles.finders.AppDirectoriesFinder'
-                    ),
-                    item
-                )
+        default_settings = extend_settings(
+            default_settings, boilerplate_settings, 'STATICFILES_FINDERS',
+            'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+        )
         del boilerplate_settings['STATICFILES_FINDERS']
 
-        for item in boilerplate_settings['TEMPLATE_LOADERS']:
-            if item not in default_settings['TEMPLATE_LOADERS']:
-                default_settings['TEMPLATE_LOADERS'].insert(
-                    default_settings['TEMPLATE_LOADERS'].index(
-                        'django.template.loaders.app_directories.Loader'
-                    ),
-                    item
-                )
+        default_settings = extend_settings(
+            default_settings, boilerplate_settings, 'TEMPLATE_LOADERS',
+            'django.template.loaders.app_directories.Loader'
+        )
         del boilerplate_settings['TEMPLATE_LOADERS']
 
         for setting in ('INSTALLED_APPS', 'TEMPLATE_CONTEXT_PROCESSORS'):
