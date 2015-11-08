@@ -124,7 +124,7 @@ class CommandTests(unittest.TestCase):
         from django.conf import settings
 
         with work_in(self.basedir):
-            with captured_output() as (out, err):
+            #with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 with temp_dir() as STATIC_ROOT:
                     with temp_dir() as MEDIA_ROOT:
@@ -157,28 +157,40 @@ class CommandTests(unittest.TestCase):
                         if DJANGO_1_7:
                             # Check the loaders
                             self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATE_LOADERS)
+                            # Loaders declared in settings
+                            self.assertTrue('admin_tools.template_loaders.Loader' in local_settings.TEMPLATE_LOADERS)
                             # Existing application is kept
                             self.assertTrue('django.core.context_processors.request' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
                             # New one is added
                             self.assertTrue('django.core.context_processors.debug' in local_settings.TEMPLATE_CONTEXT_PROCESSORS)
+                            # Check template dirs
+                            self.assertTrue('some/dir' in local_settings.TEMPLATE_DIRS)
                             # Check for aldryn boilerplates
                             for name, value in boilerplate_settings.items():
                                 if type(value) in (list, tuple):
                                     self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
+                                elif name == 'ALDRYN_BOILERPLATE_NAME':
+                                    self.assertEqual(getattr(local_settings, name), 'legacy')
                                 else:
                                     self.assertTrue(value in getattr(local_settings, name))
                         else:
                             # Check the loaders
                             self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
+                            # Loaders declared in settings
+                            self.assertTrue('admin_tools.template_loaders.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
                             # Existing application is kept
                             self.assertTrue('django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
                             # New one is added
                             self.assertTrue('django.template.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
+                            # Check template dirs
+                            self.assertTrue('some/dir' in local_settings.TEMPLATES[0]['DIRS'])
                             # Check for aldryn boilerplates
                             for name, value in boilerplate_settings.items():
                                 if not name.startswith('TEMPLATE'):
                                     if type(value) in (list, tuple):
                                         self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
+                                    elif name == 'ALDRYN_BOILERPLATE_NAME':
+                                        self.assertEqual(getattr(local_settings, name), 'legacy')
                                     else:
                                         self.assertTrue(value in getattr(local_settings, name))
                                 elif name == 'TEMPLATE_CONTEXT_PROCESSORS':

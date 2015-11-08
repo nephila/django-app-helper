@@ -13,6 +13,9 @@ HELPER_SETTINGS = {
     'TEMPLATE_CONTEXT_PROCESSORS': [
         'django.core.context_processors.debug'
     ],
+    'TEMPLATE_LOADERS': [
+        'admin_tools.template_loaders.Loader',
+    ],
     'TOP_MIDDLEWARE_CLASSES': [
         'top_middleware',
     ],
@@ -21,5 +24,9 @@ HELPER_SETTINGS = {
     ],
     'TOP_INSTALLED_APPS': [
         'djangocms_admin_style'
-    ]
+    ],
+    'ALDRYN_BOILERPLATE_NAME': 'legacy',
+    'TEMPLATE_DIRS': [
+        'some/dir'
+    ],
 }
