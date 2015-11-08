@@ -249,6 +249,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         apps_top = extra_settings.pop('TOP_INSTALLED_APPS', [])
         template_processors = extra_settings.pop('TEMPLATE_CONTEXT_PROCESSORS', [])
         template_loaders = extra_settings.pop('TEMPLATE_LOADERS', [])
+        template_dirs = extra_settings.pop('TEMPLATE_DIRS', [])
         middleware = extra_settings.pop('MIDDLEWARE_CLASSES', [])
         middleware_top = extra_settings.pop('TOP_MIDDLEWARE_CLASSES', [])
         default_settings.update(extra_settings)
@@ -257,6 +258,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         default_settings['INSTALLED_APPS'].extend(apps)
         default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
         default_settings['TEMPLATE_LOADERS'].extend(template_loaders)
+        if 'TEMPLATE_DIRS' not in default_settings:
+            default_settings['TEMPLATE_DIRS'] = []
+        default_settings['TEMPLATE_DIRS'].extend(template_dirs)
         default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
         for middleware in middleware_top:
             default_settings['MIDDLEWARE_CLASSES'].insert(0, middleware)
@@ -315,8 +319,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         ]
         if 'TEMPLATE_DIRS' in default_settings:
             default_settings['TEMPLATES'][0]['DIRS'] = default_settings.pop('TEMPLATE_DIRS')
-        else:
-            default_settings['TEMPLATES'][0]['DIRS'] = []
 
     # Support for custom user models
     if 'AUTH_USER_MODEL' in os.environ:

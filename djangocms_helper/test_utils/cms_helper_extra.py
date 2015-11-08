@@ -24,5 +24,9 @@ HELPER_SETTINGS = {
     ],
     'TOP_INSTALLED_APPS': [
         'djangocms_admin_style'
-    ]
+    ],
+    'ALDRYN_BOILERPLATE_NAME': 'legacy',
+    'TEMPLATE_DIRS': [
+        'some/dir'
+    ],
 }
