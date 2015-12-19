@@ -27,7 +27,7 @@ Usage:
     djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [options]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
+    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
@@ -48,6 +48,7 @@ Options:
     --simple-runner             User DjangoTestSuiteRunner
     --boilerplate               Add support for aldryn-boilerplates
     --persistent[=path]         Use persistent storage
+    --locale=locale,-l=locale   Update messgaes for given locale
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
@@ -110,14 +111,16 @@ def compilemessages(application):
         call_command('compilemessages', all=True)
 
 
-def makemessages(application):
+def makemessages(application, locale):
     """
     Updates the locale message files
     """
     from django.core.management import call_command
 
+    if not locale:
+        locale = 'en'
     with work_in(application):
-        call_command('makemessages', locale=('en',))
+        call_command('makemessages', locale=(locale,))
 
 
 def cms_check(migrate_cmd=False):
@@ -336,7 +339,7 @@ def core(args, application):
                 elif args['compilemessages']:
                     compilemessages(application)
                 elif args['makemessages']:
-                    makemessages(application)
+                    makemessages(application, locale=args['--locale'])
                 elif args['makemigrations']:
                     makemigrations(application, merge=args['--merge'], dry_run=args['--dry-run'],
                                    empty=args['--empty'],

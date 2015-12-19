@@ -126,15 +126,21 @@ update and compile locales
 
 ::
 
+    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--locale=locale]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
-    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms]
 
 Examples::
 
-    djangocms-helper some_application compilemessages --cms
     djangocms-helper some_application makemessages --cms
+    djangocms-helper some_application compilemessages --cms
 
 These two commands compiles and update the locale messages.
+
+Options
+-------
+
+* ``--locale=locale``: ``makemessages`` allows a single option to choose the locale to update.
+                       If not provided **en** is used.
 
 makemigrations
 ==============
