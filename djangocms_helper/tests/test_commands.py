@@ -42,6 +42,7 @@ DEFAULT_ARGS = {
     '--cms': True,
     '--failfast': False,
     '--merge': False,
+    '--locale': '',
     '--boilerplate': False,
     '--dry-run': False,
     '--empty': False,
