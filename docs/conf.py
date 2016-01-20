@@ -20,7 +20,7 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../djangocms_helper/test_utils'))
 import cms_helper
-cms_helper.setup()
+cms_helper.setup_nocms()
 
 # -- General configuration ------------------------------------------------
 

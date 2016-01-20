@@ -50,5 +50,12 @@ def setup():
     from djangocms_helper import runner
     runner.setup('example1', sys.modules[__name__], use_cms=True)
 
+
+def setup_nocms():
+    import sys
+    from djangocms_helper import runner
+    runner.setup('example1', sys.modules[__name__], use_cms=False)
+
+
 if __name__ == "__main__":
     run()
