@@ -7,6 +7,9 @@ History
 ++++++++++++++++++
 
 * Add Naked setup mode
+* Add TEMPLATE_DIRS to special settings
+* Add TEMPLATE_LOADERS to special settings
+* Allow to specify a locale in makemessages
 
 0.9.3 (2015-10-07)
 ++++++++++++++++++
