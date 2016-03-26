@@ -72,6 +72,14 @@ The basic command structure is::
 where **<application>** is the django application name and **<command>** is one
 of the available commands. Optins vary for each command.
 
+*************
+Bootstrapping
+*************
+
+To bootstrap a project using ``djangocms-helper`` you may want to have a look at `cookiecutter-djangopackage-helper <https://github.com/nephila/cookiecutter-djangopackage-helper>`_, a `cookiecutter <https://github.com/audreyr/cookiecutter>`_ template for ``djangocms-helper``.
+
+To use it follows `usage instructions <https://github.com/nephila/cookiecutter-djangopackage-helper#usage>`_
+
 ******
 Runner
 ******
@@ -122,3 +130,4 @@ Thanks
 The general logic and part of the code of the whole application is heavily taken from
 `django CMS's <https://github.com/divio/django-cms>`_ own `develop.py` so all the contributors
 deserve a huge thanks for their work.
+
