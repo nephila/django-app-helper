@@ -145,7 +145,10 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
 
     apps = [application]
     if extra_applications:
-        apps += extra_applications
+        if isinstance(extra_applications, text_type):
+            apps += [extra_applications]
+        elif isinstance(extra_applications, list):
+            apps += extra_applications
 
     if DJANGO_1_6:
         from south.exceptions import NoMigrations
