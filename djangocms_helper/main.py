@@ -238,7 +238,7 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
             usr = create_user('admin', 'admin@admin.com', 'admin', is_staff=True,
                               is_superuser=True)
             print('')
-            print('A admin user (username: %s, password: admin)'
+            print('A admin user (username: %s, password: admin) '
                   'has been created.' % usr.get_username())
             print('')
     from django.contrib.staticfiles.management.commands import runserver
