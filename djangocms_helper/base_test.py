@@ -25,7 +25,6 @@ class BaseTestCase(TestCase):
     """
     Utils class that provides some helper methods to setup and interact with
     Django testing framework.
-
     """
     request_factory = None
     user = None
@@ -35,29 +34,67 @@ class BaseTestCase(TestCase):
     languages = None
     _login_context = None
 
-    """
-    List of pages data for the different languages
+    #: Username for auto-generated superuser
+    _admin_user_username = 'admin'
+    #: Password for auto-generated superuser
+    _admin_user_password = 'admin'
+    #: Email for auto-generated superuser
+    _admin_user_email = 'admin@admin.com'
 
-    Example implementation::
+    #: Username for auto-generated staff user
+    _staff_user_username = 'staff'
+    #: Password for auto-generated staff user
+    _staff_user_password = 'staff'
+    #: Email for auto-generated staff user
+    _staff_user_email = 'staff@admin.com'
 
-    _pages_data = (
-        {'en': {'title': 'Page title', 'template': 'page.html', 'publish': True},
-         'fr': {'title': 'Titre', 'publish': True},
-         'it': {'title': 'Titolo pagina', 'publish': False}},
-    )
-    """
+    #: Username for auto-generated non-staff user
+    _user_user_username = 'normal'
+    #: Password for auto-generated non-staff user
+    _user_user_password = 'normal'
+    #: Email for auto-generated non-staff user
+    _user_user_email = 'user@admin.com'
+
     _pages_data = ()
+    """
+    List of pages data for the different languages.
+
+    Each item of the list is a dictionary containing the attributes
+    (as accepted by ``cms.api.create_page``) of the page to be created.
+
+    The first language will be created with ``cms.api.create_page`` the following
+    languages using ``cms.api.create_title``
+
+    Example:
+        Single page created in en, fr, it languages::
+
+            _pages_data = (
+                {
+                    'en': {'title': 'Page title', 'template': 'page.html', 'publish': True},
+                    'fr': {'title': 'Titre', 'publish': True},
+                    'it': {'title': 'Titolo pagina', 'publish': False}
+                },
+            )
+
+    """
 
     @classmethod
     def setUpClass(cls):
         from django.contrib.sites.models import Site
         super(BaseTestCase, cls).setUpClass()
         cls.request_factory = RequestFactory()
-        cls.user = create_user('admin', 'admin@admin.com', 'admin',
-                               is_staff=True, is_superuser=True)
-        cls.user_staff = create_user('staff', 'staff@admin.com', 'staff',
-                                     is_staff=True)
-        cls.user_normal = create_user('normal', 'normal@admin.com', 'normal')
+        cls.user = create_user(
+            cls._admin_user_username, cls._admin_user_email, cls._admin_user_password,
+            is_staff=True, is_superuser=True
+        )
+        cls.user_staff = create_user(
+            cls._staff_user_username, cls._staff_user_email, cls._staff_user_password,
+            is_staff=True, is_superuser=True
+        )
+        cls.user_normal = create_user(
+            cls._user_user_username, cls._user_user_email, cls._user_user_password,
+            is_staff=True, is_superuser=True
+        )
         cls.site_1 = Site.objects.get(pk=1)
 
         try:

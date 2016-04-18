@@ -19,6 +19,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../djangocms_helper/test_utils'))
+sys.path.insert(1, os.path.abspath('..'))
 import cms_helper
 cms_helper.setup_nocms()
 
@@ -32,13 +33,15 @@ cms_helper.setup_nocms()
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    #'sphinx.ext.intersphinx',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
 ]
-
+intersphinx_mapping = {
+    'djangocms': ('http://readthedocs.org/docs/django-cms/en/latest/', None),
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
