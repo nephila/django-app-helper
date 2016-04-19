@@ -89,11 +89,11 @@ class BaseTestCase(TestCase):
         )
         cls.user_staff = create_user(
             cls._staff_user_username, cls._staff_user_email, cls._staff_user_password,
-            is_staff=True, is_superuser=True
+            is_staff=True, is_superuser=False
         )
         cls.user_normal = create_user(
             cls._user_user_username, cls._user_user_email, cls._user_user_password,
-            is_staff=True, is_superuser=True
+            is_staff=False, is_superuser=False
         )
         cls.site_1 = Site.objects.get(pk=1)
 
