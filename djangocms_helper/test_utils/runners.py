@@ -2,7 +2,10 @@
 import sys
 
 from django.test.runner import DiscoverRunner
-from django.utils import unittest
+try:
+    from django.utils import unittest
+except ImportError:
+    import unittest
 
 
 class CapturedOutputRunner(DiscoverRunner):

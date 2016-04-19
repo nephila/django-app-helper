@@ -389,7 +389,14 @@ def create_user(username, email, password, is_staff=False, is_superuser=False,
                 base_cms_permissions=False, permissions=None):
     from django.contrib.auth.models import Permission
     User = get_user_model()
-    user = User()
+
+    try:
+        if User.USERNAME_FIELD == 'email':
+            user = User.objects.get(**{User.USERNAME_FIELD: email})
+        else:
+            user = User.objects.get(**{User.USERNAME_FIELD: username})
+    except User.DoesNotExist:
+        user = User()
 
     if User.USERNAME_FIELD != 'email':
         setattr(user, User.USERNAME_FIELD, username)
