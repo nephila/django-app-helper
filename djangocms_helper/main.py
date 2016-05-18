@@ -24,7 +24,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [options]
+    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--verbose=<level>]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
@@ -59,12 +59,16 @@ Options:
 """  # NOQA # nopyflakes
 
 
-def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]):
+def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[], verbose=1):
     warnings.filterwarnings(
         'error', r'DateTimeField received a naive datetime',
         RuntimeWarning, r'django\.db\.models\.fields')
     from django.conf import settings
     from django.test.utils import get_runner
+    try:
+        verbose = int(verbose)
+    except (ValueError, TypeError):
+        verbose = 1
 
     settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
@@ -76,13 +80,13 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]
             sys.argv.append('-x')
     if runner_options:
         sys.argv.extend(runner_options.split(','))
-    test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
+    test_runner = TestRunner(verbosity=verbose, interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 
 
 def test(test_labels, application, failfast=False, test_runner=None,
-         runner_options=[]):
+         runner_options=[], verbose=1):
     """
     Runs the test suite
     :param test_labels: space separated list of test labels
@@ -98,7 +102,7 @@ def test(test_labels, application, failfast=False, test_runner=None,
                 test_labels = ['%s.tests' % application]
     elif type(test_labels) is text_type:
         test_labels = [test_labels]
-    return _test_run_worker(test_labels, test_runner, failfast, runner_options)
+    return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
 
 
 def compilemessages(application):
@@ -333,7 +337,7 @@ def core(args, application):
                     with context:
                         num_failures = test(args['<test-label>'], application,
                                             args['--failfast'], runner,
-                                            args['--runner-options'])
+                                            args['--runner-options'], args.get('--verbose', 1))
                         sys.exit(num_failures)
                 elif args['server']:
                     server(args['--bind'], args['--port'], args.get('--migrate', True))
