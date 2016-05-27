@@ -314,6 +314,8 @@ class CommandTests(unittest.TestCase):
             self.assertFalse('[WARNING]' in out.getvalue())
             self.assertFalse('[ERROR]' in out.getvalue())
 
+    @unittest.skipIf(LooseVersion(django.get_version()) > LooseVersion('1.8'),
+                     reason='Test for Django up until 1.8')
     def test_cms_check_nocms(self):
         try:
             import cms
@@ -329,6 +331,23 @@ class CommandTests(unittest.TestCase):
                 args['--migrate'] = False
                 core(args, self.application)
             self.assertTrue('cms_check available only if django CMS is installed' in out.getvalue())
+
+    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.9'),
+                     reason='Test for Django 1.9+')
+    def test_cms_check_nocms_19(self):
+        try:
+            import cms
+            raise unittest.SkipTest('django CMS available, skipping test')
+        except ImportError:
+            pass
+        with work_in(self.basedir):
+            with self.assertRaises(ImportError):
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args['cms_check'] = True
+                args['--extra-settings'] = 'cms_helper.py'
+                args['--migrate'] = False
+                core(args, self.application)
 
     @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
                      reason='check command available in Django 1.7+ only')

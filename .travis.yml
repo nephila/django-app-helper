@@ -23,7 +23,11 @@ env:
   - DJANGO='django17' CMS='cmsno'
   - DJANGO='django18' CMS='cms31'
   - DJANGO='django18' CMS='cms32'
+  - DJANGO='django18' CMS='cms33'
   - DJANGO='django18' CMS='cmsno'
+  - DJANGO='django19' CMS='cms32'
+  - DJANGO='django19' CMS='cms33'
+  - DJANGO='django19' CMS='cmsno'
   - TOXENV='pep8'
   - TOXENV='isort'
 
@@ -77,7 +81,15 @@ matrix:
   - python: 2.6
     env: DJANGO='django18' CMS='cms32'
   - python: 2.6
+    env: DJANGO='django18' CMS='cms33'
+  - python: 2.6
     env: DJANGO='django18' CMS='cmsno'
+  - python: 2.6
+    env: DJANGO='django19' CMS='cms32'
+  - python: 2.6
+    env: DJANGO='django19' CMS='cms33'
+  - python: 2.6
+    env: DJANGO='django19' CMS='cmsno'
   - python: 2.7
     env: DJANGO='django17' CMS='cms30'
   - python: 2.7
@@ -102,6 +114,12 @@ matrix:
     env: DJANGO='django17' CMS='cms32'
   - python: 3.3
     env: DJANGO='django17' CMS='cmsno'
+  - python: 3.3
+    env: DJANGO='django19' CMS='cms32'
+  - python: 3.3
+    env: DJANGO='django19' CMS='cms33'
+  - python: 3.3
+    env: DJANGO='django19' CMS='cmsno'
   - python: 3.5
     env: DJANGO='django16' CMS='cms30'
   - python: 3.5
