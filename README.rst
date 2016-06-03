@@ -74,7 +74,7 @@ The basic command structure is::
     djangocms-helper <application> <command> [options ...]
 
 where **<application>** is the django application name and **<command>** is one
-of the available commands. Optins vary for each command.
+of the available commands. Options vary for each command.
 
 *************
 Bootstrapping
