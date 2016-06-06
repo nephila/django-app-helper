@@ -3,7 +3,16 @@
 History
 -------
 
-0.9.4 (XXXX-XX-XX)
+0.9.5 (2016-06-06)
+++++++++++++++++++
+
+* Fixed issue with mocked session storage
+* Added verbosity level to tests
+* Fixed user creation
+* Added option to allow parametrizing auto-created user
+* Fixed extra_applications
+
+0.9.4 (2016-01-20)
 ++++++++++++++++++
 
 * Add Naked setup mode
