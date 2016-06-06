@@ -4,9 +4,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 from contextlib import contextmanager
 from copy import deepcopy
+from importlib import import_module
 
 from django.conf import settings
-from django.contrib.auth import SESSION_KEY
 from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
 from django.template import RequestContext
@@ -244,6 +244,7 @@ class BaseTestCase(TestCase):
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False,
                          secure=False):
         from django.contrib.auth.models import AnonymousUser
+        engine = import_module(settings.SESSION_ENGINE)
 
         request.current_page = SimpleLazyObject(lambda: page)
         if not user:
@@ -251,14 +252,17 @@ class BaseTestCase(TestCase):
                 user = self._login_context.user
             else:
                 user = AnonymousUser()
+        if user.is_authenticated():
+            session_key = user._meta.pk.value_to_string(user)
+        else:
+            session_key = 'session_key'
+
         request.user = user
         request._cached_user = user
-        request.session = {}
+        request.session = engine.SessionStore(session_key)
         if secure:
             request.environ['SERVER_PORT'] = str('443')
             request.environ['wsgi.url_scheme'] = str('https')
-        if user.is_authenticated():
-            request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
         request.cookies = SimpleCookie()
         request.errors = StringIO()
         request.LANGUAGE_CODE = lang
