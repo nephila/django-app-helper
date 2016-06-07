@@ -4,7 +4,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 from contextlib import contextmanager
 from copy import deepcopy
-from importlib import import_module
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
@@ -244,6 +243,11 @@ class BaseTestCase(TestCase):
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False,
                          secure=False):
         from django.contrib.auth.models import AnonymousUser
+        try:
+            from importlib import import_module
+        except ImportError:
+            from django.utils.importlib import import_module
+
         engine = import_module(settings.SESSION_ENGINE)
 
         request.current_page = SimpleLazyObject(lambda: page)
