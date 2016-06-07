@@ -27,11 +27,15 @@ except ImportError:
 try:
     import cms  # NOQA
     CMS = True
+    CMS_34 = LooseVersion('3.4') <= LooseVersion(cms.__version__) < LooseVersion('3.5')
+    CMS_33 = LooseVersion('3.3') <= LooseVersion(cms.__version__) < LooseVersion('3.4')
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
     CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:  # pragma: no cover
     CMS = False
+    CMS_34 = False
+    CMS_33 = False
     CMS_32 = False
     CMS_31 = False
     CMS_30 = False
@@ -42,6 +46,7 @@ DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
 DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
 DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
 DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion('1.10')
+DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion('1.11')
 
 
 def load_from_file(module_path):
