@@ -58,7 +58,7 @@ Common options
 
 * ``--cms``: Loads configuration to properly run a django CMS-based application;
 * ``--extra-settings``: Path to a helper file to set extra settings; see
-  `Settings section <http://djangocms-helper.readthedocs.org/en/develop/settings.html>`_
+  `Settings section <https://djangocms-helper.readthedocs.io/en/develop/settings.html>`_
   for details;
 
 *****
@@ -90,7 +90,7 @@ Runner
 
 By using the integrated runned in the settings file you'll be able to run
 the commands without invoking ``djangocms-helper``: see
-`Integrate runner <http://djangocms-helper.readthedocs.org/en/develop/runner.html>`_
+`Integrate runner <https://djangocms-helper.readthedocs.io/en/develop/runner.html>`_
 for reference.
 
 ************
@@ -118,7 +118,7 @@ Requirements
 Documentation
 *************
 
-Documentation is available on `readthedocs <http://djangocms-helper.readthedocs.org>`_.
+Documentation is available on `readthedocs <https://djangocms-helper.readthedocs.io>`_.
 
 
 *******
