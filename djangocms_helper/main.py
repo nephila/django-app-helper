@@ -261,10 +261,17 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
     rs._raw_ipv6 = False
     rs.addr = bind
     rs.port = port
+    try:
+        from channels.log import setup_logger
+        rs.logger = setup_logger('django.channels', 1)
+    except ImportError:
+        pass
     autoreload.main(rs.inner_run, (), {
         'addrport': '%s:%s' % (bind, port),
         'insecure_serving': True,
-        'use_threading': True
+        'use_threading': True,
+        'verbosity': 1,
+        'use_reloader': True,
     })
 
 
