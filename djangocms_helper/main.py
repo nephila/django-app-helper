@@ -31,7 +31,7 @@ Usage:
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent[=path]]
+    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent[=path]] [--verbose=<level>]
     djangocms-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate]
 
@@ -235,7 +235,7 @@ def static_analisys(application):
         print('Static analisys available only if django CMS is installed')
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
     from django.utils import autoreload
 
     if os.environ.get('RUN_MAIN') != 'true':
@@ -270,7 +270,7 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):  # pragma: no cover
         'addrport': '%s:%s' % (bind, port),
         'insecure_serving': True,
         'use_threading': True,
-        'verbosity': 1,
+        'verbosity': verbose,
         'use_reloader': True,
     })
 
@@ -347,7 +347,10 @@ def core(args, application):
                                             args['--runner-options'], args.get('--verbose', 1))
                         sys.exit(num_failures)
                 elif args['server']:
-                    server(args['--bind'], args['--port'], args.get('--migrate', True))
+                    server(
+                        args['--bind'], args['--port'], args.get('--migrate', True),
+                        args.get('--verbose', 1)
+                    )
                 elif args['cms_check']:
                     cms_check(args.get('--migrate', True))
                 elif args['compilemessages']:
