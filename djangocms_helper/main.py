@@ -7,6 +7,7 @@ import subprocess
 import sys
 import warnings
 
+from django.utils import autoreload
 from django.utils.encoding import force_text
 from django.utils.six import text_type
 from docopt import DocoptExit, docopt
@@ -236,7 +237,7 @@ def static_analisys(application):
 
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
-    from django.utils import autoreload
+    from django.contrib.staticfiles.management.commands import runserver
 
     if os.environ.get('RUN_MAIN') != 'true':
         _create_db(migrate_cmd)
@@ -248,7 +249,6 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
             print('A admin user (username: %s, password: admin) '
                   'has been created.' % usr.get_username())
             print('')
-    from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()
     try:
         from django.core.management.base import OutputWrapper

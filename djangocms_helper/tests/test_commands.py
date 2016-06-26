@@ -197,7 +197,20 @@ class CommandTests(unittest.TestCase):
                                 elif name == 'TEMPLATE_CONTEXT_PROCESSORS':
                                     self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['context_processors']).intersection(set(value)))
                                 elif name == 'TEMPLATE_LOADERS':
+
                                     self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['loaders']).intersection(set(value)))
+
+    @patch('djangocms_helper.main.autoreload')
+    def test_server(self, mocked_command):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args['server'] = True
+                core(args, self.application)
+            self.assertTrue(
+                'A admin user (username: admin, password: admin) has been created.' in
+                out.getvalue()
+            )
 
     def test_makemigrations(self):
         with work_in(self.basedir):
