@@ -4,6 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 from contextlib import contextmanager
 from copy import deepcopy
+from operator import methodcaller
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -18,7 +19,7 @@ from mock import patch
 
 from .utils import (
     OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
-)
+    captured_output)
 
 
 class BaseTestCase(TestCase):
@@ -55,7 +56,6 @@ class BaseTestCase(TestCase):
     #: Email for auto-generated non-staff user
     _user_user_email = 'user@admin.com'
 
-    _pages_data = ()
     """
     List of pages data for the different languages.
 
@@ -77,6 +77,18 @@ class BaseTestCase(TestCase):
             )
 
     """
+    _pages_data = ()
+    _pages_list = []
+
+    """
+    Dictionary for the test objects used by the test case:
+
+        for each key, the 'method' is executed to return (and eventuallu generate) the object list
+        `key': 'method'
+    """
+    _test_objects = {
+        'pages': 'get_pages'
+    }
 
     @classmethod
     def setUpClass(cls):
@@ -153,6 +165,17 @@ class BaseTestCase(TestCase):
         return create_user(username, email, password, is_staff, is_superuser, base_cms_permissions,
                            permissions)
 
+    def getTestObjects(self):
+        """
+        Returns the test objects (pages and other object instances) created on test setup
+        or loaded via fixtures
+        :return:
+        """
+        data = {}
+        for cls, method in self._test_objects.items():
+            data[cls] = getattr(self, method)()
+        return data
+
     def get_pages_data(self):
         """
         Construct a list of pages in the different languages available for the
@@ -168,7 +191,16 @@ class BaseTestCase(TestCase):
         Create pages using self._pages_data and self.languages
         :return: list of created pages
         """
-        return self.create_pages(self._pages_data, self.languages)
+        from cms.models import Page
+        if not self._pages_list:
+            data = Page.objects.public().prefetch_related('title_set')
+            if data:
+                titles = [page[self.languages[0]]['title'] for page in self._pages_data]
+                title = lambda x: titles.index(x.get_title(self.languages[0]))
+                self._pages_list = sorted(data, key=title)
+            else:
+                self._pages_list = self.create_pages(self._pages_data, self.languages)
+        return self._pages_list
 
     @staticmethod
     def create_pages(source, languages):
@@ -411,6 +443,16 @@ class BaseTestCase(TestCase):
 
         :return: stdout, stderr wrappers
         """
-        with patch('sys.stdout', new_callable=StringIO) as out:
-            with patch('sys.stderr', new_callable=StringIO) as err:
+        with captured_output() as (out, err):
                 yield out, err
+
+
+    # def atest_dump_data(self):
+    #     pages = self.get_pages()
+    #     with self.captured_output() as (out, err):
+    #         call_command(
+    #             'dumpdata', use_natural_foreign_keys=True, use_natural_primary_keys=True,
+    #             indent=3, exclude=['auth', 'contenttypes', 'sites']
+    #         )
+    #     with open('fixtures.json', 'w') as fixtures:
+    #         fixtures.write(out.getvalue())
