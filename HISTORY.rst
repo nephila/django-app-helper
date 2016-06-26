@@ -7,6 +7,7 @@ History
 ++++++++++++++++++
 
 * Added support for channels runserver.
+* Added verbosity level to server command.
 
 0.9.5 (2016-06-06)
 ++++++++++++++++++
