@@ -2,6 +2,7 @@
 import sys
 
 from django.test.runner import DiscoverRunner
+
 try:
     from django.utils import unittest
 except ImportError:
