@@ -3,36 +3,34 @@ import sys
 from djangocms_helper import __version__
 
 test_requirements = []
+requirements = [
+    'pyflakes',
+    'docopt',
+    'dj-database-url',
+    'pyflakes',
+    'south',
+    'django',
+]
 if sys.version_info[:2] < (2, 7):
     test_requirements.append('unittest2')
     test_suite = 'unittest2.collector'
 else:
     test_suite = 'djangocms_helper.tests'
+if sys.version_info[:2] < (3, 3):
+    requirements.append('mock')
 
 setuptools.setup(
     name="djangocms-helper",
     version=__version__,
     url="https://github.com/nephila/djangocms-helper",
-
     author="Iacopo Spalletti",
     author_email="i.spalletti@nephila.it",
-
     description="Helpers for django CMS plugin development",
     long_description=open('README.rst').read(),
     license='GPLv2+',
-
     packages=setuptools.find_packages(),
     include_package_data=True,
-
-    install_requires=[
-        'pyflakes',
-        'docopt',
-        'dj-database-url',
-        'pyflakes',
-        'south',
-        'django',
-        'mock',
-    ],
+    install_requires=requirements,
     entry_points={
         'console_scripts': [
             'djangocms-helper = djangocms_helper.main:main',

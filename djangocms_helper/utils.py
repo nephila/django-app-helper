@@ -15,9 +15,14 @@ from django.utils import six
 from django.utils.functional import empty
 from django.utils.six import StringIO
 from django.utils.six.moves import reload_module
-from mock import patch
 
 from . import HELPER_FILE
+
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 
 try:
     from collections import OrderedDict

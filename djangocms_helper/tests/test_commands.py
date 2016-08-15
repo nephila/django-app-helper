@@ -11,12 +11,17 @@ from tempfile import mkdtemp
 
 import django
 from django.utils.encoding import force_text
-from mock import patch
 
 from djangocms_helper import runner
 from djangocms_helper.default_settings import get_boilerplates_settings
 from djangocms_helper.main import _make_settings, core
 from djangocms_helper.utils import DJANGO_1_6, DJANGO_1_7, captured_output, temp_dir, work_in
+
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 
 try:
     import unittest2 as unittest

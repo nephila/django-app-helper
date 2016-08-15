@@ -13,11 +13,15 @@ from django.template.loader import get_template
 from django.test import RequestFactory, TestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
-from mock import patch
 
 from .utils import (
     OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
 )
+
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 
 class BaseTestCase(TestCase):
