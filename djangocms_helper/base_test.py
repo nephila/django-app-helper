@@ -210,6 +210,19 @@ class BaseTestCase(TestCase):
             reload_urls(settings, cms_apps=True)
         return list(pages.values())
 
+    def get_content_renderer(self, request):
+        """
+        Returns a the plugin renderer. Only for django CMS 3.4+
+
+        :param request: request instance
+        :return: ContentRenderer instance
+        """
+        try:
+            from cms.plugin_rendering import ContentRenderer
+            return ContentRenderer(request)
+        except ImportError:
+            return None
+
     def get_plugin_context(self, page, lang, plugin, edit=False):
         """
         Returns a context suitable for CMSPlugin.render_plugin / render_placeholder
@@ -222,7 +235,13 @@ class BaseTestCase(TestCase):
         """
         from cms.plugin_rendering import PluginContext
         request = self.get_page_request(page, self.user, lang=lang, edit=edit)
-        return PluginContext({'request': request}, plugin, plugin.placeholder)
+        context = {
+            'request': request
+        }
+        renderer = self.get_content_renderer(request)
+        if renderer:
+            context['cms_content_renderer'] = renderer
+        return PluginContext(context, plugin, plugin.placeholder)
 
     def render_plugin(self, page, lang, plugin, edit=False):
         """
