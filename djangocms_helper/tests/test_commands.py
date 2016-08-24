@@ -494,7 +494,6 @@ class CommandTests(unittest.TestCase):
                         args.append('djangocms_helper')
                         args.append('test')
                         args.append('example1')
-                        args.append('tests')
                         runner.cms('example1', args)
         self.assertTrue('visible string' in out.getvalue())
         self.assertFalse('hidden string' in out.getvalue())

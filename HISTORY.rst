@@ -8,6 +8,8 @@ History
 
 * Added support for channels runserver.
 * Added verbosity level to server command.
+* Added support for Django 1.10.
+* Added support for django CMS 3.4.
 
 0.9.5 (2016-06-06)
 ++++++++++++++++++

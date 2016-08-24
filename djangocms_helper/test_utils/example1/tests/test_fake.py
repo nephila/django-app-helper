@@ -11,6 +11,7 @@ try:
     from djangocms_helper.base_test import BaseTestCase
     from djangocms_helper.utils import get_user_model_labels
 
+
     class FakeTests(BaseTestCase):
         _pages_data = (
             {'en': {'title': 'Page title', 'template': 'page.html', 'publish': True},
@@ -129,10 +130,10 @@ try:
             plugin = add_plugin(placeholder=placeholder, plugin_type='FakePlugin', language='en')
             pages[0].publish('en')
             context = self.get_plugin_context(pages[0], 'en', plugin, edit=False)
-            rendered_1 = plugin.render_plugin(context, placeholder)
             rendered_2 = self.render_plugin(pages[0], 'en', plugin)
-            self.assertEqual(rendered_1, rendered_2)
-            self.assertEqual(rendered_1, sample_text)
+            rendered_1 = plugin.render_plugin(context, placeholder)
+            self.assertEqual(rendered_2, rendered_1)
+            self.assertEqual(rendered_2, sample_text)
 
         def test_request(self):
             from django.conf import settings

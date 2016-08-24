@@ -13,6 +13,8 @@ python:
 
 env:
   matrix:
+  - TOXENV='pep8'
+  - TOXENV='isort'
   - DJANGO='django16' CMS='cms30'
   - DJANGO='django16' CMS='cms31'
   - DJANGO='django16' CMS='cms32'
@@ -24,12 +26,16 @@ env:
   - DJANGO='django18' CMS='cms31'
   - DJANGO='django18' CMS='cms32'
   - DJANGO='django18' CMS='cms33'
+  - DJANGO='django18' CMS='cms34'
   - DJANGO='django18' CMS='cmsno'
   - DJANGO='django19' CMS='cms32'
   - DJANGO='django19' CMS='cms33'
+  - DJANGO='django19' CMS='cms34'
   - DJANGO='django19' CMS='cmsno'
-  - TOXENV='pep8'
-  - TOXENV='isort'
+  - DJANGO='django110' CMS='cms32'
+  - DJANGO='django110' CMS='cms33'
+  - DJANGO='django110' CMS='cms34'
+  - DJANGO='django110' CMS='cmsno'
 
 before_install:
   - pip install codecov
@@ -83,13 +89,25 @@ matrix:
   - python: 2.6
     env: DJANGO='django18' CMS='cms33'
   - python: 2.6
+    env: DJANGO='django18' CMS='cms34'
+  - python: 2.6
     env: DJANGO='django18' CMS='cmsno'
   - python: 2.6
     env: DJANGO='django19' CMS='cms32'
   - python: 2.6
     env: DJANGO='django19' CMS='cms33'
   - python: 2.6
+    env: DJANGO='django19' CMS='cms34'
+  - python: 2.6
     env: DJANGO='django19' CMS='cmsno'
+  - python: 2.6
+    env: DJANGO='django110' CMS='cms32'
+  - python: 2.6
+    env: DJANGO='django110' CMS='cms33'
+  - python: 2.6
+    env: DJANGO='django110' CMS='cms34'
+  - python: 2.6
+    env: DJANGO='django110' CMS='cmsno'
   - python: 2.7
     env: DJANGO='django17' CMS='cms30'
   - python: 2.7
@@ -119,7 +137,17 @@ matrix:
   - python: 3.3
     env: DJANGO='django19' CMS='cms33'
   - python: 3.3
+    env: DJANGO='django19' CMS='cms34'
+  - python: 3.3
     env: DJANGO='django19' CMS='cmsno'
+  - python: 3.3
+    env: DJANGO='django110' CMS='cms32'
+  - python: 3.3
+    env: DJANGO='django110' CMS='cms33'
+  - python: 3.3
+    env: DJANGO='django110' CMS='cms34'
+  - python: 3.3
+    env: DJANGO='django110' CMS='cmsno'
   - python: 3.5
     env: DJANGO='django16' CMS='cms30'
   - python: 3.5
