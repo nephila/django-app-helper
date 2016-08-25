@@ -3,7 +3,7 @@
 History
 -------
 
-0.9.6 (unreleased)
+0.9.6 (2016-08-25)
 ++++++++++++++++++
 
 * Added support for channels runserver.
