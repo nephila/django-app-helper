@@ -234,6 +234,8 @@ class BaseTestCase(TestCase):
         :return: PluginContext instance
         """
         from cms.plugin_rendering import PluginContext
+        from sekizai.context_processors import sekizai
+
         request = self.get_page_request(page, self.user, lang=lang, edit=edit)
         context = {
             'request': request
@@ -241,6 +243,7 @@ class BaseTestCase(TestCase):
         renderer = self.get_content_renderer(request)
         if renderer:
             context['cms_content_renderer'] = renderer
+        context.update(sekizai(request))
         return PluginContext(context, plugin, plugin.placeholder)
 
     def render_plugin(self, page, lang, plugin, edit=False):
