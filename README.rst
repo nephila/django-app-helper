@@ -43,14 +43,14 @@ to handle generic plugins development process.
 Supported versions
 ==================
 
-Python: 2.6, 2.7, 3.3, 3.4, 3.5
+Python: 2.7, 3.4, 3.5
 
-Django: 1.6 to 1.10
+Django: 1.8 to 1.10
 
-django CMS: 3.0 to 3.4
+django CMS: 3.2 to 3.4
 
 .. warning:: Starting from version 1.0, compatibily with Python 2.6, Python 3.3, Django<=1.7 and
-             django CMS<=3.1 will be dropped. Pin your test requirements accordingly
+             django CMS<=3.1 has been dropped. Pin your test requirements accordingly
              (``djangocms-helper<1.0``).
 
 Common options
