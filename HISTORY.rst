@@ -9,6 +9,7 @@ History
 * Added support for django-sekizai 0.10
 * Fixed mock dependency in setup.py
 * Fixed issue with server command in Django 1.10
+* Fixed issue in tests with django CMS 3.4
 
 0.9.6 (2016-08-25)
 ++++++++++++++++++
