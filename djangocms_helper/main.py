@@ -269,6 +269,7 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
     autoreload.main(rs.inner_run, (), {
         'addrport': '%s:%s' % (bind, port),
         'insecure_serving': True,
+        'use_static_handler': True,
         'use_threading': True,
         'verbosity': verbose,
         'use_reloader': True,
