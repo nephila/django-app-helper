@@ -16,8 +16,6 @@ if sys.version_info[:2] < (2, 7):
     test_suite = 'unittest2.collector'
 else:
     test_suite = 'djangocms_helper.tests'
-if sys.version_info[:2] < (3, 3):
-    requirements.append('mock')
 
 setuptools.setup(
     name="djangocms-helper",
@@ -31,6 +29,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=requirements,
+    extras_require={
+        ':python_version<"3.3"': ['mock'],
+    },
     entry_points={
         'console_scripts': [
             'djangocms-helper = djangocms_helper.main:main',
