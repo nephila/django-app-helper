@@ -3,7 +3,7 @@
 History
 -------
 
-0.9.7 (unreleased)
+0.9.7 (2016-12-03)
 ++++++++++++++++++
 
 * Added support for django-sekizai 0.10
