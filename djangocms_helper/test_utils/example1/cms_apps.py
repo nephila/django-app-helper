@@ -10,4 +10,5 @@ class Example(CMSApp):
     name = _('Example')
     urls = ['djangocms_helper.urls']
 
+
 apphook_pool.register(Example)

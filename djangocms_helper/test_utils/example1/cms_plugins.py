@@ -7,4 +7,5 @@ class FakePlugin(CMSPluginBase):
     name = 'FakePlugin'
     render_template = 'fake_plugin.html'
 
+
 plugin_pool.register_plugin(FakePlugin)
