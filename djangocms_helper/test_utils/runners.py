@@ -18,6 +18,7 @@ class CapturedOutputRunner(DiscoverRunner):
             stream=sys.stderr
         ).run(suite)
 
+
 try:
     from django.test.simple import DjangoTestSuiteRunner
 
