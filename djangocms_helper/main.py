@@ -237,7 +237,13 @@ def static_analisys(application):
 
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
-    from django.contrib.staticfiles.management.commands import runserver
+    try:
+        from channels.log import setup_logger
+        from channels.management.commands import runserver
+        logger = setup_logger('django.channels', 1)
+    except ImportError:
+        from django.contrib.staticfiles.management.commands import runserver
+        logger = None
 
     if os.environ.get('RUN_MAIN') != 'true':
         _create_db(migrate_cmd)
@@ -261,11 +267,9 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
     rs._raw_ipv6 = False
     rs.addr = bind
     rs.port = port
-    try:
-        from channels.log import setup_logger
-        rs.logger = setup_logger('django.channels', 1)
-    except ImportError:
-        pass
+    if logger:
+        rs.http_timeout = 60
+        rs.logger = logger
     autoreload.main(rs.inner_run, (), {
         'addrport': '%s:%s' % (bind, port),
         'insecure_serving': True,

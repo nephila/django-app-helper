@@ -3,6 +3,11 @@
 History
 -------
 
+0.9.8 (2017-03-04)
+++++++++++++++++++
+
+* Fixed compatibility with newer channels releases
+
 0.9.7 (2016-12-03)
 ++++++++++++++++++
 
