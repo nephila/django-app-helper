@@ -7,6 +7,7 @@ History
 ++++++++++++++++++
 
 * Added ApphookReloadMiddleware in server mode
+* Added a default for FILE_UPLOAD_TEMP_DIR
 
 0.9.8 (2017-03-04)
 ++++++++++++++++++
