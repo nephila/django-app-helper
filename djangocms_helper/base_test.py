@@ -4,6 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 from contextlib import contextmanager
 from copy import deepcopy
+from tempfile import mkdtemp
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
@@ -412,7 +413,11 @@ class BaseTestCase(TestCase):
 
         img = self.create_image()
         self.image_name = 'test_file.jpg'
-        self.filename = os.path.join(settings.FILE_UPLOAD_TEMP_DIR, self.image_name)
+        if settings.FILE_UPLOAD_TEMP_DIR:
+            tmp_dir = settings.FILE_UPLOAD_TEMP_DIR
+        else:
+            tmp_dir = mkdtemp()
+        self.filename = os.path.join(tmp_dir, self.image_name)
         img.save(self.filename, 'JPEG')
         return DjangoFile(open(self.filename, 'rb'), name=self.image_name)
 
