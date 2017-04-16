@@ -32,6 +32,7 @@ except ImportError:
 try:
     import cms  # NOQA
     CMS = True
+    CMS_35 = LooseVersion('3.5') <= LooseVersion(cms.__version__) < LooseVersion('3.6')
     CMS_34 = LooseVersion('3.4') <= LooseVersion(cms.__version__) < LooseVersion('3.5')
     CMS_33 = LooseVersion('3.3') <= LooseVersion(cms.__version__) < LooseVersion('3.4')
     CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
@@ -39,6 +40,7 @@ try:
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:  # pragma: no cover
     CMS = False
+    CMS_35 = False
     CMS_34 = False
     CMS_33 = False
     CMS_32 = False
@@ -52,6 +54,7 @@ DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
 DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
 DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion('1.10')
 DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion('1.11')
+DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion('2.0')
 
 
 def load_from_file(module_path):
@@ -123,7 +126,10 @@ class DisableMigrations(object):
         return True
 
     def __getitem__(self, item):
-        return 'notmigrations'
+        if DJANGO_1_9:
+            return 'notmigrations'
+        else:
+            return None
 
 
 def _reset_django(settings):
@@ -347,6 +353,10 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     if not DJANGO_1_6 and not migrate:
         default_settings['MIGRATION_MODULES'] = DisableMigrations()
+
+    if not DJANGO_1_9:
+        default_settings['MIDDLEWARE'] = default_settings['MIDDLEWARE_CLASSES']
+        del default_settings['MIDDLEWARE_CLASSES']
 
     _reset_django(settings)
     settings.configure(**default_settings)
