@@ -16,7 +16,7 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 
 from .utils import (
-    OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
+    DJANGO_1_9, OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
 )
 
 try:
@@ -301,17 +301,28 @@ class BaseTestCase(TestCase):
             request._dont_enforce_csrf_checks = True
         # Let's use middleware in case requested, otherwise just use CMS toolbar if needed
         if use_middlewares:
-            handler = BaseHandler()
-            handler.load_middleware()
-            for middleware_method in handler._request_middleware:
-                if middleware_method(request):
-                    raise Exception('Couldn\'t create request mock object -'
-                                    'request middleware returned a response')
+            self._apply_middlewares(request)
         elif use_toolbar:
             from cms.middleware.toolbar import ToolbarMiddleware
             mid = ToolbarMiddleware()
             mid.process_request(request)
         return request
+
+    def _apply_middlewares(self, request):
+        handler = BaseHandler()
+        if DJANGO_1_9:
+            handler.load_middleware()
+            for middleware_method in handler._request_middleware:
+                if middleware_method(request):
+                    raise Exception('Couldn\'t create request mock object -'
+                                    'request middleware returned a response')
+        else:
+            from django.utils.module_loading import import_string
+            for middleware_path in reversed(settings.MIDDLEWARE):
+                middleware = import_string(middleware_path)
+                mw_instance = middleware(handler)
+                if hasattr(mw_instance, 'process_request'):
+                    mw_instance.process_request(request)
 
     def get_request(self, page, lang, user=None, path=None, use_middlewares=False, secure=False):
         """

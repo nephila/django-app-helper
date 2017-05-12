@@ -8,6 +8,8 @@ History
 
 * Added ApphookReloadMiddleware in server mode
 * Added a default for FILE_UPLOAD_TEMP_DIR
+* Added support for Django 1.11
+* Switched to new-style middlewares for Django 1.10+
 
 0.9.8 (2017-03-04)
 ++++++++++++++++++

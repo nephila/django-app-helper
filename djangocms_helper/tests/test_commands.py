@@ -15,7 +15,9 @@ from django.utils.encoding import force_text
 from djangocms_helper import runner
 from djangocms_helper.default_settings import get_boilerplates_settings
 from djangocms_helper.main import _make_settings, core
-from djangocms_helper.utils import DJANGO_1_6, DJANGO_1_7, captured_output, temp_dir, work_in
+from djangocms_helper.utils import (
+    DJANGO_1_6, DJANGO_1_7, DJANGO_1_8, DJANGO_1_9, captured_output, temp_dir, work_in,
+)
 
 try:
     from unittest.mock import patch
@@ -154,9 +156,14 @@ class CommandTests(unittest.TestCase):
                         self.assertTrue('some_app' in local_settings.INSTALLED_APPS)
 
                         # Ditto for middlewares
-                        self.assertTrue('django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE_CLASSES)
-                        self.assertEqual('top_middleware', local_settings.MIDDLEWARE_CLASSES[0])
-                        self.assertTrue('some_middleware' in local_settings.MIDDLEWARE_CLASSES)
+                        if DJANGO_1_9:
+                            self.assertEqual('top_middleware', local_settings.MIDDLEWARE_CLASSES[0])
+                            self.assertTrue('some_middleware' in local_settings.MIDDLEWARE_CLASSES)
+                            self.assertTrue('django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE_CLASSES)
+                        else:
+                            self.assertTrue('django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE)
+                            self.assertEqual('top_middleware', local_settings.MIDDLEWARE[0])
+                            self.assertTrue('some_middleware' in local_settings.MIDDLEWARE)
 
                         boilerplate_settings = get_boilerplates_settings()
 
@@ -444,6 +451,11 @@ class CommandTests(unittest.TestCase):
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit:
+                    try:
+                        from django.test.utils import _TestState
+                        del _TestState.saved_data
+                    except (ImportError, AttributeError):
+                        pass
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
                     args['--persistent'] = mkdtemp()
@@ -642,6 +654,11 @@ class CommandTests(unittest.TestCase):
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit:
+                    try:
+                        from django.test.utils import _TestState
+                        del _TestState.saved_data
+                    except (ImportError, AttributeError):
+                        pass
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
                     args['--cms'] = False
@@ -675,6 +692,11 @@ class CommandTests(unittest.TestCase):
             raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
+                try:
+                    from django.test.utils import _TestState
+                    del _TestState.saved_data
+                except (ImportError, AttributeError):
+                    pass
                 args = copy(DEFAULT_ARGS)
                 args['<command>'] = 'test'
                 args['--cms'] = False
