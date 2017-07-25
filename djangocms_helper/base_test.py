@@ -258,14 +258,24 @@ class BaseTestCase(TestCase):
         :return: Rendered plugin
         """
         request = self.get_page_request(page, self.user, lang=lang, edit=edit)
-        context = RequestContext(request)
-        try:
-            template = get_template(page.get_template()).template
-            with context.bind_template(template):
+        context = self.get_plugin_context(page, lang, plugin, edit)
+        if 'cms_content_renderer' in context:
+            content_renderer = context['cms_content_renderer']
+            rendered = content_renderer.render_plugin(
+                instance=plugin,
+                context=context,
+                placeholder=plugin.placeholder,
+            )
+            return rendered
+        else:
+            context = RequestContext(request)
+            try:
+                template = get_template(page.get_template()).template
+                with context.bind_template(template):
+                    rendered = plugin.render_plugin(context, plugin.placeholder)
+            except AttributeError:
                 rendered = plugin.render_plugin(context, plugin.placeholder)
-        except AttributeError:
-            rendered = plugin.render_plugin(context, plugin.placeholder)
-        return rendered
+            return rendered
 
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False,
                          secure=False):
