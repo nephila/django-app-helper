@@ -3,7 +3,7 @@
 History
 -------
 
-0.9.9 (unreleased)
+1.0.0 (2017-07-25)
 ++++++++++++++++++
 
 * Added ApphookReloadMiddleware in server mode
