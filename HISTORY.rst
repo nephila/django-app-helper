@@ -3,6 +3,12 @@
 History
 -------
 
+1.1.0 (Unreleased)
+++++++++++++++++++
+
+* Removed Django <1.8, Python 2.6, 3.3 from setup.py
+* Add Django 1.11, Python 3.6
+
 1.0.0 (2017-07-25)
 ++++++++++++++++++
 
