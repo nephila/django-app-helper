@@ -43,9 +43,9 @@ to handle generic plugins development process.
 Supported versions
 ==================
 
-Python: 2.7, 3.4, 3.5
+Python: 2.7, 3.4, 3.5, 3.6
 
-Django: 1.8 to 1.10
+Django: 1.8 to 1.11
 
 django CMS: 3.4
 
