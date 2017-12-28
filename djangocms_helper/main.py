@@ -233,7 +233,7 @@ def static_analisys(application):
         else:
             assert report == 0
     except ImportError:
-        print('Static analisys available only if django CMS is installed')
+        print('Static analysis available only if django CMS is installed')
 
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover

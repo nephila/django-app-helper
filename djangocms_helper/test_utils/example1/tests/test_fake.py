@@ -118,6 +118,19 @@ try:
             self.assertEqual(image.height, 600)
             self.assertEqual(Image.objects.count(), 1)
 
+        def test_create_filer_image(self):
+            from filer.models import Image
+
+            image = BaseTestCase.create_filer_image(self.user, 'random.jpg')
+            self.assertEqual(image.original_filename, 'random.jpg')
+            self.assertEqual(image.width, 800)
+            self.assertEqual(image.height, 600)
+            self.assertEqual(Image.objects.count(), 1)
+
+        def test_create_django_image_object(self):
+            image = self.create_django_image_object()
+            self.assertEqual(image.name, self.image_name)
+
         def test_render_plugin(self):
             from django.conf import settings
             if 'cms' not in settings.INSTALLED_APPS:

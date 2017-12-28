@@ -37,6 +37,7 @@ class BaseTestCase(TestCase):
     site_1 = None
     languages = None
     _login_context = None
+    image_name = 'test_image.jpg'
 
     #: Username for auto-generated superuser
     _admin_user_username = 'admin'
@@ -395,7 +396,8 @@ class BaseTestCase(TestCase):
         return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True,
                                      secure=secure)
 
-    def create_image(self, mode='RGB', size=(800, 600)):
+    @staticmethod
+    def create_image(mode='RGB', size=(800, 600)):
         """
         Create a random image suitable for saving as DjangoFile
         :param mode: color mode
@@ -414,7 +416,7 @@ class BaseTestCase(TestCase):
         draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), 'red')
         return image
 
-    def create_django_image_obj(self):
+    def create_django_image_obj(self):  # pragma: no cover
         return self.create_django_image_object()
 
     def create_django_image_object(self):
@@ -430,17 +432,34 @@ class BaseTestCase(TestCase):
         It requires Pillow installed in the environment to work
 
         """
+        img_obj, self.filename = self.create_django_image()
+        self.image_name = img_obj.name
+        return img_obj
+
+    @staticmethod
+    def create_django_image():
+        """
+        Create a django image file object suitable for FileField
+        It also sets the following attributes:
+
+        * ``self.image_name``: the image base name
+        * ``self.filename``: the complete image path
+
+        :return: (django file object, path to file image)
+
+        It requires Pillow installed in the environment to work
+        """
         from django.core.files import File as DjangoFile
 
-        img = self.create_image()
-        self.image_name = 'test_file.jpg'
+        img = BaseTestCase.create_image()
+        image_name = 'test_file.jpg'
         if settings.FILE_UPLOAD_TEMP_DIR:
             tmp_dir = settings.FILE_UPLOAD_TEMP_DIR
         else:
             tmp_dir = mkdtemp()
-        self.filename = os.path.join(tmp_dir, self.image_name)
-        img.save(self.filename, 'JPEG')
-        return DjangoFile(open(self.filename, 'rb'), name=self.image_name)
+        filename = os.path.join(tmp_dir, image_name)
+        img.save(filename, 'JPEG')
+        return DjangoFile(open(filename, 'rb'), name=image_name), filename
 
     def create_filer_image_object(self):
         """
@@ -456,12 +475,33 @@ class BaseTestCase(TestCase):
         It requires Pillow and django-filer installed in the environment to work
 
         """
+        self.filer_image = self.create_filer_image(self.user, self.image_name)
+        return self.filer_image
+
+    @staticmethod
+    def create_filer_image(user, image_name):
+        """
+        Create a filer image object suitable for FilerImageField
+        It also sets the following attributes:
+
+        * ``self.image_name``: the image base name
+        * ``self.filename``: the complete image path
+        * ``self.filer_image``: the filer image object
+
+        :param user: image owner
+        :param image_name: image name
+        :return: filer image object
+
+        It requires Pillow and django-filer installed in the environment to work
+
+        """
         from filer.models import Image
 
-        file_obj = self.create_django_image_object()
-        self.filer_image = Image.objects.create(owner=self.user, file=file_obj,
-                                                original_filename=self.image_name)
-        return self.filer_image
+        file_obj, filename = BaseTestCase.create_django_image()
+        filer_image = Image.objects.create(
+            owner=user, file=file_obj, original_filename=image_name
+        )
+        return filer_image
 
     @contextmanager
     def captured_output(self):

@@ -9,6 +9,7 @@ History
 * Removed Django <1.8, Python 2.6, 3.3 from setup.py
 * Add Django 1.11, Python 3.6
 * Switched to new-style middlewares for Django 1.10+
+* Create static methods to generate images
 
 1.0.0 (2017-07-25)
 ++++++++++++++++++
