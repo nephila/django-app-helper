@@ -356,7 +356,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if not DJANGO_1_6 and not migrate:
         default_settings['MIGRATION_MODULES'] = DisableMigrations()
 
-    if not DJANGO_1_9:
+    if not DJANGO_1_9 and 'MIDDLEWARE' not in default_settings:
         default_settings['MIDDLEWARE'] = default_settings['MIDDLEWARE_CLASSES']
         del default_settings['MIDDLEWARE_CLASSES']
 
