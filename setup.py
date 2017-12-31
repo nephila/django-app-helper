@@ -8,7 +8,6 @@ requirements = [
     'docopt',
     'dj-database-url',
     'pyflakes',
-    'south',
     'django',
 ]
 if sys.version_info[:2] < (2, 7):
