@@ -1,0 +1,4 @@
+-r requirements-test.txt
+Django<2.0
+django-filer
+django<1.10
