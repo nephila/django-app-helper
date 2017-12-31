@@ -241,8 +241,10 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
         from channels.log import setup_logger
         from channels.management.commands import runserver
         logger = setup_logger('django.channels', 1)
+        use_channels = True
     except ImportError:
         from django.contrib.staticfiles.management.commands import runserver
+        use_channels = False
         logger = None
 
     if os.environ.get('RUN_MAIN') != 'true':
@@ -268,15 +270,17 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
     rs.addr = bind
     rs.port = port
     if logger:
-        rs.http_timeout = 60
         rs.logger = logger
+    if use_channels:
+        rs.http_timeout = 60
+        rs.websocket_handshake_timeout = 5
     autoreload.main(rs.inner_run, (), {
         'addrport': '%s:%s' % (bind, port),
         'insecure_serving': True,
         'use_static_handler': True,
         'use_threading': True,
         'verbosity': verbose,
-        'use_reloader': True,
+        'use_reloader': True
     })
 
 
