@@ -14,7 +14,7 @@ from docopt import DocoptExit, docopt
 
 from . import __version__
 from .utils import (
-    DJANGO_1_6, _create_db, _make_settings, create_user, ensure_unicoded_and_unique,
+    DJANGO_1_11, _create_db, _make_settings, create_user, ensure_unicoded_and_unique,
     get_user_model, persistent_dir, temp_dir, work_in,
 )
 
@@ -113,7 +113,10 @@ def compilemessages(application):
     from django.core.management import call_command
 
     with work_in(application):
-        call_command('compilemessages', all=True)
+        if DJANGO_1_11:
+            call_command('compilemessages', all=True)
+        else:
+            call_command('compilemessages')
 
 
 def makemessages(application, locale):
@@ -143,9 +146,8 @@ def cms_check(migrate_cmd=False):
 
 def makemigrations(application, merge=False, dry_run=False, empty=False, extra_applications=None):
     """
-    Generate migrations (for both south and django 1.7+)
+    Generate migrations
     """
-    from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
     from django.core.management import call_command
 
     apps = [application]
@@ -155,33 +157,8 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
         elif isinstance(extra_applications, list):
             apps += extra_applications
 
-    if DJANGO_1_6:
-        from south.exceptions import NoMigrations
-        from south.migration import Migrations
-
-        if merge:
-            raise DjangoRuntimeWarning('Option not implemented for Django 1.6 and below')
-        for app in apps:
-            try:
-                if not Migrations(app):
-                    raise NoMigrations(app)
-            except NoMigrations:
-                print('ATTENTION: No migrations found for {0}, '
-                      'creating initial migrations.'.format(app))
-                try:
-                    call_command('schemamigration', *(app,), initial=True, empty=empty)
-                except SystemExit:  # pragma: no cover
-                    pass
-            except ImproperlyConfigured:  # pragma: no cover
-                print('WARNING: The app: {0} could not be found.'.format(app))
-            else:
-                try:  # pragma: no cover
-                    call_command('schemamigration', *(app,), auto=True, empty=empty)
-                except SystemExit:
-                    pass
-    else:
-        for app in apps:
-            call_command('makemigrations', *(app,), merge=merge, dry_run=dry_run, empty=empty)
+    for app in apps:
+        call_command('makemigrations', *(app,), merge=merge, dry_run=dry_run, empty=empty)
 
 
 def generate_authors():
