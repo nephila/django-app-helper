@@ -25,16 +25,16 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--verbose=<level>]
+    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
     djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent[=path]] [--verbose=<level>]
+    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>]
     djangocms-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate]
+    djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--boilerplate] [--migrate] [--no-migrate]
 
 Options:
     -h --help                   Show this screen.
@@ -48,7 +48,8 @@ Options:
     --nose-runner               Use django-nose as test runner
     --simple-runner             User DjangoTestSuiteRunner
     --boilerplate               Add support for aldryn-boilerplates
-    --persistent[=path]         Use persistent storage
+    --persistent                Use persistent storage
+    --persistent-path=<path>    Persistent storage path
     --locale=locale,-l=locale   Update messgaes for given locale
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
     --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
@@ -265,6 +266,34 @@ def setup_env(settings):
     return settings
 
 
+def _map_argv(argv, application_module):
+    try:
+        # by default docopt uses sys.argv[1:]; ensure correct args passed
+        args = docopt(__doc__, argv=argv[1:], version=application_module.__version__)
+        if argv[2] == 'help':
+            raise DocoptExit()
+    except DocoptExit:
+        if argv[2] == 'help':
+            raise
+        args = docopt(__doc__, argv[1:3], version=application_module.__version__)
+    args['--cms'] = '--cms' in argv
+    args['--persistent'] = '--persistent' in argv
+    for arg in argv:
+        if arg.startswith('--extra-settings='):
+            args['--extra-settings'] = arg.split('=')[1]
+        if arg.startswith('--runner='):
+            args['--runner'] = arg.split('=')[1]
+        if arg.startswith('--persistent-path='):
+            args['--persistent-path'] = arg.split('=')[1]
+            args['--persistent'] = True
+    args['options'] = [argv[0]] + argv[2:]
+    if args['test'] and '--native' in args['options']:
+        args['test'] = False
+        args['<command>'] = 'test'
+        args['options'].remove('--native')
+    return args
+
+
 def core(args, application):
     from django.conf import settings
 
@@ -274,8 +303,8 @@ def core(args, application):
         RuntimeWarning, r'django\.db\.models\.fields')
     if args['--persistent']:
         create_dir = persistent_dir
-        if args['--persistent'] is not True:
-            parent_path = args['--persistent']
+        if args['--persistent-path']:
+            parent_path = args['--persistent-path']
         else:
             parent_path = 'data'
     else:
@@ -292,7 +321,8 @@ def core(args, application):
             if args['<command>']:
                 from django.core.management import execute_from_command_line
                 options = [option for option in args['options'] if (
-                    option != '--cms' and '--extra-settings' not in option
+                    option != '--cms' and '--extra-settings' not in option and
+                    not option.startswith('--persistent')
                 )]
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 execute_from_command_line(options)
@@ -364,26 +394,7 @@ def main(argv=sys.argv):  # pragma: no cover
     if len(argv) > 1:
         application = argv[1]
         application_module = __import__(application)
-        try:
-            # by default docopt uses sys.argv[1:]; ensure correct args passed
-            args = docopt(__doc__, argv=argv[1:], version=application_module.__version__)
-            if argv[2] == 'help':
-                raise DocoptExit()
-        except DocoptExit:
-            if argv[2] == 'help':
-                raise
-            args = docopt(__doc__, argv[1:3], version=application_module.__version__)
-        args['--cms'] = '--cms' in argv
-        for arg in argv:
-            if arg.startswith('--extra-settings='):
-                args['--extra-settings'] = arg.split('=')[1]
-            if arg.startswith('--runner='):
-                args['--runner'] = arg.split('=')[1]
-        args['options'] = [argv[0]] + argv[2:]
-        if args['test'] and '--native' in args['options']:
-            args['test'] = False
-            args['<command>'] = 'test'
-            args['options'].remove('--native')
+        args = _map_argv(argv, application_module)
         return core(args=args, application=application)
     else:
         args = docopt(__doc__, version=__version__)
