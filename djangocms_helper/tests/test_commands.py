@@ -437,7 +437,7 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['pyflakes'] = True
                 core(args, self.application)
-            self.assertTrue('Static analisys available only if django CMS is installed' in out.getvalue())
+            self.assertTrue('Static analysis available only if django CMS is installed' in out.getvalue())
         self.assertFalse(os.path.exists(args['STATIC_ROOT']))
         self.assertFalse(os.path.exists(args['MEDIA_ROOT']))
 
@@ -461,7 +461,7 @@ class CommandTests(unittest.TestCase):
                     args['--persistent'] = mkdtemp()
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 12 tests in' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
         self.assertTrue(os.path.exists(args['STATIC_ROOT']))
         self.assertTrue(os.path.exists(args['MEDIA_ROOT']))
@@ -510,7 +510,7 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('visible string' in out.getvalue())
         self.assertFalse('hidden string' in out.getvalue())
         self.assertFalse('hidden string' in err.getvalue())
-        self.assertTrue('Ran 12 tests in' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -625,7 +625,7 @@ class CommandTests(unittest.TestCase):
                         args.append('--simple-runner')
                         args.append('example1.FakeTests')
                         runner.cms('example1', args)
-        self.assertTrue('Ran 12 tests in' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -645,7 +645,7 @@ class CommandTests(unittest.TestCase):
                     args.append('--nose-runner')
                     args.append('example1.tests')
                     runner.cms('example1', args)
-        self.assertTrue('Ran 24 tests in' in err.getvalue())
+        self.assertTrue('Ran 28 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -664,7 +664,7 @@ class CommandTests(unittest.TestCase):
                     args['--cms'] = False
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
-        self.assertTrue('Ran 12 tests in' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -680,7 +680,7 @@ class CommandTests(unittest.TestCase):
                     args.append('--extra-settings=cms_helper.py')
                     args.append('--runner=runners.CapturedOutputRunner')
                     runner.run('example1', args)
-        self.assertTrue('Ran 12 tests in' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     @unittest.skipIf(sys.version_info < (2, 7),
@@ -703,7 +703,7 @@ class CommandTests(unittest.TestCase):
                 args['--native'] = True
                 args['--extra-settings'] = 'cms_helper_extra_runner.py'
                 core(args, self.application)
-        self.assertTrue('Ran 12 tests in' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
 
     def test_authors(self):
         with work_in(self.basedir):
