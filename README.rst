@@ -2,33 +2,7 @@
 djangocms-helper
 ================
 
-.. image:: https://img.shields.io/pypi/v/djangocms-helper.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/djangocms-helper
-    :alt: Latest PyPI version
-
-.. image:: https://img.shields.io/pypi/dm/djangocms-helper.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/djangocms-helper
-    :alt: Monthly downloads
-
-.. image:: https://img.shields.io/pypi/pyversions/djangocms-helper.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/djangocms-helper
-    :alt: Python versions
-
-.. image:: https://img.shields.io/travis/nephila/djangocms-helper.svg?style=flat-square
-    :target: https://travis-ci.org/nephila/djangocms-helper
-    :alt: Latest Travis CI build status
-
-.. image:: https://img.shields.io/coveralls/nephila/djangocms-helper/master.svg?style=flat-square
-    :target: https://coveralls.io/r/nephila/djangocms-helper?branch=master
-    :alt: Test coverage
-
-.. image:: https://img.shields.io/codecov/c/github/nephila/djangocms-helper/master.svg?style=flat-square
-    :target: https://codecov.io/github/nephila/djangocms-helper
-    :alt: Test coverage
-
-.. image:: https://codeclimate.com/github/nephila/djangocms-helper/badges/gpa.svg?style=flat-square
-   :target: https://codeclimate.com/github/nephila/djangocms-helper
-   :alt: Code Climate
+|Gitter| |PyPiVersion| |PyVersion| |Status| |TestCoverage| |CodeClimate| |License|
 
 ****************************************
 Helper for django CMS plugin development
@@ -134,3 +108,32 @@ The general logic and part of the code of the whole application is heavily taken
 `django CMS's <https://github.com/divio/django-cms>`_ own `develop.py` so all the contributors
 deserve a huge thanks for their work.
 
+
+
+.. |Gitter| image:: https://img.shields.io/badge/GITTER-join%20chat-brightgreen.svg?style=flat-square
+    :target: https://gitter.im/nephila/applications
+    :alt: Join the Gitter chat
+
+.. |PyPiVersion| image:: https://img.shields.io/pypi/v/djangocms-helper.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/djangocms-helper
+    :alt: Latest PyPI version
+
+.. |PyVersion| image:: https://img.shields.io/pypi/pyversions/djangocms-helper.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/djangocms-helper
+    :alt: Python versions
+
+.. |Status| image:: https://img.shields.io/travis/nephila/djangocms-helper.svg?style=flat-square
+    :target: https://travis-ci.org/nephila/djangocms-helper
+    :alt: Latest Travis CI build status
+
+.. |TestCoverage| image:: https://img.shields.io/coveralls/nephila/djangocms-helper/master.svg?style=flat-square
+    :target: https://coveralls.io/r/nephila/djangocms-helper?branch=master
+    :alt: Test coverage
+
+.. |License| image:: https://img.shields.io/github/license/nephila/djangocms-helper.svg?style=flat-square
+   :target: https://pypi.python.org/pypi/djangocms-helper/
+    :alt: License
+
+.. |CodeClimate| image:: https://codeclimate.com/github/nephila/djangocms-helper/badges/gpa.svg?style=flat-square
+   :target: https://codeclimate.com/github/nephila/djangocms-helper
+   :alt: Code Climate

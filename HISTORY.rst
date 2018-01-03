@@ -7,9 +7,12 @@ History
 ++++++++++++++++++
 
 * Removed Django <1.8, Python 2.6, 3.3 from setup.py
-* Add Django 1.11, Python 3.6
+* Added Django 1.11, Python 3.6
 * Switched to new-style middlewares for Django 1.10+
-* Create static methods to generate images
+* Created static methods to generate images
+* Fixed persistent option behavior with arbitrary commands
+* Added minimal changes to allow third party application to run test on django 2.0
+* Fixed options for channels runserver
 
 1.0.0 (2017-07-25)
 ++++++++++++++++++
