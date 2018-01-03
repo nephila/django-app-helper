@@ -25,7 +25,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
+    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
@@ -46,7 +46,6 @@ Options:
     --failfast                  Stop tests on first failure.
     --native                    Use the native test command, instead of the djangocms-helper on
     --nose-runner               Use django-nose as test runner
-    --simple-runner             User DjangoTestSuiteRunner
     --boilerplate               Add support for aldryn-boilerplates
     --persistent                Use persistent storage
     --persistent-path=<path>    Persistent storage path
@@ -98,10 +97,7 @@ def test(test_labels, application, failfast=False, test_runner=None,
         if os.path.exists('tests'):  # pragma: no cover
             test_labels = ['tests']
         elif os.path.exists(os.path.join(application, 'tests')):
-            if 'DjangoTestSuiteRunner' in test_runner:
-                test_labels = [application]
-            else:
-                test_labels = ['%s.tests' % application]
+            test_labels = ['%s.tests' % application]
     elif type(test_labels) is text_type:
         test_labels = [test_labels]
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
@@ -333,8 +329,6 @@ def core(args, application):
                 if args['test']:
                     if args['--nose-runner']:
                         runner = 'django_nose.NoseTestSuiteRunner'
-                    elif args['--simple-runner']:
-                        runner = 'django.test.simple.DjangoTestSuiteRunner'
                     elif args['--runner']:
                         runner = args['--runner']
                     else:

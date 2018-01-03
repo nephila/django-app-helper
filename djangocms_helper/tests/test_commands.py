@@ -40,7 +40,6 @@ DEFAULT_ARGS = {
     '--runner': None,
     '--runner-options': None,
     '--nose-runner': False,
-    '--simple-runner': False,
     '--cms': True,
     '--failfast': False,
     '--merge': False,
@@ -155,7 +154,6 @@ class CommandTests(unittest.TestCase):
             '--port': '8000',
             '--runner': '',
             '--runner-options': None,
-            '--simple-runner': False,
             '--verbose': None,
             '--version': False,
             '--xvfb': False,
@@ -204,7 +202,6 @@ class CommandTests(unittest.TestCase):
             '--port': '8000',
             '--runner': '',
             '--runner-options': None,
-            '--simple-runner': False,
             '--verbose': None,
             '--version': False,
             '--xvfb': False,
@@ -254,7 +251,6 @@ class CommandTests(unittest.TestCase):
             '--port': '8000',
             '--runner': '',
             '--runner-options': None,
-            '--simple-runner': False,
             '--verbose': None,
             '--version': False,
             '--xvfb': False,
@@ -714,28 +710,6 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('example2' in settings.INSTALLED_APPS)
         self.assertFalse('aldryn_boilerplates' in settings.INSTALLED_APPS)
         self.assertFalse('cms' in settings.INSTALLED_APPS)
-
-    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.8'),
-                     reason='Simple runner not available in Django > 1.8')
-    def test_runner_simple(self):
-        try:
-            import cms
-        except ImportError:
-            raise unittest.SkipTest('django CMS not available, skipping test')
-        from djangocms_helper.test_utils.runners import CapturedOutputSimpleRunner
-        with patch('django.test.simple.DjangoTestSuiteRunner', CapturedOutputSimpleRunner):
-            with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    with self.assertRaises(SystemExit) as exit:
-                        args = list()
-                        args.append('djangocms_helper')
-                        args.append('test')
-                        args.append('example1')
-                        args.append('--simple-runner')
-                        args.append('example1.FakeTests')
-                        runner.cms('example1', args)
-        self.assertTrue('Ran 14 tests in' in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
 
     def test_runner_nose(self):
         try:
