@@ -21,12 +21,10 @@ try:
 except ImportError:
     from mock import patch
 
-
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-
 
 DEFAULT_ARGS = {
     'shell': False,
@@ -42,7 +40,6 @@ DEFAULT_ARGS = {
     '--runner': None,
     '--runner-options': None,
     '--nose-runner': False,
-    '--simple-runner': False,
     '--cms': True,
     '--failfast': False,
     '--merge': False,
@@ -52,6 +49,7 @@ DEFAULT_ARGS = {
     '--empty': False,
     '--native': False,
     '--persistent': False,
+    '--persistent-path': None,
     '--bind': '',
     '--port': '',
     '<test-label>': '',
@@ -76,15 +74,18 @@ class CommandTests(unittest.TestCase):
         cls.application_2 = 'example2'
         with work_in(cls.basedir):
             with captured_output():
-                cls.migration_example = os.path.abspath(os.path.join(cls.application, 'data', 'django_0001_initial.py'))
-                cls.migration_partial = os.path.abspath(os.path.join(cls.application, 'data', 'django_0001_partial.py'))
+                cls.migration_example = os.path.abspath(
+                    os.path.join(cls.application, 'data', 'django_0001_initial.py'))
+                cls.migration_partial = os.path.abspath(
+                    os.path.join(cls.application, 'data', 'django_0001_partial.py'))
                 cls.poexample = os.path.abspath(os.path.join(cls.application, 'data', 'django.po'))
                 cls.pofile = os.path.abspath(os.path.join(cls.application, 'locale', 'en', 'LC_MESSAGES', 'django.po'))
                 cls.mofile = os.path.abspath(os.path.join(cls.application, 'locale', 'en', 'LC_MESSAGES', 'django.mo'))
                 cls.migration_dir = os.path.abspath(os.path.join(cls.application, 'migrations'))
                 cls.migration_dir_2 = os.path.abspath(os.path.join(cls.application_2, 'migrations'))
                 cls.migration_file = os.path.abspath(os.path.join(cls.application, 'migrations', '0001_initial.py'))
-                cls.migration_file_2 = os.path.abspath(os.path.join(cls.application_2, 'migrations', '0001_initial.py'))
+                cls.migration_file_2 = os.path.abspath(
+                    os.path.join(cls.application_2, 'migrations', '0001_initial.py'))
         try:
             import cms
         except ImportError:
@@ -121,68 +122,241 @@ class CommandTests(unittest.TestCase):
     def tearDown(self):
         self.setUp()
 
+    def test_map_argv(self):
+        from ..main import _map_argv
+
+        argv_1 = [
+            'cms_helper.py',
+            'example1',
+            'test',
+            '--cms',
+            '--persistent-path=test',
+            '--extra-settings==something.py',
+            '--runner==something.py',
+        ]
+        target_1 = {
+            '--bind': '127.0.0.1',
+            '--boilerplate': False,
+            '--cms': True,
+            '--dry-run': False,
+            '--empty': False,
+            '--extra-settings': '',
+            '--failfast': False,
+            '--help': False,
+            '--locale': None,
+            '--merge': False,
+            '--migrate': False,
+            '--native': False,
+            '--no-migrate': False,
+            '--nose-runner': False,
+            '--persistent': True,
+            '--persistent-path': 'test',
+            '--port': '8000',
+            '--runner': '',
+            '--runner-options': None,
+            '--verbose': None,
+            '--version': False,
+            '--xvfb': False,
+            '<application>': 'example1',
+            '<command>': None,
+            '<extra-applications>': [],
+            '<test-label>': [],
+            'authors': False,
+            'cms_check': False,
+            'compilemessages': False,
+            'makemessages': False,
+            'makemigrations': False,
+            'options': ['cms_helper.py', 'test', '--cms', '--persistent-path=test',
+                        '--extra-settings==something.py', '--runner==something.py'],
+            'pyflakes': False,
+            'server': False,
+            'setup': False,
+            'test': True
+        }
+        argv_2 = [
+            'cms_helper.py',
+            'example1',
+            'server',
+            '--cms',
+            '--persistent-path=test',
+            '--extra-settings==something.py',
+            '--runner==something.py',
+        ]
+        target_2 = {
+            '--bind': '127.0.0.1',
+            '--boilerplate': False,
+            '--cms': True,
+            '--dry-run': False,
+            '--empty': False,
+            '--extra-settings': '',
+            '--failfast': False,
+            '--help': False,
+            '--locale': None,
+            '--merge': False,
+            '--migrate': False,
+            '--native': False,
+            '--no-migrate': False,
+            '--nose-runner': False,
+            '--persistent': True,
+            '--persistent-path': 'test',
+            '--port': '8000',
+            '--runner': '',
+            '--runner-options': None,
+            '--verbose': None,
+            '--version': False,
+            '--xvfb': False,
+            '<application>': 'example1',
+            '<command>': None,
+            '<extra-applications>': [],
+            '<test-label>': [],
+            'authors': False,
+            'cms_check': False,
+            'compilemessages': False,
+            'makemessages': False,
+            'makemigrations': False,
+            'options': ['cms_helper.py', 'server', '--cms', '--persistent-path=test',
+                        '--extra-settings==something.py', '--runner==something.py'],
+            'pyflakes': False,
+            'server': True,
+            'setup': False,
+            'test': False
+        }
+
+        argv_3 = [
+            'cms_helper.py',
+            'example1',
+            'some_command',
+            '--cms',
+            '--persistent-path=test',
+            '--extra-settings==something.py',
+            '--runner==something.py',
+        ]
+        target_3 = {
+            '--bind': '127.0.0.1',
+            '--boilerplate': False,
+            '--cms': True,
+            '--dry-run': False,
+            '--empty': False,
+            '--extra-settings': '',
+            '--failfast': False,
+            '--help': False,
+            '--locale': None,
+            '--merge': False,
+            '--migrate': False,
+            '--native': False,
+            '--no-migrate': False,
+            '--nose-runner': False,
+            '--persistent': True,
+            '--persistent-path': 'test',
+            '--port': '8000',
+            '--runner': '',
+            '--runner-options': None,
+            '--verbose': None,
+            '--version': False,
+            '--xvfb': False,
+            '<application>': 'example1',
+            '<command>': 'some_command',
+            '<extra-applications>': [],
+            '<test-label>': [],
+            'authors': False,
+            'cms_check': False,
+            'compilemessages': False,
+            'makemessages': False,
+            'makemigrations': False,
+            'options': ['cms_helper.py', 'some_command', '--cms', '--persistent-path=test',
+                        '--extra-settings==something.py', '--runner==something.py'],
+            'pyflakes': False,
+            'server': False,
+            'setup': False,
+            'test': False
+        }
+
+        application_module = __import__(argv_1[1])
+        args = _map_argv(argv_1, application_module)
+        self.assertEqual(target_1, args)
+
+        application_module = __import__(argv_2[1])
+        args = _map_argv(argv_2, application_module)
+        self.assertEqual(target_2, args)
+
+        application_module = __import__(argv_3[1])
+        args = _map_argv(argv_3, application_module)
+        self.assertEqual(target_3, args)
+
     def test_extra_settings(self):
         from django.conf import settings
 
         with work_in(self.basedir):
-            #with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                with temp_dir() as STATIC_ROOT:
-                    with temp_dir() as MEDIA_ROOT:
-                        local_settings = _make_settings(args, self.application,
-                                                        settings,
-                                                        STATIC_ROOT, MEDIA_ROOT)
-                        # Testing that cms_helper.py in custom project is loaded
-                        self.assertEqual(local_settings.TIME_ZONE, 'Europe/Rome')
+            # with captured_output() as (out, err):
+            args = copy(DEFAULT_ARGS)
+            with temp_dir() as STATIC_ROOT:
+                with temp_dir() as MEDIA_ROOT:
+                    local_settings = _make_settings(args, self.application,
+                                                    settings,
+                                                    STATIC_ROOT, MEDIA_ROOT)
+                    # Testing that cms_helper.py in custom project is loaded
+                    self.assertEqual(local_settings.TIME_ZONE, 'Europe/Rome')
 
-                        args['--boilerplate'] = True
-                        args['--extra-settings'] = 'cms_helper_extra.py'
-                        local_settings = _make_settings(args, self.application,
-                                                        settings,
-                                                        STATIC_ROOT, MEDIA_ROOT)
-                        # Testing that cms_helper.py in the command option is loaded
-                        self.assertEqual(local_settings.TIME_ZONE, 'Europe/Paris')
-                        # Existing application is kept
-                        self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
-                        # New ones are added both on top and in random positions
-                        self.assertEqual('djangocms_admin_style', local_settings.INSTALLED_APPS[0])
-                        self.assertTrue('some_app' in local_settings.INSTALLED_APPS)
+                    args['--boilerplate'] = True
+                    args['--extra-settings'] = 'cms_helper_extra.py'
+                    local_settings = _make_settings(args, self.application,
+                                                    settings,
+                                                    STATIC_ROOT, MEDIA_ROOT)
+                    # Testing that cms_helper.py in the command option is loaded
+                    self.assertEqual(local_settings.TIME_ZONE, 'Europe/Paris')
+                    # Existing application is kept
+                    self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
+                    # New ones are added both on top and in random positions
+                    self.assertEqual('djangocms_admin_style', local_settings.INSTALLED_APPS[0])
+                    self.assertTrue('some_app' in local_settings.INSTALLED_APPS)
 
-                        # Ditto for middlewares
-                        if DJANGO_1_9:
-                            self.assertEqual('top_middleware', local_settings.MIDDLEWARE_CLASSES[0])
-                            self.assertTrue('some_middleware' in local_settings.MIDDLEWARE_CLASSES)
-                            self.assertTrue('django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE_CLASSES)
-                        else:
-                            self.assertTrue('django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE)
-                            self.assertEqual('top_middleware', local_settings.MIDDLEWARE[0])
-                            self.assertTrue('some_middleware' in local_settings.MIDDLEWARE)
+                    # Ditto for middlewares
+                    if DJANGO_1_9:
+                        self.assertEqual('top_middleware', local_settings.MIDDLEWARE_CLASSES[0])
+                        self.assertTrue('some_middleware' in local_settings.MIDDLEWARE_CLASSES)
+                        self.assertTrue(
+                            'django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE_CLASSES)
+                    else:
+                        self.assertTrue(
+                            'django.contrib.sessions.middleware.SessionMiddleware' in local_settings.MIDDLEWARE)
+                        self.assertEqual('top_middleware', local_settings.MIDDLEWARE[0])
+                        self.assertTrue('some_middleware' in local_settings.MIDDLEWARE)
 
-                        boilerplate_settings = get_boilerplates_settings()
+                    boilerplate_settings = get_boilerplates_settings()
 
-                        # Check the loaders
-                        self.assertTrue('django.template.loaders.app_directories.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
-                        # Loaders declared in settings
-                        self.assertTrue('admin_tools.template_loaders.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
-                        # Existing application is kept
-                        self.assertTrue('django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
-                        # New one is added
-                        self.assertTrue('django.template.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS']['context_processors'])
-                        # Check template dirs
-                        self.assertTrue('some/dir' in local_settings.TEMPLATES[0]['DIRS'])
-                        # Check for aldryn boilerplates
-                        for name, value in boilerplate_settings.items():
-                            if not name.startswith('TEMPLATE'):
-                                if type(value) in (list, tuple):
-                                    self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
-                                elif name == 'ALDRYN_BOILERPLATE_NAME':
-                                    self.assertEqual(getattr(local_settings, name), 'legacy')
-                                else:
-                                    self.assertTrue(value in getattr(local_settings, name))
-                            elif name == 'TEMPLATE_CONTEXT_PROCESSORS':
-                                self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['context_processors']).intersection(set(value)))
-                            elif name == 'TEMPLATE_LOADERS':
-                                self.assertTrue(set(local_settings.TEMPLATES[0]['OPTIONS']['loaders']).intersection(set(value)))
+                    # Check the loaders
+                    self.assertTrue(
+                        'django.template.loaders.app_directories.Loader' in local_settings.TEMPLATES[0]['OPTIONS'][
+                            'loaders'])
+                    # Loaders declared in settings
+                    self.assertTrue(
+                        'admin_tools.template_loaders.Loader' in local_settings.TEMPLATES[0]['OPTIONS']['loaders'])
+                    # Existing application is kept
+                    self.assertTrue(
+                        'django.template.context_processors.request' in local_settings.TEMPLATES[0]['OPTIONS'][
+                            'context_processors'])
+                    # New one is added
+                    self.assertTrue(
+                        'django.template.context_processors.debug' in local_settings.TEMPLATES[0]['OPTIONS'][
+                            'context_processors'])
+                    # Check template dirs
+                    self.assertTrue('some/dir' in local_settings.TEMPLATES[0]['DIRS'])
+                    # Check for aldryn boilerplates
+                    for name, value in boilerplate_settings.items():
+                        if not name.startswith('TEMPLATE'):
+                            if type(value) in (list, tuple):
+                                self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
+                            elif name == 'ALDRYN_BOILERPLATE_NAME':
+                                self.assertEqual(getattr(local_settings, name), 'legacy')
+                            else:
+                                self.assertTrue(value in getattr(local_settings, name))
+                        elif name == 'TEMPLATE_CONTEXT_PROCESSORS':
+                            self.assertTrue(
+                                set(local_settings.TEMPLATES[0]['OPTIONS']['context_processors']).intersection(
+                                    set(value)))
+                        elif name == 'TEMPLATE_LOADERS':
+                            self.assertTrue(
+                                set(local_settings.TEMPLATES[0]['OPTIONS']['loaders']).intersection(set(value)))
 
     @patch('djangocms_helper.main.autoreload')
     def test_server(self, mocked_command):
@@ -374,6 +548,7 @@ class CommandTests(unittest.TestCase):
             import cms
         except ImportError:
             raise unittest.SkipTest('django CMS not available, skipping test')
+        path = os.path.join(self.basedir, 'data')
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit:
@@ -384,11 +559,40 @@ class CommandTests(unittest.TestCase):
                         pass
                     args = copy(DEFAULT_ARGS)
                     args['test'] = True
-                    args['--persistent'] = mkdtemp()
+                    args['--persistent'] = True
                     args['--runner'] = 'runners.CapturedOutputRunner'
                     core(args, self.application)
         self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
+        self.assertTrue(args['STATIC_ROOT'].startswith(path))
+        self.assertTrue(args['MEDIA_ROOT'].startswith(path))
+        self.assertTrue(os.path.exists(args['STATIC_ROOT']))
+        self.assertTrue(os.path.exists(args['MEDIA_ROOT']))
+
+    def test_testrun_persistent_path(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+        path = mkdtemp()
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit:
+                    try:
+                        from django.test.utils import _TestState
+                        del _TestState.saved_data
+                    except (ImportError, AttributeError):
+                        pass
+                    args = copy(DEFAULT_ARGS)
+                    args['test'] = True
+                    args['--persistent'] = True
+                    args['--persistent-path'] = path
+                    args['--runner'] = 'runners.CapturedOutputRunner'
+                    core(args, self.application)
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
+        self.assertEqual(exit.exception.code, 0)
+        self.assertTrue(args['STATIC_ROOT'].startswith(path))
+        self.assertTrue(args['MEDIA_ROOT'].startswith(path))
         self.assertTrue(os.path.exists(args['STATIC_ROOT']))
         self.assertTrue(os.path.exists(args['MEDIA_ROOT']))
 
@@ -402,14 +606,15 @@ class CommandTests(unittest.TestCase):
                 exception = ImportError
             else:
                 exception = SystemExit
-            with self.assertRaises(exception) as exit:
-                args = list()
-                args.append('djangocms_helper')
-                args.append('test')
-                args.append('example1')
-                args.append('--runner=runners.CapturedOutputRunner')
-                args.append('whatever')
-                runner.cms('example1', args)
+            with captured_output() as (out, err):
+                with self.assertRaises(exception) as exit:
+                    args = list()
+                    args.append('djangocms_helper')
+                    args.append('test')
+                    args.append('example1')
+                    args.append('--runner=runners.CapturedOutputRunner')
+                    args.append('whatever')
+                    runner.cms('example1', args)
         if sys.version_info >= (3, 5):
             self.assertEqual(exit.exception.code, 1)
 
@@ -433,21 +638,6 @@ class CommandTests(unittest.TestCase):
         self.assertFalse('hidden string' in err.getvalue())
         self.assertTrue('Ran 14 tests in' in err.getvalue())
         self.assertEqual(exit.exception.code, 0)
-
-    def test_runner_cms_exception(self):
-        try:
-            import cms
-            raise unittest.SkipTest('django CMS available, skipping test')
-        except ImportError:
-            pass
-        from djangocms_helper.test_utils.runners import CapturedOutputRunner
-        with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
-            with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    with self.assertRaises(ImportError) as exit:
-                        args = list()
-                        args.append('djangocms_helper')
-                        runner.cms('example1', args)
 
     def test_runner_cms_exception(self):
         try:
@@ -520,28 +710,6 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('example2' in settings.INSTALLED_APPS)
         self.assertFalse('aldryn_boilerplates' in settings.INSTALLED_APPS)
         self.assertFalse('cms' in settings.INSTALLED_APPS)
-
-    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.8'),
-                     reason='Simple runner not available in Django > 1.8')
-    def test_runner_simple(self):
-        try:
-            import cms
-        except ImportError:
-            raise unittest.SkipTest('django CMS not available, skipping test')
-        from djangocms_helper.test_utils.runners import CapturedOutputSimpleRunner
-        with patch('django.test.simple.DjangoTestSuiteRunner', CapturedOutputSimpleRunner):
-            with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    with self.assertRaises(SystemExit) as exit:
-                        args = list()
-                        args.append('djangocms_helper')
-                        args.append('test')
-                        args.append('example1')
-                        args.append('--simple-runner')
-                        args.append('example1.FakeTests')
-                        runner.cms('example1', args)
-        self.assertTrue('Ran 14 tests in' in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
 
     def test_runner_nose(self):
         try:
