@@ -10,7 +10,6 @@ from tempfile import mkdtemp
 
 import django
 from django.core.management import call_command
-from django.core.urlresolvers import clear_url_caches
 from django.utils import six
 from django.utils.functional import empty
 from django.utils.six import StringIO
@@ -19,15 +18,15 @@ from django.utils.six.moves import reload_module
 from . import HELPER_FILE
 
 try:
+    from django.urls import clear_url_caches
+except ImportError:
+    from django.core.urlresolvers import clear_url_caches
+
+try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
 
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from django.utils.datastructures import SortedDict as OrderedDict
 
 try:
     import cms  # NOQA
@@ -55,6 +54,9 @@ DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
 DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion('1.10')
 DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion('1.11')
 DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion('2.0')
+DJANGO_2_0 = LooseVersion(django.get_version()) < LooseVersion('2.1')
+DJANGO_2_1 = LooseVersion(django.get_version()) < LooseVersion('2.2')
+DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion('3.0')
 
 
 def load_from_file(module_path):
@@ -139,17 +141,8 @@ def _reset_django(settings):
     """
     if settings._wrapped != empty:
         clear_url_caches()
-        if DJANGO_1_6:
-            from django.db.models.loading import cache as apps
-            apps.app_store = OrderedDict()
-            apps.loaded = False
-            apps.handled = set()
-            apps.postponed = []
-            apps.nesting_level = 0
-            apps._get_models_cache = {}
-        else:
-            from django.apps import apps
-            apps.clear_cache()
+        from django.apps import apps
+        apps.clear_cache()
         settings._wrapped = empty
         clear_url_caches()
 
@@ -224,42 +217,10 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         CMS_PROCESSORS = []
         URLCONF = 'djangocms_helper.urls'
 
-    CMS_1_7_MIGRATIONS = {}
-    try:
-        import cms.migrations_django  # NOQA # nopyflakes
-        CMS_1_7_MIGRATIONS['cms'] = 'cms.migrations_django'
-        CMS_1_7_MIGRATIONS['menus'] = 'menus.migrations_django'
-    except ImportError:
-        # we're using the Django 1.7 migrations
-        pass
-    try:  # pragma: no cover
-        import djangocms_text_ckeditor.migrations_django  # NOQA # nopyflakes
-        CMS_1_7_MIGRATIONS['djangocms_text_ckeditor'] = 'djangocms_text_ckeditor.migrations_django'
-    except ImportError:  # pragma: no cover
-        # we're using the Django 1.7 migrations
-        pass
-    try:  # pragma: no cover
-        import filer.migrations_django  # NOQA # nopyflakes # pragma: no cover
-        CMS_1_7_MIGRATIONS['filer'] = 'filer.migrations_django'
-    except ImportError:  # pragma: no cover
-        # we're using the Django 1.7 migrations
-        pass
-    try:  # pragma: no cover
-        import cmsplugin_filer_image.migrations_django  # NOQA # nopyflakes
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_file'] = 'cmsplugin_filer_file.migrations_django'
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_folder'] = 'cmsplugin_filer_folder.migrations_django'
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_image'] = 'cmsplugin_filer_image.migrations_django'
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_link'] = 'cmsplugin_filer_link.migrations_django'
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_teaser'] = 'cmsplugin_filer_teaser.migrations_django'
-        CMS_1_7_MIGRATIONS['cmsplugin_filer_video'] = 'cmsplugin_filer_video.migrations_django'
-    except ImportError:  # pragma: no cover
-        # we're using the Django 1.7 migrations
-        pass
-
-    default_settings = get_default_settings(CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE,
-                                            CMS_APP_STYLE, URLCONF, application)
+    default_settings = get_default_settings(
+        CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application
+    )
     migrate = args.get('--migrate') or not args.get('--no-migrate')
-    configs['SOUTH_TESTS_MIGRATE'] = migrate
     default_settings.update(configs)
 
     if extra_settings:
@@ -283,18 +244,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         for middleware in middleware_top:
             default_settings['MIDDLEWARE_CLASSES'].insert(0, middleware)
 
-    if DJANGO_1_6:
-        default_settings['INSTALLED_APPS'].append('south')
-    elif args['--cms']:
-        default_settings['MIGRATION_MODULES'].update(CMS_1_7_MIGRATIONS)
-
     if 'cms' in default_settings['INSTALLED_APPS']:
-        if CMS_30:
-            if 'mptt' not in default_settings['INSTALLED_APPS']:
-                default_settings['INSTALLED_APPS'].append('mptt')
-        else:
-            if 'treebeard' not in default_settings['INSTALLED_APPS']:
-                default_settings['INSTALLED_APPS'].append('treebeard')
+        if 'treebeard' not in default_settings['INSTALLED_APPS']:
+            default_settings['INSTALLED_APPS'].append('treebeard')
     if ('filer' in default_settings['INSTALLED_APPS'] and
             'mptt' not in default_settings['INSTALLED_APPS']):
         default_settings['INSTALLED_APPS'].append('mptt')
@@ -323,20 +275,19 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
             del boilerplate_settings[setting]
         default_settings.update(boilerplate_settings)
 
-    if not DJANGO_1_7:
-        default_settings['TEMPLATES'] = [
-            {'NAME': 'django',
-             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-             'OPTIONS': {
-                 'context_processors': [
-                     template_processor.replace('django.core', 'django.template')
-                     for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
-                 ],
-                 'loaders': default_settings.pop('TEMPLATE_LOADERS')
-             }}
-        ]
-        if 'TEMPLATE_DIRS' in default_settings:
-            default_settings['TEMPLATES'][0]['DIRS'] = default_settings.pop('TEMPLATE_DIRS')
+    default_settings['TEMPLATES'] = [
+        {'NAME': 'django',
+         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+         'OPTIONS': {
+             'context_processors': [
+                 template_processor.replace('django.core', 'django.template')
+                 for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
+             ],
+             'loaders': default_settings.pop('TEMPLATE_LOADERS')
+         }}
+    ]
+    if 'TEMPLATE_DIRS' in default_settings:
+        default_settings['TEMPLATES'][0]['DIRS'] = default_settings.pop('TEMPLATE_DIRS')
 
     # Support for custom user models
     if 'AUTH_USER_MODEL' in os.environ:
@@ -353,7 +304,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if application not in default_settings['INSTALLED_APPS']:
         default_settings['INSTALLED_APPS'].append(application)
 
-    if not DJANGO_1_6 and not migrate:
+    if not migrate:
         default_settings['MIGRATION_MODULES'] = DisableMigrations()
 
     if not DJANGO_1_9 and 'MIDDLEWARE' not in default_settings:
@@ -362,11 +313,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
     _reset_django(settings)
     settings.configure(**default_settings)
-    if not DJANGO_1_6:
-        django.setup()
-    elif 'south' in settings.INSTALLED_APPS:
-        from south.management.commands import patch_for_test_db_setup
-        patch_for_test_db_setup()
+    django.setup()
     reload_urls(settings, cms_apps=False)
     return settings
 
@@ -389,17 +336,7 @@ def reload_urls(settings, urlconf=None, cms_apps=True):
 
 
 def _create_db(migrate_cmd=False):
-    if DJANGO_1_6:
-        if migrate_cmd:
-            call_command('syncdb', interactive=False, verbosity=1, database='default')
-            call_command('migrate', interactive=False, verbosity=1, database='default')
-        else:
-            call_command('syncdb', interactive=False, verbosity=1, database='default',
-                         migrate=False, migrate_all=True)
-            call_command('migrate', interactive=False, verbosity=1, database='default',
-                         fake=True)
-    else:
-        call_command('migrate')
+    call_command('migrate')
 
 
 def get_user_model():

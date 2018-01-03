@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
+from collections import OrderedDict
 from contextlib import contextmanager
 from copy import deepcopy
 from tempfile import mkdtemp
@@ -15,9 +16,7 @@ from django.test import RequestFactory, TestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 
-from .utils import (
-    DJANGO_1_9, OrderedDict, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
-)
+from .utils import DJANGO_1_9, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
 try:
     from unittest.mock import patch
@@ -294,7 +293,11 @@ class BaseTestCase(TestCase):
                 user = self._login_context.user
             else:
                 user = AnonymousUser()
-        if user.is_authenticated():
+        if callable(user.is_authenticated):
+            authenticated = user.is_authenticated()
+        else:
+            authenticated = user.is_authenticated
+        if authenticated:
             session_key = user._meta.pk.value_to_string(user)
         else:
             session_key = 'session_key'

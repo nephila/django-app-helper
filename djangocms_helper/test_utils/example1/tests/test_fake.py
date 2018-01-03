@@ -246,7 +246,8 @@ try:
                 self.assertEqual(request.current_page.get_absolute_url(), pages[1].get_absolute_url())
 
 
-except Exception:
+except Exception as e:
+    print(e)
     from unittest2 import TestCase
 
     class FakeTests(TestCase):
