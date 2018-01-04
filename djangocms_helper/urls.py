@@ -5,6 +5,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.static import serve
 
 from .utils import load_from_file
@@ -46,3 +47,4 @@ if settings.USE_CMS:
     )
 
 urlpatterns += i18n_patterns(*i18n_urls)
+urlpatterns += staticfiles_urlpatterns()
