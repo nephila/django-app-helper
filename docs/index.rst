@@ -2,15 +2,21 @@
 django CMS Helper
 #################
 
-django CMS Helper is a set of commandline utilities to help developers of applications for the
-`django CMS <http://django-cms.org>`_ ecosystem.
 
-It's a modified version of django CMS's own `develop.py` script, allowing you to work with your
-application even without having a full project - which is not always possible or convenient - set
-up.
+djangocms-helper is a set of commands and helper methods
+to make developing and testing reusable Django applications easier.
 
-It does this by spawning its own virtual project - a basic generic project built in to itself -
-that's ready to integrate with your application with just a little extra configuration.
+Being born in the django CMS ecosystem, it provides a lot of utility
+functions to develop, run and test django CMS applications.
+
+It's a modified version of django CMS's own `develop.py` script, and it allows
+to develop applications without having a full project
+- which is not always possible or convenient - set up.
+
+It does this by spawning its own virtual project
+- a basic generic project built in to itself -
+that's ready to integrate with your application with just
+a little extra configuration.
 
 The utilities provided:
 

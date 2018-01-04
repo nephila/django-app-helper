@@ -4,15 +4,18 @@ djangocms-helper
 
 |Gitter| |PyPiVersion| |PyVersion| |Status| |TestCoverage| |CodeClimate| |License|
 
-****************************************
-Helper for django CMS plugin development
-****************************************
+******************************************
+Helper for django applications development
+******************************************
 
-djangocms-helper is a set of commands to handle django CMS plugins development
-process.
+djangocms-helper is a set of commands and helper methods
+to make developing and testing reusable Django applications easier.
+
+Being born in the django CMS ecosystem, it provides a lot of utility
+functions to develop, run and test django CMS applications.
 
 It's a modified version of django CMS's own ``develop.py`` script, modified
-to handle generic plugins development process.
+to handle generic application development process.
 
 Supported versions
 ==================

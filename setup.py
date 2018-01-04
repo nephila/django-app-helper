@@ -17,12 +17,12 @@ else:
     test_suite = 'djangocms_helper.tests'
 
 setuptools.setup(
-    name="djangocms-helper",
+    name='djangocms-helper',
     version=__version__,
-    url="https://github.com/nephila/djangocms-helper",
-    author="Iacopo Spalletti",
-    author_email="i.spalletti@nephila.it",
-    description="Helpers for django CMS plugin development",
+    url='https://github.com/nephila/djangocms-helper',
+    author='Iacopo Spalletti',
+    author_email='i.spalletti@nephila.it',
+    description='Helper for django applications development',
     long_description=open('README.rst').read(),
     license='GPLv2+',
     packages=setuptools.find_packages(),
