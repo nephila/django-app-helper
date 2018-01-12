@@ -411,7 +411,7 @@ class UserLoginContext(object):
         self.testcase.client.logout()
 
 
-def ensure_unicoded_and_unique(args_list):
+def ensure_unicoded_and_unique(args_list, application):
     """
     Iterate over args_list, make it unicode if needed and ensure that there
     are no duplicates.
@@ -421,6 +421,6 @@ def ensure_unicoded_and_unique(args_list):
     for argument in args_list:
         argument = (six.u(argument)
                     if not isinstance(argument, six.text_type) else argument)
-        if argument not in unicoded_args:
+        if argument not in unicoded_args or argument == application:
             unicoded_args.append(argument)
     return unicoded_args
