@@ -39,7 +39,6 @@ DEFAULT_ARGS = {
     '--xvfb': '',
     '--runner': None,
     '--runner-options': None,
-    '--nose-runner': False,
     '--cms': True,
     '--failfast': False,
     '--merge': False,
@@ -148,7 +147,6 @@ class CommandTests(unittest.TestCase):
             '--migrate': False,
             '--native': False,
             '--no-migrate': False,
-            '--nose-runner': False,
             '--persistent': True,
             '--persistent-path': 'test',
             '--port': '8000',
@@ -196,7 +194,6 @@ class CommandTests(unittest.TestCase):
             '--migrate': False,
             '--native': False,
             '--no-migrate': False,
-            '--nose-runner': False,
             '--persistent': True,
             '--persistent-path': 'test',
             '--port': '8000',
@@ -245,7 +242,6 @@ class CommandTests(unittest.TestCase):
             '--migrate': False,
             '--native': False,
             '--no-migrate': False,
-            '--nose-runner': False,
             '--persistent': True,
             '--persistent-path': 'test',
             '--port': '8000',
@@ -710,24 +706,6 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('example2' in settings.INSTALLED_APPS)
         self.assertFalse('aldryn_boilerplates' in settings.INSTALLED_APPS)
         self.assertFalse('cms' in settings.INSTALLED_APPS)
-
-    def test_runner_nose(self):
-        try:
-            import cms
-        except ImportError:
-            raise unittest.SkipTest('django CMS not available, skipping test')
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit:
-                    args = list()
-                    args.append('djangocms_helper')
-                    args.append('test')
-                    args.append('example1')
-                    args.append('--nose-runner')
-                    args.append('example1.tests')
-                    runner.cms('example1', args)
-        self.assertTrue('Ran 28 tests in' in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
 
     def test_testrun_nocms(self):
         with work_in(self.basedir):
