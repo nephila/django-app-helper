@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
+
 import setuptools
-import sys
 from djangocms_helper import __version__
 
 test_requirements = []
@@ -10,11 +12,7 @@ requirements = [
     'pyflakes',
     'django',
 ]
-if sys.version_info[:2] < (2, 7):
-    test_requirements.append('unittest2')
-    test_suite = 'unittest2.collector'
-else:
-    test_suite = 'djangocms_helper.tests'
+
 
 setuptools.setup(
     name='djangocms-helper',
@@ -36,7 +34,7 @@ setuptools.setup(
             'djangocms-helper = djangocms_helper.main:main',
         ]
     },
-    test_suite=test_suite,
+    test_suite='djangocms_helper.tests',
     tests_require=test_requirements,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',

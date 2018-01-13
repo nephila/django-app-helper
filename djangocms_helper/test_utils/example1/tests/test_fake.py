@@ -9,7 +9,7 @@ except ImportError:
 try:
     from django.contrib.auth.models import AnonymousUser
     from djangocms_helper.base_test import BaseTestCase
-    from djangocms_helper.utils import get_user_model_labels
+    from djangocms_helper.utils import get_user_model_labels, CMS_34
 
 
     class FakeTests(BaseTestCase):
@@ -137,15 +137,17 @@ try:
                 raise unittest.SkipTest('django CMS not available, skipping test')
 
             from cms.api import add_plugin
-            sample_text = '\nfake text\nPage title\n'
+            sample_text = '\nfake text\nen\nPage title\n\n'
             pages = self.get_pages()
+            public = pages[0].get_public_object()
             placeholder = pages[0].placeholders.get(slot='content')
             plugin = add_plugin(placeholder=placeholder, plugin_type='FakePlugin', language='en')
             pages[0].publish('en')
-            context = self.get_plugin_context(pages[0], 'en', plugin, edit=False)
-            rendered_2 = self.render_plugin(pages[0], 'en', plugin)
-            rendered_1 = plugin.render_plugin(context, placeholder)
-            self.assertEqual(rendered_2, rendered_1)
+            rendered_2 = self.render_plugin(public, 'en', plugin)
+            if CMS_34:
+                context = self.get_plugin_context(pages[0], 'en', plugin, edit=False)
+                rendered_1 = plugin.render_plugin(context, placeholder)
+                self.assertEqual(rendered_2, rendered_1)
             self.assertEqual(rendered_2, sample_text)
 
         def test_request(self):

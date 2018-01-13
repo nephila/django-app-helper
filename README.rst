@@ -24,7 +24,7 @@ Python: 2.7, 3.4, 3.5, 3.6
 
 Django: 1.8 to 1.11 (limited 2.0 support)
 
-django CMS: 3.4
+django CMS: 3.4, 3.5
 
 .. warning:: Starting from version 1.1, compatibily nose test runnerhas been dropped.
              Pin your test requirements accordingly (``djangocms-helper<1.0``).

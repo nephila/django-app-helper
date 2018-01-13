@@ -13,7 +13,7 @@ import django
 
 from djangocms_helper import runner
 from djangocms_helper.default_settings import get_boilerplates_settings
-from djangocms_helper.main import _make_settings, core
+from djangocms_helper.main import _make_settings, _map_argv, core
 from djangocms_helper.utils import DJANGO_1_9, captured_output, temp_dir, work_in
 
 try:
@@ -627,6 +627,7 @@ class CommandTests(unittest.TestCase):
                         args = list()
                         args.append('djangocms_helper')
                         args.append('test')
+                        args.append('--extra-settings=cms_helper.py')
                         args.append('example1')
                         runner.cms('example1', args)
         self.assertTrue('visible string' in out.getvalue())

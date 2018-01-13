@@ -83,4 +83,5 @@ def runner(argv):
     extra_settings = any(map(lambda x: x.startswith('--extra-settings='), argv))
     if os.path.basename(helper) != HELPER_FILE and not extra_settings:
         argv.append('--extra-settings=%s' % helper)
+    print(argv)
     return main(argv)

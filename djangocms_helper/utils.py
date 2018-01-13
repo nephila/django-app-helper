@@ -250,6 +250,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if ('filer' in default_settings['INSTALLED_APPS'] and
             'mptt' not in default_settings['INSTALLED_APPS']):
         default_settings['INSTALLED_APPS'].append('mptt')
+    if ('filer' in default_settings['INSTALLED_APPS'] and
+            'easy_thumbnails' not in default_settings['INSTALLED_APPS']):
+        default_settings['INSTALLED_APPS'].append('easy_thumbnails')
 
     if args['--boilerplate']:
         boilerplate_settings = get_boilerplates_settings()
