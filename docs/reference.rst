@@ -45,7 +45,7 @@ test
 
 ::
 
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--simple-runner] [--runner-options=<option1>,<option2>]
+    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--simple-runner] [--runner-options=<option1>,<option2>]
 
 Example: ``djangocms-helper some_application test --cms``
 
@@ -73,7 +73,6 @@ Options
 * ``--no-migrate``: skip migrations;
 * ``--boilerplate``: adds ``aldryn-boilerplates`` configuration to settings;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
-* ``--nose-runner``: use django nose test suite
 * ``--simple-runner`` use Django DjangoTestSuiteRunner
 * ``--native`` use the native Django command: the use of this option is **incompatible** with
   the options above.
@@ -102,12 +101,7 @@ Currently two different tests layouts are supported:
 
 Depending on the used test runner you may need to setup your tests accordingly.
 
-Currently supported test runners are:
-
-* Django's DiscoverRunner (default on Django 1.6+)
-* Nose's NoseTestSuiteRunner (option ``--nose-runner``)
-
-You can also specify your own custom runner with the ``--runner`` option.
+The default runner is the Django one, but it's possible to specify your own custom runner with the ``--runner`` option.
 
 
 cms_check

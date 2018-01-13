@@ -13,6 +13,7 @@ History
 * Fixed persistent option behavior with arbitrary commands
 * Added minimal changes to allow third party application to run test on django 2.0
 * Fixed options for channels runserver
+* Removed support for django-nose test runner
 
 1.0.0 (2017-07-25)
 ++++++++++++++++++

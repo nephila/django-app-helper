@@ -25,7 +25,7 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--nose-runner] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
+    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
     djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
     djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
@@ -45,7 +45,6 @@ Options:
     --merge                     Merge migrations
     --failfast                  Stop tests on first failure.
     --native                    Use the native test command, instead of the djangocms-helper on
-    --nose-runner               Use django-nose as test runner
     --boilerplate               Add support for aldryn-boilerplates
     --persistent                Use persistent storage
     --persistent-path=<path>    Persistent storage path
@@ -74,11 +73,6 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]
     settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
 
-    # Monkeypatching sys.argv to avoid passing to nose unwanted arguments
-    if test_runner == 'django_nose.NoseTestSuiteRunner':  # pragma: no cover
-        sys.argv = sys.argv[:2]
-        if failfast:
-            sys.argv.append('-x')
     if runner_options:
         sys.argv.extend(runner_options.split(','))
     test_runner = TestRunner(verbosity=verbose, interactive=False, failfast=failfast)
@@ -327,9 +321,7 @@ def core(args, application):
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 # run
                 if args['test']:
-                    if args['--nose-runner']:
-                        runner = 'django_nose.NoseTestSuiteRunner'
-                    elif args['--runner']:
+                    if args['--runner']:
                         runner = args['--runner']
                     else:
                         runner = 'django.test.runner.DiscoverRunner'
