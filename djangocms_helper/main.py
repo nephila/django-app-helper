@@ -375,10 +375,10 @@ def main(argv=sys.argv):  # pragma: no cover
     # Command is executed in the main directory of the plugin, and we must
     # include it in the current path for the imports to work
     sys.path.insert(0, '.')
-    # ensure that argv, are unique and the same type as doc string
-    argv = ensure_unicoded_and_unique(argv)
     if len(argv) > 1:
         application = argv[1]
+        # ensure that argv, are unique and the same type as doc string
+        argv = ensure_unicoded_and_unique(argv, application)
         application_module = __import__(application)
         args = _map_argv(argv, application_module)
         return core(args=args, application=application)
