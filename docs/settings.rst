@@ -62,13 +62,13 @@ All ``TEMPLATES_`` settings from Django 1.6/1.7 are automatically translated to 
 will take care of converting.
 
 Django 1.10 support
-==================
+===================
 
 ``MIDDLEWARE_CLASSES`` setting is automatically copied into ``MIDDLEWARE`` on Django 1.10 and above
 to support new style middleware. *This assumes all the middlewares are compatible with the new style.*
 If you define a ``MIDDLEWARE`` setting, ``MIDDLEWARE_CLASSES`` is **not** copied over it or merged with
 it, including the django CMS middlewares. To support both styles, thus, just use the old setting and
-and the `compatibility mixin<https://docs.djangoproject.com/en/1.10/topics/http/middleware/#upgrading-middleware>`_.
+and the `compatibility mixin`_.
 
 
 ================
@@ -151,3 +151,6 @@ Middlewares::
 ``djangocms-helper`` discovers automtically the South / Django migrations layout and configure
 the settings accordingly. As of the current version ``filer``, ``djangocms_text_ckeditor``,
 ``cmplugin_filer`` are supported.
+
+
+.. _compatibility mixin: https://docs.djangoproject.com/en/1.10/topics/http/middleware/#upgrading-middleware
