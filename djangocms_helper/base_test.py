@@ -12,7 +12,7 @@ from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
 from django.template import RequestContext
 from django.template.loader import get_template
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 
@@ -24,9 +24,9 @@ except ImportError:
     from mock import patch
 
 
-class BaseTestCase(TestCase):
+class BaseTestCaseMixin(object):
     """
-    Utils class that provides some helper methods to setup and interact with
+    Utils mixin that provides some helper methods to setup and interact with
     Django testing framework.
     """
     request_factory = None
@@ -85,7 +85,7 @@ class BaseTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         from django.contrib.sites.models import Site
-        super(BaseTestCase, cls).setUpClass()
+        super(BaseTestCaseMixin, cls).setUpClass()
         cls.request_factory = RequestFactory()
         cls.user = create_user(
             cls._admin_user_username, cls._admin_user_email, cls._admin_user_password,
@@ -109,7 +109,7 @@ class BaseTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(BaseTestCase, cls).tearDownClass()
+        super(BaseTestCaseMixin, cls).tearDownClass()
         User = get_user_model()
         User.objects.all().delete()
 
@@ -524,3 +524,17 @@ class BaseTestCase(TestCase):
         with patch('sys.stdout', new_callable=StringIO) as out:
             with patch('sys.stderr', new_callable=StringIO) as err:
                 yield out, err
+
+
+class BaseTestCase(BaseTestCaseMixin, TestCase):
+    """
+    Base class that implements :py:class:`BaseTestCaseMixin` and
+    :py:class:`django.tests.TestCase`
+    """
+
+
+class BaseTransactionTestCase(BaseTestCaseMixin, TransactionTestCase):
+    """
+    Base class that implements :py:class:`BaseTestCaseMixin` and
+    :py:class:`django.tests.TransactionTestCase`
+    """
