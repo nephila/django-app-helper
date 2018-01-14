@@ -1,4 +1,5 @@
-{% load sekizai_tags %}
+{% load sekizai_tags cms_tags %}
 fake text
-{{ request.current_page }}
+{{ request.LANGUAGE_CODE }}
+{% page_attribute "title" %}
 {% addtoblock "css" %}<style>body{font-weight: bold;}</style>{% endaddtoblock %}
