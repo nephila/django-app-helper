@@ -16,9 +16,7 @@ from django.test import RequestFactory, TestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 
-from .utils import (
-    CMS_34, DJANGO_1_9, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir,
-)
+from .utils import DJANGO_1_9, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
 try:
     from unittest.mock import patch
@@ -208,9 +206,12 @@ class BaseTestCase(TestCase):
                     create_title(**title_data)
                     if publish:
                         page.publish(lang)
-            if not home_set and not CMS_34 and main_data.get('published', False):
-                home_set = True
+            if (
+                not home_set and hasattr(page, 'set_as_homepage') and
+                main_data.get('published', False)
+            ):
                 page.set_as_homepage()
+                home_set = True
             page = page.get_draft_object()
             pages[page.get_slug(languages[0])] = page
         if has_apphook:
