@@ -3,7 +3,7 @@
 History
 -------
 
-1.1.0 (Unreleased)
+1.1.0 (2018-02-20)
 ++++++++++++++++++
 
 * Removed Django <1.8, Python 2.6, 3.3 from setup.py
