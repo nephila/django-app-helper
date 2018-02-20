@@ -18,7 +18,6 @@ from .utils import (
     get_user_model, persistent_dir, temp_dir, work_in,
 )
 
-
 __doc__ = """django CMS applications development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
