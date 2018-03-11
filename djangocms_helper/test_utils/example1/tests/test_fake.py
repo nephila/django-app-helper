@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 
+from django.contrib.sites.models import Site
+
 try:
     import unittest2 as unittest
 except ImportError:
@@ -22,19 +24,36 @@ try:
                     },
              'fr': {'title': 'Deuxieme', 'publish': True},
              'it': {'title': 'Seconda pagina', 'publish': False}},
+            {'en': {'title': 'Page title', 'template': 'page.html', 'publish': True, 'site': 2}}
         )
+
+        @classmethod
+        def setUpTestData(cls):
+            cls.site_2, __ = Site.objects.get_or_create(domain='http://example2.com')
+            super(FakeTests, cls).setUpTestData()
 
         def test_fake(self):
             self.assertTrue(True)
 
         def test_pages(self):
             from django.conf import settings
+
             data = self.get_pages_data()
             self.assertEqual(set(data[0].keys()), set(('en', 'fr', 'it')))
 
             if 'cms' in settings.INSTALLED_APPS:
                 pages = self.get_pages()
-                self.assertEqual(len(pages), 2)
+                self.assertEqual(len(pages), 3)
+
+                for index, page in enumerate(pages):
+                    try:
+                        page_site = page.node.site
+                    except AttributeError:  # Compatibility with django CMS 3.4-
+                        page_site = page.site
+                    if index < 2:
+                        self.assertEqual(page_site, self.site_1)
+                    else:
+                        self.assertEqual(page_site, self.site_2)
 
         def test_get(self):
             from django.conf import settings

@@ -2,12 +2,13 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from contextlib import contextmanager
 from copy import deepcopy
 from tempfile import mkdtemp
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
 from django.template import RequestContext
@@ -66,17 +67,25 @@ class BaseTestCaseMixin(object):
     Each item of the list is a dictionary containing the attributes
     (as accepted by ``cms.api.create_page``) of the page to be created.
 
-    The first language will be created with ``cms.api.create_page`` the following
-    languages using ``cms.api.create_title``
+    The first language (according to the CMS_LANGUAGES) configuration will be created with
+    ``cms.api.create_page`` the following languages using ``cms.api.create_title``.
+
+    The first page (for each site) will be marked as home page
+
+    A few special keys exists for the first language:
+
+        * 'published': Mark the page as published
+        * 'parent': Is replaced with the page of the given index in the _pages_data list
+        * 'site': Is replaced with the Site instance with the given ID
 
     Example:
         Single page created in en, fr, it languages::
 
             _pages_data = (
                 {
-                    'en': {'title': 'Page title', 'template': 'page.html', 'publish': True},
-                    'fr': {'title': 'Titre', 'publish': True},
-                    'it': {'title': 'Titolo pagina', 'publish': False}
+                    'en': {'title': 'Page title', 'template': 'page.html', 'published': True},
+                    'fr': {'title': 'Titre', 'published': True},
+                    'it': {'title': 'Titolo pagina', 'published': False}
                 },
             )
 
@@ -183,14 +192,18 @@ class BaseTestCaseMixin(object):
         from cms.api import create_page, create_title
         pages = OrderedDict()
         has_apphook = False
-        home_set = False
+        home_set = defaultdict(None)
         for page_data in source:
             main_data = deepcopy(page_data[languages[0]])
-            if 'publish' in main_data:
-                main_data['published'] = main_data.pop('publish')
+            site = main_data.get('site', 1)
+            current_home_set = home_set.get(site, False)
             main_data['language'] = languages[0]
+            if main_data.get('publish', None):
+                main_data['published'] = main_data.pop('publish')
             if main_data.get('parent', None):
                 main_data['parent'] = pages[main_data['parent']]
+            if main_data.get('site', None):
+                main_data['site'] = Site.objects.get(pk=main_data['site'])
             page = create_page(**main_data)
             has_apphook = has_apphook or 'apphook' in main_data
             for lang in languages[1:]:
@@ -207,11 +220,11 @@ class BaseTestCaseMixin(object):
                     if publish:
                         page.publish(lang)
             if (
-                not home_set and hasattr(page, 'set_as_homepage') and
+                not current_home_set and hasattr(page, 'set_as_homepage') and
                 main_data.get('published', False)
             ):
                 page.set_as_homepage()
-                home_set = True
+                home_set[site] = True
             page = page.get_draft_object()
             pages[page.get_slug(languages[0])] = page
         if has_apphook:
