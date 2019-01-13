@@ -3,7 +3,7 @@ django CMS Helper
 #################
 
 
-djangocms-helper is a set of commands and helper methods
+django-app-helper is a set of commands and helper methods
 to make developing and testing reusable Django applications easier.
 
 Being born in the django CMS ecosystem, it provides a lot of utility
@@ -37,17 +37,17 @@ Installation
 
 Installing from pip::
 
-    pip install djangocms-helper
+    pip install django-app-helper
 
 or::
 
-    pip install djangocms-helper[cms]
+    pip install django-app-helper[cms]
 
 to install it along with django CMS
 
 Installing from source::
 
-    pip install git+https://github.com/nephila/djangocms-helper#egg=djangocms-helper
+    pip install git+https://github.com/nephila/django-app-helper#egg=django-app-helper
 
 ============
 Requirements

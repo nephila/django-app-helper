@@ -11,10 +11,10 @@ from tempfile import mkdtemp
 
 import django
 
-from djangocms_helper import runner
-from djangocms_helper.default_settings import get_boilerplates_settings
-from djangocms_helper.main import _make_settings, _map_argv, core
-from djangocms_helper.utils import DJANGO_1_9, captured_output, temp_dir, work_in
+from app_helper import runner
+from app_helper.default_settings import get_boilerplates_settings
+from app_helper.main import _make_settings, _map_argv, core
+from app_helper.utils import DJANGO_1_9, captured_output, temp_dir, work_in
 
 try:
     from unittest.mock import patch
@@ -68,7 +68,7 @@ class CommandTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         os.environ.setdefault('DATABASE_URL', 'sqlite://localhost/:memory:')
-        cls.basedir = os.path.abspath(os.path.join('djangocms_helper', 'test_utils'))
+        cls.basedir = os.path.abspath(os.path.join('app_helper', 'test_utils'))
         cls.application = 'example1'
         cls.application_2 = 'example2'
         with work_in(cls.basedir):
@@ -125,7 +125,7 @@ class CommandTests(unittest.TestCase):
         from ..main import _map_argv
 
         argv_1 = [
-            'cms_helper.py',
+            'helper.py',
             'example1',
             'test',
             '--cms',
@@ -164,7 +164,7 @@ class CommandTests(unittest.TestCase):
             'compilemessages': False,
             'makemessages': False,
             'makemigrations': False,
-            'options': ['cms_helper.py', 'test', '--cms', '--persistent-path=test',
+            'options': ['helper.py', 'test', '--cms', '--persistent-path=test',
                         '--extra-settings==something.py', '--runner==something.py'],
             'pyflakes': False,
             'server': False,
@@ -172,7 +172,7 @@ class CommandTests(unittest.TestCase):
             'test': True
         }
         argv_2 = [
-            'cms_helper.py',
+            'helper.py',
             'example1',
             'server',
             '--cms',
@@ -211,7 +211,7 @@ class CommandTests(unittest.TestCase):
             'compilemessages': False,
             'makemessages': False,
             'makemigrations': False,
-            'options': ['cms_helper.py', 'server', '--cms', '--persistent-path=test',
+            'options': ['helper.py', 'server', '--cms', '--persistent-path=test',
                         '--extra-settings==something.py', '--runner==something.py'],
             'pyflakes': False,
             'server': True,
@@ -220,7 +220,7 @@ class CommandTests(unittest.TestCase):
         }
 
         argv_3 = [
-            'cms_helper.py',
+            'helper.py',
             'example1',
             'some_command',
             '--cms',
@@ -259,7 +259,7 @@ class CommandTests(unittest.TestCase):
             'compilemessages': False,
             'makemessages': False,
             'makemigrations': False,
-            'options': ['cms_helper.py', 'some_command', '--cms', '--persistent-path=test',
+            'options': ['helper.py', 'some_command', '--cms', '--persistent-path=test',
                         '--extra-settings==something.py', '--runner==something.py'],
             'pyflakes': False,
             'server': False,
@@ -290,7 +290,7 @@ class CommandTests(unittest.TestCase):
                     local_settings = _make_settings(args, self.application,
                                                     settings,
                                                     STATIC_ROOT, MEDIA_ROOT)
-                    # Testing that cms_helper.py in custom project is loaded
+                    # Testing that helper.py in custom project is loaded
                     self.assertEqual(local_settings.TIME_ZONE, 'Europe/Rome')
 
                     args['--boilerplate'] = True
@@ -298,10 +298,10 @@ class CommandTests(unittest.TestCase):
                     local_settings = _make_settings(args, self.application,
                                                     settings,
                                                     STATIC_ROOT, MEDIA_ROOT)
-                    # Testing that cms_helper.py in the command option is loaded
+                    # Testing that helper.py in the command option is loaded
                     self.assertEqual(local_settings.TIME_ZONE, 'Europe/Paris')
                     # Existing application is kept
-                    self.assertTrue('djangocms_helper.test_data' in local_settings.INSTALLED_APPS)
+                    self.assertTrue('app_helper.test_data' in local_settings.INSTALLED_APPS)
                     # New ones are added both on top and in random positions
                     self.assertEqual('djangocms_admin_style', local_settings.INSTALLED_APPS[0])
                     self.assertTrue('some_app' in local_settings.INSTALLED_APPS)
@@ -354,7 +354,7 @@ class CommandTests(unittest.TestCase):
                             self.assertTrue(
                                 set(local_settings.TEMPLATES[0]['OPTIONS']['loaders']).intersection(set(value)))
 
-    @patch('djangocms_helper.main.autoreload')
+    @patch('app_helper.main.autoreload')
     def test_server(self, mocked_command):
         with work_in(self.basedir):
             with captured_output() as (out, err):
@@ -436,7 +436,7 @@ class CommandTests(unittest.TestCase):
                 shutil.copy(self.poexample, self.pofile)
                 args = copy(DEFAULT_ARGS)
                 args['cms_check'] = True
-                args['--extra-settings'] = 'cms_helper.py'
+                args['--extra-settings'] = 'helper.py'
                 args['--migrate'] = False
                 core(args, self.application)
             self.assertTrue('Installation okay' in out.getvalue())
@@ -456,7 +456,7 @@ class CommandTests(unittest.TestCase):
                 shutil.copy(self.poexample, self.pofile)
                 args = copy(DEFAULT_ARGS)
                 args['cms_check'] = True
-                args['--extra-settings'] = 'cms_helper.py'
+                args['--extra-settings'] = 'helper.py'
                 args['--migrate'] = False
                 core(args, self.application)
             self.assertTrue('cms_check available only if django CMS is installed' in out.getvalue())
@@ -474,7 +474,7 @@ class CommandTests(unittest.TestCase):
                 shutil.copy(self.poexample, self.pofile)
                 args = copy(DEFAULT_ARGS)
                 args['cms_check'] = True
-                args['--extra-settings'] = 'cms_helper.py'
+                args['--extra-settings'] = 'helper.py'
                 args['--migrate'] = False
                 core(args, self.application)
 
@@ -605,7 +605,7 @@ class CommandTests(unittest.TestCase):
             with captured_output() as (out, err):
                 with self.assertRaises(exception) as exit:
                     args = list()
-                    args.append('djangocms_helper')
+                    args.append('helper')
                     args.append('test')
                     args.append('example1')
                     args.append('--runner=runners.CapturedOutputRunner')
@@ -619,15 +619,36 @@ class CommandTests(unittest.TestCase):
             import cms
         except ImportError:
             raise unittest.SkipTest('django CMS not available, skipping test')
-        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        from app_helper.test_utils.runners import CapturedOutputRunner
         with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
                     with self.assertRaises(SystemExit) as exit:
                         args = list()
-                        args.append('djangocms_helper')
+                        args.append('helper')
                         args.append('test')
-                        args.append('--extra-settings=cms_helper.py')
+                        args.append('--extra-settings=helper.py')
+                        args.append('example1')
+                        runner.cms('example1', args)
+        self.assertTrue('visible string' in out.getvalue())
+        self.assertFalse('hidden string' in out.getvalue())
+        self.assertFalse('hidden string' in err.getvalue())
+        self.assertTrue('Ran 14 tests in' in err.getvalue())
+        self.assertEqual(exit.exception.code, 0)
+
+    def test_runner_compat(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+        from app_helper.test_utils.runners import CapturedOutputRunner
+        with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    with self.assertRaises(SystemExit) as exit:
+                        args = list()
+                        args.append('cms_helper')
+                        args.append('test')
                         args.append('example1')
                         runner.cms('example1', args)
         self.assertTrue('visible string' in out.getvalue())
@@ -642,13 +663,13 @@ class CommandTests(unittest.TestCase):
             raise unittest.SkipTest('django CMS available, skipping test')
         except ImportError:
             pass
-        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        from app_helper.test_utils.runners import CapturedOutputRunner
         with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
                     with self.assertRaises(ImportError) as exit:
                         args = list()
-                        args.append('djangocms_helper')
+                        args.append('helper')
                         runner.cms('example1', args)
 
     def test_runner_cms_argv(self):
@@ -660,29 +681,29 @@ class CommandTests(unittest.TestCase):
         def fake_runner(argv):
             return argv
 
-        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        from app_helper.test_utils.runners import CapturedOutputRunner
         with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
                     args = list()
-                    args.append('djangocms_helper')
-                    with patch('djangocms_helper.runner.runner', fake_runner):
+                    args.append('helper')
+                    with patch('app_helper.runner.runner', fake_runner):
                         data = runner.cms('example1', args)
-                    self.assertEqual(data, ['djangocms_helper', 'example1', 'test', '--cms'])
+                    self.assertEqual(data, ['helper', 'example1', 'test', '--cms'])
 
     def test_runner_argv(self):
         def fake_runner(argv):
             return argv
 
-        from djangocms_helper.test_utils.runners import CapturedOutputRunner
+        from app_helper.test_utils.runners import CapturedOutputRunner
         with patch('django.test.runner.DiscoverRunner', CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
                     args = list()
-                    args.append('djangocms_helper')
-                    with patch('djangocms_helper.runner.runner', fake_runner):
+                    args.append('helper')
+                    with patch('app_helper.runner.runner', fake_runner):
                         data = runner.run('example1', args)
-                    self.assertEqual(data, [u'djangocms_helper', u'example1', u'test'])
+                    self.assertEqual(data, ['helper', 'example1', 'test'])
 
     def test_setup_cms(self):
         try:
@@ -691,9 +712,9 @@ class CommandTests(unittest.TestCase):
             raise unittest.SkipTest('django CMS not available, skipping test')
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                from djangocms_helper.test_utils import cms_helper
+                from app_helper.test_utils import helper
                 settings = runner.setup(
-                    'example1', cms_helper, use_cms=True, extra_args=['--boilerplate']
+                    'example1', helper, use_cms=True, extra_args=['--boilerplate']
                 )
         self.assertTrue('example2' in settings.INSTALLED_APPS)
         self.assertTrue('aldryn_boilerplates' in settings.INSTALLED_APPS)
@@ -702,8 +723,8 @@ class CommandTests(unittest.TestCase):
     def test_setup_nocms(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                from djangocms_helper.test_utils import cms_helper
-                settings = runner.setup('example1', cms_helper, extra_args=[])
+                from app_helper.test_utils import helper
+                settings = runner.setup('example1', helper, extra_args=[])
         self.assertTrue('example2' in settings.INSTALLED_APPS)
         self.assertFalse('aldryn_boilerplates' in settings.INSTALLED_APPS)
         self.assertFalse('cms' in settings.INSTALLED_APPS)
@@ -730,10 +751,10 @@ class CommandTests(unittest.TestCase):
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit:
                     args = list()
-                    args.append('djangocms_helper')
+                    args.append('helper')
                     args.append('example1')
                     args.append('test')
-                    args.append('--extra-settings=cms_helper.py')
+                    args.append('--extra-settings=helper.py')
                     args.append('--runner=runners.CapturedOutputRunner')
                     runner.run('example1', args)
         self.assertTrue('Ran 14 tests in' in err.getvalue())

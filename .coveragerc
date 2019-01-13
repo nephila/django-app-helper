@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = djangocms_helper
+source = app_helper
 
 [report]
 omit = *migrations*,*tests*,*test_utils*

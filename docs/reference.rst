@@ -8,17 +8,17 @@ Commands
 
 Commands take the general form::
 
-    djangocms-helper <application> <command> [options ...]
+    django-app-helper <application> <command> [options ...]
 
 where **<application>** is the Django application name and **<command>** is a Django supported
-command, *or* one of the djangocms-helper commands detailed below. Options vary for each command.
+command, *or* one of the django-app-helper commands detailed below. Options vary for each command.
 
 
 Common options
 ==============
 
 * ``--extra-settings=path``: loads the extra settings from the provided file instead of the
-  default ``cms_helper.py``
+  default ``helper.py``
 * ``cms``: loads django CMS specific options (see :ref:`cms-option` for details)
 
 
@@ -28,9 +28,9 @@ Django commands
 django CMS Helper supports any Django command available according to the project setup; the
 general syntax is::
 
-    djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms]
 
-Example: ``djangocms-helper some_application shell --cms``
+Example: ``django-app-helper some_application shell --cms``
 
 Arguments
 ---------
@@ -45,9 +45,9 @@ test
 
 ::
 
-    djangocms-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--simple-runner] [--runner-options=<option1>,<option2>]
+    django-app-helper <application> test [--failfast] [--migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--simple-runner] [--runner-options=<option1>,<option2>]
 
-Example: ``djangocms-helper some_application test --cms``
+Example: ``django-app-helper some_application test --cms``
 
 Runs the application's test suite in django CMS Helper's virtual environment.
 
@@ -109,24 +109,24 @@ cms_check
 
 ::
 
-    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
+    django-app-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--migrate]
 
 Runs the django CMS ``cms check`` command.
 
-Example: ``djangocms-helper some_application cms_check``
+Example: ``django-app-helper some_application cms_check``
 
 update and compile locales
 ==========================
 
 ::
 
-    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--locale=locale]
-    djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--locale=locale]
+    django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
 
 Examples::
 
-    djangocms-helper some_application makemessages --cms
-    djangocms-helper some_application compilemessages --cms
+    django-app-helper some_application makemessages --cms
+    django-app-helper some_application compilemessages --cms
 
 These two commands compiles and update the locale messages.
 
@@ -141,7 +141,7 @@ makemigrations
 
 ::
 
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--dry-run] [--empty] [<extra-applications>...]
+    django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--dry-run] [--empty] [<extra-applications>...]
 
 Updates the application migrations (south migrations or Django migrations
 according to the current installed Django version). For South, it automatically
@@ -164,7 +164,7 @@ squashmigrations
 
 ::
 
-    djangocms-helper <application> squashmigrations <migration-name>
+    django-app-helper <application> squashmigrations <migration-name>
 
 
 Runs the ``squashmigrations`` command. It operates on the current application.
@@ -179,7 +179,7 @@ pyflakes
 
 ::
 
-    djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
 
 Performs static analysis using pyflakes, with the same configuration as django CMS.
 
@@ -188,7 +188,7 @@ authors
 
 ::
 
-    djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
 
 Generates an authors list from the git log, in a form suitable for the **AUTHORS** file.
 
@@ -197,6 +197,6 @@ server
 
 ::
 
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
 
 Starts a runserver instance.

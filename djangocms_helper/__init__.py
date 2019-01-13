@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+This is a compatibility package to allow legacy import to work without any changes
+"""
 from __future__ import absolute_import, print_function, unicode_literals
 
-__version__ = '1.2.0.dev1'
-__author__ = 'Iacopo Spalletti <i.spalletti@nephila.it>'
-__all__ = ['runner']
+import sys
 
-HELPER_FILE = 'cms_helper.py'
+# clone app_helper in djangocms_helper module
+import app_helper  # NOQA
+
+sys.modules[__name__] = sys.modules['app_helper']

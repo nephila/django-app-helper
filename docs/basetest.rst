@@ -7,22 +7,22 @@ repetitive tasks during development.
 :py:class:`django.tests.TestCase` and :py:class:`django.tests.TransactionTestCase`
 
 
-.. autoclass:: djangocms_helper.base_test.BaseTestCaseMixin
+.. autoclass:: app_helper.base_test.BaseTestCaseMixin
     :members:
     :private-members:
 
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._admin_user_username
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._admin_user_password
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._admin_user_email
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._staff_user_username
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._staff_user_password
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._staff_user_email
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._user_user_username
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._user_user_password
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._user_user_email
-    .. autoattribute:: djangocms_helper.base_test.BaseTestCase._pages_data
+    .. autoattribute:: app_helper.base_test.BaseTestCase._admin_user_username
+    .. autoattribute:: app_helper.base_test.BaseTestCase._admin_user_password
+    .. autoattribute:: app_helper.base_test.BaseTestCase._admin_user_email
+    .. autoattribute:: app_helper.base_test.BaseTestCase._staff_user_username
+    .. autoattribute:: app_helper.base_test.BaseTestCase._staff_user_password
+    .. autoattribute:: app_helper.base_test.BaseTestCase._staff_user_email
+    .. autoattribute:: app_helper.base_test.BaseTestCase._user_user_username
+    .. autoattribute:: app_helper.base_test.BaseTestCase._user_user_password
+    .. autoattribute:: app_helper.base_test.BaseTestCase._user_user_email
+    .. autoattribute:: app_helper.base_test.BaseTestCase._pages_data
 
 
-.. autoclass:: djangocms_helper.base_test.BaseTestCase
+.. autoclass:: app_helper.base_test.BaseTestCase
 
-.. autoclass:: djangocms_helper.base_test.BaseTransactionTestCase
+.. autoclass:: app_helper.base_test.BaseTransactionTestCase

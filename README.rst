@@ -1,6 +1,6 @@
-================
-djangocms-helper
-================
+=================
+django-app-helper
+=================
 
 |Gitter| |PyPiVersion| |PyVersion| |Status| |TestCoverage| |CodeClimate| |License|
 
@@ -8,7 +8,7 @@ djangocms-helper
 Helper for django applications development
 ******************************************
 
-djangocms-helper is a set of commands and helper methods
+django-app-helper is a set of commands and helper methods
 to make developing and testing reusable Django applications easier.
 
 Being born in the django CMS ecosystem, it provides a lot of utility
@@ -38,7 +38,7 @@ Common options
 
 * ``--cms``: Loads configuration to properly run a django CMS-based application;
 * ``--extra-settings``: Path to a helper file to set extra settings; see
-  `Settings section <https://djangocms-helper.readthedocs.io/en/develop/settings.html>`_
+  `Settings section <https://django-app-helper.readthedocs.io/en/develop/settings.html>`_
   for details;
 
 *****
@@ -51,7 +51,7 @@ current directory.
 
 The basic command structure is::
 
-    djangocms-helper <application> <command> [options ...]
+    django-app-helper <application> <command> [options ...]
 
 where **<application>** is the django application name and **<command>** is one
 of the available commands. Options vary for each command.
@@ -60,7 +60,7 @@ of the available commands. Options vary for each command.
 Bootstrapping
 *************
 
-To bootstrap a project using ``djangocms-helper`` you may want to have a look at `cookiecutter-djangopackage-helper <https://github.com/nephila/cookiecutter-djangopackage-helper>`_, a `cookiecutter <https://github.com/audreyr/cookiecutter>`_ template for ``djangocms-helper``.
+To bootstrap a project using ``django-app-helper`` you may want to have a look at `cookiecutter-djangopackage-helper <https://github.com/nephila/cookiecutter-djangopackage-helper>`_, a `cookiecutter <https://github.com/audreyr/cookiecutter>`_ template for ``django-app-helper``.
 
 To use it follows `usage instructions <https://github.com/nephila/cookiecutter-djangopackage-helper#usage>`_
 
@@ -69,8 +69,8 @@ Runner
 ******
 
 By using the integrated runned in the settings file you'll be able to run
-the commands without invoking ``djangocms-helper``: see
-`Integrate runner <https://djangocms-helper.readthedocs.io/en/develop/runner.html>`_
+the commands without invoking ``django-app-helper``: see
+`Integrate runner <https://django-app-helper.readthedocs.io/en/develop/runner.html>`_
 for reference.
 
 ************
@@ -79,11 +79,11 @@ Installation
 
 Installing from pip::
 
-    pip install djangocms-helper
+    pip install django-app-helper
 
 Installing from source::
 
-    pip install git+https://github.com/nephila/djangocms-helper#egg=djangocms-helper
+    pip install git+https://github.com/nephila/django-app-helper#egg=django-app-helper
 
 Requirements
 ============
@@ -97,14 +97,18 @@ Requirements
 Documentation
 *************
 
-Documentation is available on `readthedocs <https://djangocms-helper.readthedocs.io>`_.
+Documentation is available on `readthedocs <https://django-app-helper.readthedocs.io>`_.
 
 
 *******
 Authors
 *******
 
+<<<<<<< HEAD
 ``djangocms-helper`` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
+=======
+`django-app-helper` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
+>>>>>>> Rename app to django app helper
 other contributors.
 
 Thanks
@@ -120,26 +124,26 @@ deserve a huge thanks for their work.
     :target: https://gitter.im/nephila/applications
     :alt: Join the Gitter chat
 
-.. |PyPiVersion| image:: https://img.shields.io/pypi/v/djangocms-helper.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/djangocms-helper
+.. |PyPiVersion| image:: https://img.shields.io/pypi/v/django-app-helper.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/django-app-helper
     :alt: Latest PyPI version
 
-.. |PyVersion| image:: https://img.shields.io/pypi/pyversions/djangocms-helper.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/djangocms-helper
+.. |PyVersion| image:: https://img.shields.io/pypi/pyversions/django-app-helper.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/django-app-helper
     :alt: Python versions
 
-.. |Status| image:: https://img.shields.io/travis/nephila/djangocms-helper.svg?style=flat-square
-    :target: https://travis-ci.org/nephila/djangocms-helper
+.. |Status| image:: https://img.shields.io/travis/nephila/django-app-helper.svg?style=flat-square
+    :target: https://travis-ci.org/nephila/django-app-helper
     :alt: Latest Travis CI build status
 
-.. |TestCoverage| image:: https://img.shields.io/coveralls/nephila/djangocms-helper/master.svg?style=flat-square
-    :target: https://coveralls.io/r/nephila/djangocms-helper?branch=master
+.. |TestCoverage| image:: https://img.shields.io/coveralls/nephila/django-app-helper/master.svg?style=flat-square
+    :target: https://coveralls.io/r/nephila/django-app-helper?branch=master
     :alt: Test coverage
 
-.. |License| image:: https://img.shields.io/github/license/nephila/djangocms-helper.svg?style=flat-square
-   :target: https://pypi.python.org/pypi/djangocms-helper/
+.. |License| image:: https://img.shields.io/github/license/nephila/django-app-helper.svg?style=flat-square
+   :target: https://pypi.python.org/pypi/django-app-helper/
     :alt: License
 
-.. |CodeClimate| image:: https://codeclimate.com/github/nephila/djangocms-helper/badges/gpa.svg?style=flat-square
-   :target: https://codeclimate.com/github/nephila/djangocms-helper
+.. |CodeClimate| image:: https://codeclimate.com/github/nephila/django-app-helper/badges/gpa.svg?style=flat-square
+   :target: https://codeclimate.com/github/nephila/django-app-helper
    :alt: Code Climate

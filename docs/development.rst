@@ -19,7 +19,7 @@ help make it easier for developers in the django CMS ecosystem to work effective
 high quality applications.
 
 Nephila maintains overall control of the `django CMS Helper repository
-<https://github.com/nephila/djangocms-helper>`_.
+<https://github.com/nephila/django-app-helper>`_.
 
 ********************
 Standards & policies

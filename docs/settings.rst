@@ -10,7 +10,7 @@ Extra settings
 
 django CMS Helper provide a basic set of settings, you'll probably need to provide your own.
 
-Extra settings can be provided by creating a ``cms_helper.py`` file in the application root
+Extra settings can be provided by creating a ``helper.py`` file in the application root
 directory and providing the settings as a dictionary named ``HELPER_SETTINGS``::
 
     HELPER_SETTINGS={
@@ -31,7 +31,7 @@ An alternative, and possibly clearer form is::
         ...
     )
 
-By default any setting option provided in ``cms_helper.py`` will override the default ones.
+By default any setting option provided in ``helper.py`` will override the default ones.
 
 Special settings
 ================
@@ -49,7 +49,7 @@ Other extra setting:
 
 * ``TOP_INSTALLED_APPS``: items in this setting will be inserted on top of ``INSTALLED_APPS``
   (e.g.: to control the templates and static files override from standard applications
-  configured by djangocms-helper).
+  configured by django-app-helper).
 
 * ``TOP_MIDDLEWARE_CLASSES``: items in this setting will be inserted on top of
   ``MIDDLEWARE_CLASSES``.
@@ -58,7 +58,7 @@ Django 1.8 support
 ==================
 
 All ``TEMPLATES_`` settings from Django 1.6/1.7 are automatically translated to Django 1.8
-``TEMPLATE`` setting. To support both, just use the **old** names, and ``djangocms-helper``
+``TEMPLATE`` setting. To support both, just use the **old** names, and ``django-app-helper``
 will take care of converting.
 
 Django 1.10 support
@@ -85,7 +85,7 @@ Applications::
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'djangocms_helper.test_data',  # this provides basic templates and urlconf
+    'app_helper.test_data',  # this provides basic templates and urlconf
     'django.contrib.messages',
 
 Template context processors::
@@ -148,7 +148,7 @@ Middlewares::
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
 
-``djangocms-helper`` discovers automtically the South / Django migrations layout and configure
+``django-app-helper`` discovers automtically the South / Django migrations layout and configure
 the settings accordingly. As of the current version ``filer``, ``djangocms_text_ckeditor``,
 ``cmplugin_filer`` are supported.
 

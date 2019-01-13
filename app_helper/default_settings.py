@@ -13,7 +13,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE,
             'django.contrib.staticfiles',
         ] + CMS_APP_STYLE + [
             'django.contrib.admin',
-            'djangocms_helper.test_data',
+            'app_helper.test_data',
             'django.contrib.messages',
         ] + CMS_APP,
         DATABASES={

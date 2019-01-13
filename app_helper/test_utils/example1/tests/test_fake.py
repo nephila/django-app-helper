@@ -8,8 +8,8 @@ except ImportError:
 
 try:
     from django.contrib.auth.models import AnonymousUser
-    from djangocms_helper.base_test import BaseTestCase
-    from djangocms_helper.utils import get_user_model_labels, CMS_34
+    from app_helper.base_test import BaseTestCase
+    from app_helper.utils import get_user_model_labels, CMS_34
 
 
     class FakeTests(BaseTestCase):

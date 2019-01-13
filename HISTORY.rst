@@ -112,7 +112,7 @@ History
 0.8.0 (2015-03-22)
 ++++++++++++++++++
 
-* Add --native option to use native test command instead of djangocms-helper one
+* Add --native option to use native test command instead of django-app-helper one
 * Use django-discover-runner on Django 1.5 if present
 * Better handling of runner options
 * Add support for empty/dry-run arguments to makemigrations
@@ -127,10 +127,10 @@ History
 0.6.0 (2015-01-10)
 ++++++++++++++++++
 
-* Add a runner to make cms_helper file itself a runner for djangocms-helper
+* Add a runner to make cms_helper file itself a runner for django-app-helper
 * Fix issues with mptt / treebeard and Django 1.7
 * Fix some makemigrations / --migrate issues
-* Make djangocms-helper less django CMS dependent
+* Make django-app-helper less django CMS dependent
 
 0.5.0 (2015-01-01)
 ++++++++++++++++++
