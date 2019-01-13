@@ -85,7 +85,6 @@ class BaseTestCaseMixin(object):
     @classmethod
     def setUpClass(cls):
         from django.contrib.sites.models import Site
-        super(BaseTestCaseMixin, cls).setUpClass()
         cls.request_factory = RequestFactory()
         cls.user = create_user(
             cls._admin_user_username, cls._admin_user_email, cls._admin_user_password,
@@ -99,13 +98,14 @@ class BaseTestCaseMixin(object):
             cls._user_user_username, cls._user_user_email, cls._user_user_password,
             is_staff=False, is_superuser=False
         )
-        cls.site_1 = Site.objects.get(pk=1)
+        cls.site_1 = Site.objects.all().first()
 
         try:
             from cms.utils import get_language_list
             cls.languages = get_language_list()
         except ImportError:
             cls.languages = [x[0] for x in settings.LANGUAGES]
+        super(BaseTestCaseMixin, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
@@ -170,6 +170,7 @@ class BaseTestCaseMixin(object):
     def get_pages(self):
         """
         Create pages using self._pages_data and self.languages
+
         :return: list of created pages
         """
         return self.create_pages(self._pages_data, self.languages)
