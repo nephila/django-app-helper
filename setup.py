@@ -10,7 +10,6 @@ requirements = [
     'pyflakes',
     'docopt',
     'dj-database-url',
-    'pyflakes',
     'django',
 ]
 

@@ -20,18 +20,20 @@ to handle generic application development process.
 Supported versions
 ==================
 
-Python: 2.7, 3.4, 3.5, 3.6
+Python: 2.7, 3.5, 3.6, 3.7
 
-Django: 1.8 to 1.11 (limited 2.0 support)
+Django: 1.11, 2.0, 2.1
 
-django CMS: 3.4, 3.5
+django CMS: 3.4, 3.5, 3.6
 
-.. warning:: Starting from version 1.1, compatibily nose test runnerhas been dropped.
+Newer versions might work but are not tested yet.
+
+.. warning:: Starting from version 1.2, compatibily with Python 3.4, Django<=1.11 and
+             django CMS<=3.4 has been dropped. Pin your test requirements accordingly
+             (``djangocms-helper<1.2``).
+
+.. warning:: Starting from version 1.1, compatibily nose test runner has been dropped.
              Pin your test requirements accordingly (``djangocms-helper<1.0``).
-
-.. warning:: Starting from version 1.0, compatibily with Python 2.6, Python 3.3, Django<=1.7 and
-             django CMS<=3.3 has been dropped. Pin your test requirements accordingly
-             (``djangocms-helper<1.0``).
 
 Common options
 ==============
@@ -55,6 +57,21 @@ The basic command structure is::
 
 where **<application>** is the django application name and **<command>** is one
 of the available commands. Options vary for each command.
+
+Base test class
+===============
+
+A base test class is available to provide helpers and methods that
+implements repetitive tasks during development or compatibility shims
+(especially for django CMS).
+
+.. warning:: Changes in version 1.2 **might** reduce the number of queries executed in tests
+             rendering plugins.
+
+             If you are using ``assertNumQueries`` (or similar), this may
+             yield unexpected failures.
+
+             Please check your code before upgrading djangocms-helper.
 
 *************
 Bootstrapping
@@ -104,14 +121,14 @@ Documentation is available on `readthedocs <https://djangocms-helper.readthedocs
 Authors
 *******
 
-`djangocms-helper` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
+``djangocms-helper`` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
 other contributors.
 
 Thanks
 ======
 
 The general logic and part of the code of the whole application is heavily taken from
-`django CMS's <https://github.com/divio/django-cms>`_ own `develop.py` so all the contributors
+`django CMS's <https://github.com/divio/django-cms>`_ own ``develop.py`` so all the contributors
 deserve a huge thanks for their work.
 
 
