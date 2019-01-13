@@ -10,17 +10,13 @@ from tempfile import mkdtemp
 
 import django
 from django.core.management import call_command
+from django.urls import clear_url_caches
 from django.utils import six
 from django.utils.functional import empty
 from django.utils.six import StringIO
 from django.utils.six.moves import reload_module
 
 from . import HELPER_FILE
-
-try:
-    from django.urls import clear_url_caches
-except ImportError:
-    from django.core.urlresolvers import clear_url_caches
 
 try:
     from unittest.mock import patch
@@ -128,10 +124,7 @@ class DisableMigrations(object):
         return True
 
     def __getitem__(self, item):
-        if DJANGO_1_9:
-            return 'notmigrations'
-        else:
-            return None
+        return None
 
 
 def _reset_django(settings):
@@ -310,7 +303,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if not migrate:
         default_settings['MIGRATION_MODULES'] = DisableMigrations()
 
-    if not DJANGO_1_9 and 'MIDDLEWARE' not in default_settings:
+    if 'MIDDLEWARE' not in default_settings:
         default_settings['MIDDLEWARE'] = default_settings['MIDDLEWARE_CLASSES']
         del default_settings['MIDDLEWARE_CLASSES']
 
@@ -330,12 +323,9 @@ def reload_urls(settings, urlconf=None, cms_apps=True):
         reload_module(sys.modules[urlconf])
     clear_url_caches()
     if cms_apps:
-        try:
-            from cms.appresolver import clear_app_resolvers, get_app_patterns
-            clear_app_resolvers()
-            get_app_patterns()
-        except ImportError:
-            pass
+        from cms.appresolver import clear_app_resolvers, get_app_patterns
+        clear_app_resolvers()
+        get_app_patterns()
 
 
 def _create_db(migrate_cmd=False):

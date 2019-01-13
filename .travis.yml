@@ -7,28 +7,20 @@ sudo: false
 python:
   - 3.6
   - 3.5
-  - 3.4
   - 2.7
 
 env:
   matrix:
   - TOXENV='pep8'
   - TOXENV='isort'
-  - DJANGO='django18' CMS='cms34'
-  - DJANGO='django18' CMS='cms35'
-  - DJANGO='django18' CMS='cmsno'
-  - DJANGO='django19' CMS='cms34'
-  - DJANGO='django19' CMS='cms35'
-  - DJANGO='django19' CMS='cmsno'
-  - DJANGO='django110' CMS='cms34'
-  - DJANGO='django110' CMS='cms35'
-  - DJANGO='django110' CMS='cmsno'
   - DJANGO='django111' CMS='cms34'
   - DJANGO='django111' CMS='cms35'
+  - DJANGO='django111' CMS='cms36'
   - DJANGO='django111' CMS='cmsno'
-  - DJANGO='django20' CMS='cms34'
-  - DJANGO='django20' CMS='cms35'
+  - DJANGO='django20' CMS='cms36'
   - DJANGO='django20' CMS='cmsno'
+  - DJANGO='django21' CMS='cms36'
+  - DJANGO='django21' CMS='cmsno'
 
 before_install:
   - pip install codecov
@@ -40,7 +32,6 @@ after_success:
 install:
   - pip install -U setuptools tox>=1.8 coveralls
   - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then export PYVER=py27; fi"
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then export PYVER=py34; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then export PYVER=py35; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then export PYVER=py36; fi"
   - "if [[ ${DJANGO}z != 'z' ]]; then export TOXENV=$PYVER-$DJANGO-$CMS; fi"
@@ -54,73 +45,15 @@ matrix:
     env: TOXENV='pep8'
   - python: 2.7
     env: TOXENV='isort'
-  - python: 3.4
-    env: TOXENV='pep8'
-  - python: 3.4
-    env: TOXENV='isort'
   - python: 3.5
     env: TOXENV='pep8'
   - python: 3.5
     env: TOXENV='isort'
   - python: 2.7
-    env: DJANGO='django20' CMS='cms35'
-  - python: 2.7
-    env: DJANGO='django20' CMS='cms34'
+    env: DJANGO='django20' CMS='cms36'
   - python: 2.7
     env: DJANGO='django20' CMS='cmsno'
   - python: 2.7
-    env: DJANGO='django19' CMS='cms35'
+    env: DJANGO='django21' CMS='cms36'
   - python: 2.7
-    env: DJANGO='django19' CMS='cms34'
-  - python: 2.7
-    env: DJANGO='django19' CMS='cmsno'
-  - python: 2.7
-    env: DJANGO='django110' CMS='cms35'
-  - python: 2.7
-    env: DJANGO='django110' CMS='cms34'
-  - python: 2.7
-    env: DJANGO='django110' CMS='cmsno'
-  - python: 3.4
-    env: DJANGO='django19' CMS='cms35'
-  - python: 3.4
-    env: DJANGO='django19' CMS='cms34'
-  - python: 3.4
-    env: DJANGO='django19' CMS='cmsno'
-  - python: 3.4
-    env: DJANGO='django110' CMS='cms35'
-  - python: 3.4
-    env: DJANGO='django110' CMS='cms34'
-  - python: 3.4
-    env: DJANGO='django110' CMS='cmsno'
-  - python: 3.5
-    env: DJANGO='django19' CMS='cms35'
-  - python: 3.5
-    env: DJANGO='django19' CMS='cms34'
-  - python: 3.5
-    env: DJANGO='django19' CMS='cmsno'
-  - python: 3.5
-    env: DJANGO='django110' CMS='cms35'
-  - python: 3.5
-    env: DJANGO='django110' CMS='cms34'
-  - python: 3.5
-    env: DJANGO='django110' CMS='cmsno'
-
-  allow_failures:
-  - python: 3.4
-    env: DJANGO='django20' CMS='cms35'
-  - python: 3.4
-    env: DJANGO='django20' CMS='cms34'
-  - python: 3.4
-    env: DJANGO='django20' CMS='cmsno'
-  - python: 3.5
-    env: DJANGO='django20' CMS='cms35'
-  - python: 3.5
-    env: DJANGO='django20' CMS='cms34'
-  - python: 3.5
-    env: DJANGO='django20' CMS='cmsno'
-  - python: 3.6
-    env: DJANGO='django20' CMS='cms35'
-  - python: 3.6
-    env: DJANGO='django20' CMS='cms34'
-  - python: 3.6
-    env: DJANGO='django20' CMS='cmsno'
+    env: DJANGO='django21' CMS='cmsno'
