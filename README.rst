@@ -20,18 +20,18 @@ to handle generic application development process.
 Supported versions
 ==================
 
-Python: 2.7, 3.4, 3.5, 3.6
+Python: 2.7, 3.5, 3.6, 3.7
 
-Django: 1.8 to 1.11 (limited 2.0 support)
+Django: 1.11 to 2.1
 
-django CMS: 3.4, 3.5
+django CMS: 3.4, 3.5, 3.6
 
-.. warning:: Starting from version 1.1, compatibily nose test runnerhas been dropped.
+.. warning:: Starting from version 1.1, compatibily nose test runner has been dropped.
              Pin your test requirements accordingly (``djangocms-helper<1.0``).
 
-.. warning:: Starting from version 1.0, compatibily with Python 2.6, Python 3.3, Django<=1.7 and
-             django CMS<=3.3 has been dropped. Pin your test requirements accordingly
-             (``djangocms-helper<1.0``).
+.. warning:: Starting from version 1.2, compatibily with Python 3.4, Django<=1.11 and
+             django CMS<=3.4 has been dropped. Pin your test requirements accordingly
+             (``djangocms-helper<1.2``).
 
 Common options
 ==============
@@ -104,14 +104,14 @@ Documentation is available on `readthedocs <https://djangocms-helper.readthedocs
 Authors
 *******
 
-`djangocms-helper` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
+``djangocms-helper`` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
 other contributors.
 
 Thanks
 ======
 
 The general logic and part of the code of the whole application is heavily taken from
-`django CMS's <https://github.com/divio/django-cms>`_ own `develop.py` so all the contributors
+`django CMS's <https://github.com/divio/django-cms>`_ own ``develop.py`` so all the contributors
 deserve a huge thanks for their work.
 
 
