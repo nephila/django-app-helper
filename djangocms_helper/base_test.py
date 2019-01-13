@@ -10,13 +10,11 @@ from tempfile import mkdtemp
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
-from django.template import RequestContext
-from django.template.loader import get_template
 from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.utils.functional import SimpleLazyObject
 from django.utils.six import StringIO
 
-from .utils import DJANGO_1_9, UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
+from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
 try:
     from unittest.mock import patch
@@ -226,11 +224,8 @@ class BaseTestCaseMixin(object):
         :param request: request instance
         :return: ContentRenderer instance
         """
-        try:
-            from cms.plugin_rendering import ContentRenderer
-            return ContentRenderer(request)
-        except ImportError:
-            return None
+        from cms.plugin_rendering import ContentRenderer
+        return ContentRenderer(request)
 
     def get_plugin_context(self, page, lang, plugin, edit=False):
         """
@@ -265,33 +260,19 @@ class BaseTestCaseMixin(object):
         :param edit: Enable edit mode for rendering
         :return: Rendered plugin
         """
-        request = self.get_page_request(page, self.user, lang=lang, edit=edit)
         context = self.get_plugin_context(page, lang, plugin, edit)
-        if 'cms_content_renderer' in context:
-            content_renderer = context['cms_content_renderer']
-            rendered = content_renderer.render_plugin(
-                instance=plugin,
-                context=context,
-                placeholder=plugin.placeholder,
-            )
-            return rendered
-        else:
-            context = RequestContext(request)
-            try:
-                template = get_template(page.get_template()).template
-                with context.bind_template(template):
-                    rendered = plugin.render_plugin(context, plugin.placeholder)
-            except AttributeError:
-                rendered = plugin.render_plugin(context, plugin.placeholder)
-            return rendered
+        content_renderer = context['cms_content_renderer']
+        rendered = content_renderer.render_plugin(
+            instance=plugin,
+            context=context,
+            placeholder=plugin.placeholder,
+        )
+        return rendered
 
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False,
                          secure=False):
         from django.contrib.auth.models import AnonymousUser
-        try:
-            from importlib import import_module
-        except ImportError:
-            from django.utils.importlib import import_module
+        from importlib import import_module
 
         engine = import_module(settings.SESSION_ENGINE)
 
@@ -332,19 +313,12 @@ class BaseTestCaseMixin(object):
 
     def _apply_middlewares(self, request):
         handler = BaseHandler()
-        if DJANGO_1_9:
-            handler.load_middleware()
-            for middleware_method in handler._request_middleware:
-                if middleware_method(request):
-                    raise Exception('Couldn\'t create request mock object -'
-                                    'request middleware returned a response')
-        else:
-            from django.utils.module_loading import import_string
-            for middleware_path in reversed(settings.MIDDLEWARE):
-                middleware = import_string(middleware_path)
-                mw_instance = middleware(handler)
-                if hasattr(mw_instance, 'process_request'):
-                    mw_instance.process_request(request)
+        from django.utils.module_loading import import_string
+        for middleware_path in reversed(settings.MIDDLEWARE):
+            middleware = import_string(middleware_path)
+            mw_instance = middleware(handler)
+            if hasattr(mw_instance, 'process_request'):
+                mw_instance.process_request(request)
 
     def get_request(self, page, lang, user=None, path=None, use_middlewares=False, secure=False):
         """
