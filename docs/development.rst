@@ -2,7 +2,7 @@
 Development & community
 #######################
 
-django CMS Helper is an open-source project.
+Django App Helper is an open-source project.
 
 You don't need to be an expert developer to make a valuable contribution - all you need is a little
 knowledge, and a willingness to follow the contribution guidelines.
@@ -11,21 +11,21 @@ knowledge, and a willingness to follow the contribution guidelines.
 Nephila
 *******
 
-django CMS Helper was created by Iacopo Spalletti at `Nephila <https://nephila.it/>`_
+Django App Helper was created by Iacopo Spalletti at `Nephila <https://nephila.it/>`_
 and is released under a GNU GENERAL PUBLIC LICENSE.
 
-Nephila is an active supporter of django CMS and its community. django CMS Helper is intended to
+Nephila is an active supporter of django CMS and its community. Django App Helper is intended to
 help make it easier for developers in the django CMS ecosystem to work effectively and create
 high quality applications.
 
-Nephila maintains overall control of the `django CMS Helper repository
-<https://github.com/nephila/djangocms-helper>`_.
+Nephila maintains overall control of the `Django App Helper repository
+<https://github.com/nephila/django-app-helper>`_.
 
 ********************
 Standards & policies
 ********************
 
-django CMS Helper is a django CMS application, and shares much of django CMS's standards and
+Django App Helper is a django CMS application, and shares much of django CMS's standards and
 policies.
 
 These include:
@@ -40,4 +40,4 @@ These include:
   activity
 
 Please familiarise yourself with this documentation if you'd like to contribute to
-django CMS Helper.
+Django App Helper.

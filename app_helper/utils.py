@@ -202,13 +202,13 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         ]
         if not CMS_31 and args['server']:
             CMS_MIDDLEWARE.append('cms.middleware.utils.ApphookReloadMiddleware')
-        URLCONF = 'djangocms_helper.urls'
+        URLCONF = 'app_helper.urls'
     else:
         CMS_APPS = []
         CMS_APP_STYLE = []
         CMS_MIDDLEWARE = []
         CMS_PROCESSORS = []
-        URLCONF = 'djangocms_helper.urls'
+        URLCONF = 'app_helper.urls'
 
     default_settings = get_default_settings(
         CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application

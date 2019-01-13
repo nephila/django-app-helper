@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class Example(CMSApp):
     name = _('Example')
-    urls = ['djangocms_helper.urls']
+    urls = ['app_helper.urls']
 
 
 apphook_pool.register(Example)
