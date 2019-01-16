@@ -28,11 +28,11 @@ django CMS: 3.4, 3.5, 3.6
 
 Newer versions might work but are not tested yet.
 
-.. warning:: Starting from version 1.2, compatibily with Python 3.4, Django<=1.11 and
+.. warning:: Starting from version 1.2, compatibility with Python 3.4, Django<=1.11 and
              django CMS<=3.4 has been dropped. Pin your test requirements accordingly
              (``djangocms-helper<1.2``).
 
-.. warning:: Starting from version 1.1, compatibily nose test runner has been dropped.
+.. warning:: Starting from version 1.1, nose test runner has been dropped.
              Pin your test requirements accordingly (``djangocms-helper<1.0``).
 
 Common options
