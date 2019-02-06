@@ -359,7 +359,7 @@ def core(args, application):
                     if args["--runner"]:
                         runner = args["--runner"]
                     else:
-                        runner = "django.test.runner.DiscoverRunner"
+                        runner = settings.TEST_RUNNER
 
                     # make "Address already in use" errors less likely, see Django
                     # docs for more details on this env variable.
