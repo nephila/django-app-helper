@@ -5,8 +5,10 @@ History
 
 1.2.0 (unreleased)
 ++++++++++++++++++
+
 * Dropped compatiblity with Django <1.11, Python 3.4
 * Added django CMS 3.6
+* Added django 2.0, 2.1
 
 1.1.0 (2018-02-20)
 ++++++++++++++++++
