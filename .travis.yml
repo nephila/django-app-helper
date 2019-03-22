@@ -21,6 +21,8 @@ env:
   - DJANGO='django20' CMS='cmsno'
   - DJANGO='django21' CMS='cms36'
   - DJANGO='django21' CMS='cmsno'
+  - DJANGO='django22' CMS='cms36'
+  - DJANGO='django22' CMS='cmsno'
 
 before_install:
   - pip install codecov
