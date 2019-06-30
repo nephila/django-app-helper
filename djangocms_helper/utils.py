@@ -353,7 +353,10 @@ def create_user(username, email, password, is_staff=False, is_superuser=False,
     if User.USERNAME_FIELD != 'email':
         setattr(user, User.USERNAME_FIELD, username)
 
-    user.email = email
+    try:
+        user.email = email
+    except AttributeError:
+        pass
     user.set_password(password)
     if is_superuser:
         user.is_superuser = True

@@ -3,7 +3,12 @@
 History
 -------
 
-1.2.0 (unreleased)
+1.2.1 (2019-06-30)
+++++++++++++++++++
+
+* Fixed error when creating users with non-writable email attribute
+
+1.2.0 (2019-03-22)
 ++++++++++++++++++
 
 * Dropped compatiblity with Django <1.11, Python 3.4
