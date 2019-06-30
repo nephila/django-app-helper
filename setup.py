@@ -6,10 +6,9 @@ from djangocms_helper import __version__
 
 test_requirements = []
 requirements = [
-    'pyflakes',
+    'pyflakes<2.1',
     'docopt',
     'dj-database-url',
-    'pyflakes',
     'django',
 ]
 
