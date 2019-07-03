@@ -276,17 +276,14 @@ class BaseTestCaseMixin(object):
 
         engine = import_module(settings.SESSION_ENGINE)
 
-        request.current_page = SimpleLazyObject(lambda: page)
+        if page:
+            request.current_page = SimpleLazyObject(lambda: page)
         if not user:
             if self._login_context:
                 user = self._login_context.user
             else:
                 user = AnonymousUser()
-        if callable(user.is_authenticated):
-            authenticated = user.is_authenticated()
-        else:
-            authenticated = user.is_authenticated
-        if authenticated:
+        if user.is_authenticated:
             session_key = user._meta.pk.value_to_string(user)
         else:
             session_key = 'session_key'
@@ -320,7 +317,50 @@ class BaseTestCaseMixin(object):
             if hasattr(mw_instance, 'process_request'):
                 mw_instance.process_request(request)
 
-    def get_request(self, page, lang, user=None, path=None, use_middlewares=False, secure=False):
+    def request(
+        self, path, method='get', data=None, page=None, lang='', user=None,
+        use_middlewares=False, secure=False, use_toolbar=False
+    ):
+        """
+        Create a request for the given parameters.
+
+        Request will be enriched with:
+
+        * session
+        * cookies
+        * user (Anonymous if :param:user is `None`)
+        * django CMS toolbar (is set)
+        * current_page (if provided)
+
+        :param path: request path
+        :type path: str
+        :param method: HTTP verb to use
+        :type method: str
+        :param data: payload to pass to the underlying :py:class:`RequestFactory` method
+        :type data: dict
+        :param page: current page object
+        :type page: cms.models.Page
+        :param lang: request language
+        :type lang: str
+        :param user: current user
+        :type user: :py:class:`django.contrib.auth.AbstractUser`
+        :param use_middlewares: pass the request through configured middlewares
+        :type use_middlewares: bool
+        :param secure: create HTTPS request
+        :type secure: bool
+        :param use_toolbar: add django CMS toolbar
+        :type secure: bool
+        :return: request
+        """
+        request = getattr(RequestFactory(), method)(path, data=data, secure=secure)
+        return self._prepare_request(
+            request, page, user, lang, use_middlewares, secure=secure, use_toolbar=use_toolbar
+        )
+
+    def get_request(
+        self, page, lang, user=None, path=None, use_middlewares=False, secure=False,
+        use_toolbar=False
+    ):
         """
         Create a GET request for the given page and language
 
@@ -330,14 +370,17 @@ class BaseTestCaseMixin(object):
         :param path: path (if different from the current page path)
         :param use_middlewares: pass the request through configured middlewares.
         :param secure: create HTTPS request
+        :param use_toolbar: add django CMS toolbar
         :return: request
         """
         path = path or page and page.get_absolute_url(lang)
-        request = self.request_factory.get(path, secure=secure)
-        return self._prepare_request(request, page, user, lang, use_middlewares, secure=secure)
+        return self.request(
+            path, method='get', data={}, page=None, lang=lang, user=user,
+            use_middlewares=use_middlewares, secure=secure, use_toolbar=use_toolbar
+        )
 
     def post_request(self, page, lang, data, user=None, path=None, use_middlewares=False,
-                     secure=False):
+                     secure=False, use_toolbar=False):
         """
         Create a POST request for the given page and language with CSRF disabled
 
@@ -348,11 +391,14 @@ class BaseTestCaseMixin(object):
         :param path: path (if different from the current page path)
         :param use_middlewares: pass the request through configured middlewares.
         :param secure: create HTTPS request
+        :param use_toolbar: add django CMS toolbar
         :return: request
         """
         path = path or page and page.get_absolute_url(lang)
-        request = self.request_factory.post(path, data, secure=secure)
-        return self._prepare_request(request, page, user, lang, use_middlewares, secure=secure)
+        return self.request(
+            path, method='post', data=data, page=None, lang=lang, user=user,
+            use_middlewares=use_middlewares, secure=secure, use_toolbar=use_toolbar
+        )
 
     def get_page_request(self, page, user, path=None, edit=False, lang='en',
                          use_middlewares=False, secure=False):
