@@ -119,6 +119,7 @@ class CommandTests(unittest.TestCase):
             pass
 
     def tearDown(self):
+        os.environ['AUTH_USER_MODEL'] = 'auth.User'
         self.setUp()
 
     def test_map_argv(self):
@@ -698,6 +699,24 @@ class CommandTests(unittest.TestCase):
         self.assertTrue('example2' in settings.INSTALLED_APPS)
         self.assertTrue('aldryn_boilerplates' in settings.INSTALLED_APPS)
         self.assertTrue('cms' in settings.INSTALLED_APPS)
+
+    def test_setup_custom_user(self):
+        os.environ['AUTH_USER_MODEL'] = 'custom_user.CustomUser'
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest('django CMS not available, skipping test')
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                from djangocms_helper.test_utils import cms_helper_custom
+                settings = runner.setup(
+                    'example1', cms_helper_custom, use_cms=True, extra_args=['--boilerplate']
+                )
+        self.assertTrue('example2' in settings.INSTALLED_APPS)
+        self.assertTrue('custom_user' in settings.INSTALLED_APPS)
+        self.assertTrue('aldryn_boilerplates' in settings.INSTALLED_APPS)
+        self.assertTrue('cms' in settings.INSTALLED_APPS)
+        del os.environ['AUTH_USER_MODEL']
 
     def test_setup_nocms(self):
         with work_in(self.basedir):

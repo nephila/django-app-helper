@@ -289,10 +289,16 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if 'AUTH_USER_MODEL' in os.environ:
         custom_user_app = os.environ['AUTH_USER_MODEL'].rpartition('.')[0]
         custom_user_model = '.'.join(os.environ['AUTH_USER_MODEL'].split('.')[-2:])
-        default_settings['INSTALLED_APPS'].insert(
-            default_settings['INSTALLED_APPS'].index('cms'),
-            custom_user_app
-        )
+        if 'cms' in default_settings['INSTALLED_APPS']:
+            default_settings['INSTALLED_APPS'].insert(
+                default_settings['INSTALLED_APPS'].index('cms'),
+                custom_user_app
+            )
+        else:
+            default_settings['INSTALLED_APPS'].insert(
+                default_settings['INSTALLED_APPS'].index('django.contrib.auth') + 1,
+                custom_user_app
+            )
         default_settings['AUTH_USER_MODEL'] = custom_user_model
 
     if args['test']:
