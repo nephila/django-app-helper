@@ -3,7 +3,7 @@
 History
 -------
 
-1.1.1 (unreleased)
+1.1.1 (2019-07-03)
 ++++++++++++++++++
 
 * Fixed error when creating users with non-writable email attribute
