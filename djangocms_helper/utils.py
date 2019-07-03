@@ -296,10 +296,16 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     if 'AUTH_USER_MODEL' in os.environ:
         custom_user_app = os.environ['AUTH_USER_MODEL'].rpartition('.')[0]
         custom_user_model = '.'.join(os.environ['AUTH_USER_MODEL'].split('.')[-2:])
-        default_settings['INSTALLED_APPS'].insert(
-            default_settings['INSTALLED_APPS'].index('cms'),
-            custom_user_app
-        )
+        if 'cms' in default_settings['INSTALLED_APPS']:
+            default_settings['INSTALLED_APPS'].insert(
+                default_settings['INSTALLED_APPS'].index('cms'),
+                custom_user_app
+            )
+        else:
+            default_settings['INSTALLED_APPS'].insert(
+                default_settings['INSTALLED_APPS'].index('django.contrib.auth') + 1,
+                custom_user_app
+            )
         default_settings['AUTH_USER_MODEL'] = custom_user_model
 
     if args['test']:
@@ -363,7 +369,10 @@ def create_user(username, email, password, is_staff=False, is_superuser=False,
     if User.USERNAME_FIELD != 'email':
         setattr(user, User.USERNAME_FIELD, username)
 
-    user.email = email
+    try:
+        user.email = email
+    except AttributeError:
+        pass
     user.set_password(password)
     if is_superuser:
         user.is_superuser = True
