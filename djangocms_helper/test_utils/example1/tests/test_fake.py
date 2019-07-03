@@ -104,7 +104,7 @@ try:
                 self.assertEqual(request.META['REQUEST_METHOD'], 'GET')
 
         def test_get_user_model(self):
-            if 'AUTH_USER_MODEL' not in os.environ:
+            if os.environ.get('AUTH_USER_MODEL', 'auth.User'):
                 user_orm_label, user_model_label = get_user_model_labels()
                 self.assertEqual(user_orm_label, 'auth.User')
                 self.assertEqual(user_model_label, 'auth.user')
