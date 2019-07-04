@@ -3,7 +3,7 @@
 History
 -------
 
-1.2.2 (unreleased)
+1.2.2 (2019-07-05)
 ++++++++++++++++++
 
 * Improved request generation by adding a more generic request method
