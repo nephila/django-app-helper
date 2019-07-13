@@ -9,7 +9,7 @@ to make developing and testing reusable Django applications easier.
 Being born in the django CMS ecosystem, it provides a lot of utility
 functions to develop, run and test django CMS applications.
 
-It's a modified version of django CMS's own `develop.py` script, and it allows
+It's a modified version of django CMS's own ``develop.py`` script, and it allows
 to develop applications without having a full project
 - which is not always possible or convenient - set up.
 
@@ -25,7 +25,7 @@ The utilities provided:
 * run the Django check command
 * compile and update locale message
 * help manage Django and South migrations
-* perform static analysis using pyflakes
+* perform static analysis using pyflakes (only when installed with ``[pyflakes]`` extra option)
 * build an authors list automatically
 * setting up a Django environment
 
@@ -39,11 +39,10 @@ Installing from pip::
 
     pip install djangocms-helper
 
-or::
+or with additional packages::
 
-    pip install djangocms-helper[cms]
-
-to install it along with django CMS
+* ``pip install djangocms-helper[cms]``: to install it along with django CMS
+* ``pip install djangocms-helper[pyflakes]``: to install it with pyflakes
 
 Installing from source::
 

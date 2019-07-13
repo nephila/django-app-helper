@@ -7,10 +7,8 @@ from djangocms_helper import __version__
 
 test_requirements = []
 requirements = [
-    'pyflakes<2.1',
     'docopt',
     'dj-database-url',
-    'django',
 ]
 
 
@@ -28,6 +26,8 @@ setuptools.setup(
     install_requires=requirements,
     extras_require={
         ':python_version<"3.3"': ['mock'],
+        'pyflakes': ['pyflakes<2.1', 'django-cms<=3.4,<3.7'],
+        'cms': ['django-cms<=3.4,<3.7']
     },
     entry_points={
         'console_scripts': [
