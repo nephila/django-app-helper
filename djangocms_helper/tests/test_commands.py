@@ -536,7 +536,9 @@ class CommandTests(unittest.TestCase):
                 args = copy(DEFAULT_ARGS)
                 args['pyflakes'] = True
                 core(args, self.application)
-            self.assertTrue('Static analysis available only if django CMS is installed' in out.getvalue())
+            self.assertTrue(
+                'Static analysis available only if django CMS and pyflakes are installed' in out.getvalue()
+            )
         self.assertFalse(os.path.exists(args['STATIC_ROOT']))
         self.assertFalse(os.path.exists(args['MEDIA_ROOT']))
 

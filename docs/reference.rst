@@ -183,6 +183,8 @@ pyflakes
 
 Performs static analysis using pyflakes, with the same configuration as django CMS.
 
+This requires ``pyflakes<2.1`` only installed with ``djangocms-helper[pyflakes]``.
+
 authors
 =======
 
