@@ -3,6 +3,12 @@
 History
 -------
 
+1.2.3 (2019-08-05)
+++++++++++++++++++
+
+* Moved pyflakes to extras_require
+* Fixed error in get_request / post_request not preserving current_page
+
 1.2.2 (2019-07-05)
 ++++++++++++++++++
 
