@@ -91,6 +91,7 @@ try:
                 request = self.get_request(pages[1], 'en')
                 self.assertEqual(request.path, '/en/second-page/')
                 self.assertEqual(request.META['REQUEST_METHOD'], 'GET')
+                self.assertEqual(request.current_page, pages[1])
 
                 request = self.post_request(pages[1], 'en', data={'payload': 1})
                 self.assertEqual(request.path, '/en/second-page/')
