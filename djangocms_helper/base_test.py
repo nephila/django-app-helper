@@ -375,7 +375,7 @@ class BaseTestCaseMixin(object):
         """
         path = path or page and page.get_absolute_url(lang)
         return self.request(
-            path, method='get', data={}, page=None, lang=lang, user=user,
+            path, method='get', data={}, page=page, lang=lang, user=user,
             use_middlewares=use_middlewares, secure=secure, use_toolbar=use_toolbar
         )
 
@@ -396,7 +396,7 @@ class BaseTestCaseMixin(object):
         """
         path = path or page and page.get_absolute_url(lang)
         return self.request(
-            path, method='post', data=data, page=None, lang=lang, user=user,
+            path, method='post', data=data, page=page, lang=lang, user=user,
             use_middlewares=use_middlewares, secure=secure, use_toolbar=use_toolbar
         )
 
