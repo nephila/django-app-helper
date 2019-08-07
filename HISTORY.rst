@@ -3,6 +3,11 @@
 History
 -------
 
+1.2.4 (unreleased)
+++++++++++++++++++
+
+* Fixed regression introduced by #116
+
 1.2.3 (2019-08-05)
 ++++++++++++++++++
 

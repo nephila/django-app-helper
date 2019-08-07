@@ -276,8 +276,7 @@ class BaseTestCaseMixin(object):
 
         engine = import_module(settings.SESSION_ENGINE)
 
-        if page:
-            request.current_page = SimpleLazyObject(lambda: page)
+        request.current_page = SimpleLazyObject(lambda: page)
         if not user:
             if self._login_context:
                 user = self._login_context.user
