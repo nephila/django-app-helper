@@ -244,14 +244,24 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
     if use_channels:
         rs.http_timeout = 60
         rs.websocket_handshake_timeout = 5
-    autoreload.main(rs.inner_run, (), {
-        'addrport': '%s:%s' % (bind, port),
-        'insecure_serving': True,
-        'use_static_handler': True,
-        'use_threading': True,
-        'verbosity': verbose,
-        'use_reloader': True
-    })
+    try:
+        autoreload.run_with_reloader(rs.inner_run, **{
+            'addrport': '%s:%s' % (bind, port),
+            'insecure_serving': True,
+            'use_static_handler': True,
+            'use_threading': True,
+            'verbosity': verbose,
+            'use_reloader': True
+        })
+    except AttributeError:
+        autoreload.main(rs.inner_run, kwargs={
+            'addrport': '%s:%s' % (bind, port),
+            'insecure_serving': True,
+            'use_static_handler': True,
+            'use_threading': True,
+            'verbosity': verbose,
+            'use_reloader': True
+        })
 
 
 def setup_env(settings):
