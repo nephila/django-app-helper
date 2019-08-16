@@ -3,6 +3,12 @@
 History
 -------
 
+1.2.5 (unreleased)
+++++++++++++++++++
+
+* Added django CMS 3.7
+* Added Django 2.2
+
 1.2.4 (2019-08-08)
 ++++++++++++++++++
 

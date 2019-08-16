@@ -26,8 +26,8 @@ setuptools.setup(
     install_requires=requirements,
     extras_require={
         ':python_version<"3.3"': ['mock'],
-        'pyflakes': ['pyflakes<2.1', 'django-cms>=3.4,<3.7'],
-        'cms': ['django-cms>=3.4,<3.7']
+        'pyflakes': ['pyflakes<2.1', 'django-cms>=3.4,<3.8'],
+        'cms': ['django-cms>=3.4,<3.8']
     },
     entry_points={
         'console_scripts': [
@@ -43,6 +43,7 @@ setuptools.setup(
         'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
         'Framework :: Django :: 2.1',
+        'Framework :: Django :: 2.2',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
