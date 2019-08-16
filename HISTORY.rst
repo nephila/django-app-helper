@@ -3,7 +3,7 @@
 History
 -------
 
-1.2.5 (unreleased)
+1.2.5 (2019-08-16)
 ++++++++++++++++++
 
 * Added django CMS 3.7
