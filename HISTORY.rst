@@ -4,7 +4,7 @@
 History
 *******
 
-2.0.0 (unreleased)
+2.0.0 (2019-10-13)
 ==================
 
 * Renamed application to django-app-helper

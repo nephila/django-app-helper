@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-__version__ = '2.0.0a2'
+__version__ = '2.0.0'
 __author__ = 'Iacopo Spalletti <i.spalletti@nephila.it>'
 __all__ = ['runner']
 
