@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import setuptools
 
-from djangocms_helper import __version__
+from app_helper import __version__
 
 test_requirements = []
 requirements = [
@@ -13,9 +13,9 @@ requirements = [
 
 
 setuptools.setup(
-    name='djangocms-helper',
+    name='django-app-helper',
     version=__version__,
-    url='https://github.com/nephila/djangocms-helper',
+    url='https://github.com/nephila/django-app-helper',
     author='Iacopo Spalletti',
     author_email='i.spalletti@nephila.it',
     description='Helper for django applications development',
@@ -31,10 +31,10 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts': [
-            'djangocms-helper = djangocms_helper.main:main',
+            'django-app-helper = app_helper.main:main',
         ]
     },
-    test_suite='djangocms_helper.tests',
+    test_suite='app_helper.tests',
     tests_require=test_requirements,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',

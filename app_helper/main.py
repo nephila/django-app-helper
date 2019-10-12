@@ -24,16 +24,16 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    djangocms-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
-    djangocms-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
-    djangocms-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
-    djangocms-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
-    djangocms-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>]
-    djangocms-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    djangocms-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--boilerplate] [--migrate] [--no-migrate]
+    django-app-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
+    django-app-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
+    django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
+    django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
+    django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
+    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
+    django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>]
+    django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
+    django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--boilerplate] [--migrate] [--no-migrate]
 
 Options:
     -h --help                   Show this screen.
@@ -43,13 +43,13 @@ Options:
     --cms                       Add support for CMS in the project configuration.
     --merge                     Merge migrations
     --failfast                  Stop tests on first failure.
-    --native                    Use the native test command, instead of the djangocms-helper on
+    --native                    Use the native test command, instead of the django-app-helper on
     --boilerplate               Add support for aldryn-boilerplates
     --persistent                Use persistent storage
     --persistent-path=<path>    Persistent storage path
     --locale=locale,-l=locale   Update messgaes for given locale
     --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
-    --extra-settings=</path/to/settings.py>     Filesystem path to a custom cms_helper file which defines custom settings
+    --extra-settings=</path/to/settings.py>     Filesystem path to a custom app_helper file which defines custom settings
     --runner=<test.runner.class>                Dotted path to a custom test runner
     --runner-options=<option1>,<option2>        Comma separated list of command line options for the test runner
     --port=<port>                               Port to listen on [default: 8000].
@@ -202,7 +202,7 @@ def static_analisys(application):
     except ImportError:
         print(
             'Static analysis available only if django CMS and pyflakes are installed.\n'
-            'Install djangocms-helper[pyflakes] to fix this.'
+            'Install django-app-helper[pyflakes] to fix this.'
         )
 
 

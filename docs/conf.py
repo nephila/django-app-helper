@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# django CMS Helper documentation build configuration file, created by
+# Django App Helper documentation build configuration file, created by
 # sphinx-quickstart on Thu Dec 18 19:02:40 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -22,10 +22,10 @@ import sphinx_rtd_theme
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../djangocms_helper/test_utils'))
+sys.path.insert(0, os.path.abspath('../app_helper/test_utils'))
 sys.path.insert(1, os.path.abspath('..'))
-import cms_helper  # isort:skip
-cms_helper.setup_nocms()
+import helper  # isort:skip
+helper.setup_nocms()
 
 # -- General configuration ------------------------------------------------
 
@@ -59,7 +59,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django CMS Helper'
+project = u'Django App Helper'
 copyright = u'2014, Iacopo Spalletti'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -193,7 +193,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'djangoCMSHelperdoc'
+htmlhelp_basename = 'DjangoAppHelperrdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -213,7 +213,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'djangoCMSHelper.tex', u'django CMS Helper Documentation',
+  ('index', 'DjangoAppHelperr.tex', u'Django App Helper Documentation',
    u'Iacopo Spalletti', 'manual'),
 ]
 
@@ -243,7 +243,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'djangocmshelper', u'django CMS Helper Documentation',
+    ('index', 'DjangoAppHelperr', u'Django App Helper Documentation',
      [u'Iacopo Spalletti'], 1)
 ]
 
@@ -257,8 +257,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'djangoCMSHelper', u'django CMS Helper Documentation',
-   u'Iacopo Spalletti', 'djangoCMSHelper', 'One line description of project.',
+  ('index', 'DjangoAppHelperr', u'Django App Helper Documentation',
+   u'Iacopo Spalletti', 'DjangoAppHelperr', 'One line description of project.',
    'Miscellaneous'),
 ]
 
