@@ -11,10 +11,8 @@ from tempfile import mkdtemp
 import django
 from django.core.management import call_command
 from django.urls import clear_url_caches
-from django.utils import six
+import six
 from django.utils.functional import empty
-from django.utils.six import StringIO
-from django.utils.six.moves import reload_module
 
 from . import HELPER_FILE
 
@@ -27,6 +25,10 @@ except ImportError:
 try:
     import cms  # NOQA
     CMS = True
+    CMS_40 = LooseVersion('4.0') <= LooseVersion(cms.__version__) < LooseVersion('4.1')
+    CMS_38 = LooseVersion('3.8') <= LooseVersion(cms.__version__) < LooseVersion('3.9')
+    CMS_37 = LooseVersion('3.7') <= LooseVersion(cms.__version__) < LooseVersion('3.8')
+    CMS_36 = LooseVersion('3.6') <= LooseVersion(cms.__version__) < LooseVersion('3.7')
     CMS_35 = LooseVersion('3.5') <= LooseVersion(cms.__version__) < LooseVersion('3.6')
     CMS_34 = LooseVersion('3.4') <= LooseVersion(cms.__version__) < LooseVersion('3.5')
     CMS_33 = LooseVersion('3.3') <= LooseVersion(cms.__version__) < LooseVersion('3.4')
@@ -35,6 +37,10 @@ try:
     CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
 except ImportError:  # pragma: no cover
     CMS = False
+    CMS_40 = False
+    CMS_38 = False
+    CMS_37 = False
+    CMS_36 = False
     CMS_35 = False
     CMS_34 = False
     CMS_33 = False
@@ -53,6 +59,9 @@ DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion('2.0')
 DJANGO_2_0 = LooseVersion(django.get_version()) < LooseVersion('2.1')
 DJANGO_2_1 = LooseVersion(django.get_version()) < LooseVersion('2.2')
 DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion('3.0')
+DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion('3.1')
+DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion('3.2')
+DJANGO_3_2 = LooseVersion(django.get_version()) < LooseVersion('4.0')
 
 
 def load_from_file(module_path):
@@ -91,8 +100,8 @@ def work_in(dirname=None):
 
 @contextlib.contextmanager
 def captured_output():
-    with patch('sys.stdout', new_callable=StringIO) as out:
-        with patch('sys.stderr', new_callable=StringIO) as err:
+    with patch('sys.stdout', new_callable=six.StringIO) as out:
+        with patch('sys.stderr', new_callable=six.StringIO) as err:
             yield out, err
 
 
@@ -322,11 +331,11 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
 def reload_urls(settings, urlconf=None, cms_apps=True):
     if 'cms.urls' in sys.modules:
-        reload_module(sys.modules['cms.urls'])
+        six.moves.reload_module(sys.modules['cms.urls'])
     if urlconf is None:
         urlconf = settings.ROOT_URLCONF
     if urlconf in sys.modules:
-        reload_module(sys.modules[urlconf])
+        six.moves.reload_module(sys.modules[urlconf])
     clear_url_caches()
     if cms_apps:
         from cms.appresolver import clear_app_resolvers, get_app_patterns
