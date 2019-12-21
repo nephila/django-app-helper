@@ -9,9 +9,9 @@ from distutils.version import LooseVersion
 from tempfile import mkdtemp
 
 import django
+import six
 from django.core.management import call_command
 from django.urls import clear_url_caches
-import six
 from django.utils.functional import empty
 
 from . import HELPER_FILE

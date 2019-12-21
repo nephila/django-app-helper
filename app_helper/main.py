@@ -9,8 +9,8 @@ import warnings
 
 from django.utils import autoreload
 from django.utils.encoding import force_text
-from six import text_type
 from docopt import DocoptExit, docopt
+from six import text_type
 
 from . import __version__
 from .utils import (
