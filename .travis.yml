@@ -14,6 +14,7 @@ env:
   - TOXENV='docs'
   - TOXENV='pep8'
   - TOXENV='isort'
+  - DJANGO='django30' CMS='cmsno'
   - DJANGO='django22' CMS='cmsno'
   - DJANGO='django22' CMS='cms37'
   - DJANGO='django21' CMS='cmsno'
@@ -86,6 +87,10 @@ matrix:
   - python: 3.5
     env: DJANGO='django111' CMS='cms34'
 
+  - python: 2.7
+    env: DJANGO='django30' CMS='cms37'
+  - python: 2.7
+    env: DJANGO='django30' CMS='cmsno'
   - python: 2.7
     env: DJANGO='django22' CMS='cms37'
   - python: 2.7

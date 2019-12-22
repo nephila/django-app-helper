@@ -12,7 +12,7 @@ from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
 from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.utils.functional import SimpleLazyObject
-from django.utils.six import StringIO
+from six import StringIO
 
 from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
