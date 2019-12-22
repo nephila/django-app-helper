@@ -2,8 +2,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 
-def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application):
-    return dict(
+def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application):  # NOQA
+    return dict(  # NOQA
         INSTALLED_APPS=[
             "django.contrib.contenttypes",
             "django.contrib.auth",
@@ -12,9 +12,9 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE,
             "django.contrib.staticfiles",
         ]
         + CMS_APP_STYLE
-        + ["django.contrib.admin", "app_helper.test_data", "django.contrib.messages",]
+        + ["django.contrib.admin", "app_helper.test_data", "django.contrib.messages"]
         + CMS_APP,
-        DATABASES={"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:",}},
+        DATABASES={"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}},
         TEMPLATE_LOADERS=[
             "django.template.loaders.filesystem.Loader",
             "django.template.loaders.app_directories.Loader",
@@ -61,9 +61,9 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE,
 
 def get_boilerplates_settings():
     return {
-        "STATICFILES_FINDERS": ["aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder",],
-        "TEMPLATE_LOADERS": ["aldryn_boilerplates.template_loaders.AppDirectoriesLoader",],
-        "TEMPLATE_CONTEXT_PROCESSORS": ["aldryn_boilerplates.context_processors.boilerplate",],
+        "STATICFILES_FINDERS": ["aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder"],
+        "TEMPLATE_LOADERS": ["aldryn_boilerplates.template_loaders.AppDirectoriesLoader"],
+        "TEMPLATE_CONTEXT_PROCESSORS": ["aldryn_boilerplates.context_processors.boilerplate"],
         "ALDRYN_BOILERPLATE_NAME": "bootstrap3",
         "INSTALLED_APPS": ["aldryn_boilerplates"],
     }

@@ -65,7 +65,7 @@ Options:
 """  # NOQA # nopyflakes
 
 
-def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[], verbose=1):
+def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
     warnings.filterwarnings(
         "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields"
     )
@@ -76,9 +76,9 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]
         verbose = int(verbose)
     except (ValueError, TypeError):
         verbose = 1
-
+    runner_options = runner_options or []
     settings.TEST_RUNNER = test_runner
-    TestRunner = get_runner(settings)
+    TestRunner = get_runner(settings)  # NOQA
 
     if runner_options:
         sys.argv.extend(runner_options.split(","))
@@ -87,7 +87,7 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[]
     return failures
 
 
-def test(test_labels, application, failfast=False, test_runner=None, runner_options=[], verbose=1):
+def test(test_labels, application, failfast=False, test_runner=None, runner_options=None, verbose=1):
     """
     Runs the test suite
     :param test_labels: space separated list of test labels
@@ -100,6 +100,7 @@ def test(test_labels, application, failfast=False, test_runner=None, runner_opti
             test_labels = ["%s.tests" % application]
     elif type(test_labels) is text_type:
         test_labels = [test_labels]
+    runner_options = runner_options or []
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
 
 
@@ -230,7 +231,7 @@ def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma
 
     if os.environ.get("RUN_MAIN") != "true":
         _create_db(migrate_cmd)
-        User = get_user_model()
+        User = get_user_model()  # NOQA
         if not User.objects.filter(is_superuser=True).exists():
             usr = create_user("admin", "admin@admin.com", "admin", is_staff=True, is_superuser=True)
             print("")
@@ -264,7 +265,7 @@ def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma
                 "use_threading": True,
                 "verbosity": verbose,
                 "use_reloader": True,
-            },
+            }
         )
     except AttributeError:
         autoreload.main(
@@ -276,7 +277,7 @@ def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma
                 "use_threading": True,
                 "verbosity": verbose,
                 "use_reloader": True,
-            },
+            }
         )
 
 
@@ -329,8 +330,8 @@ def core(args, application):
         create_dir = temp_dir
         parent_path = "/dev/shm"
 
-    with create_dir("static", parent_path) as STATIC_ROOT:
-        with create_dir("media", parent_path) as MEDIA_ROOT:
+    with create_dir("static", parent_path) as STATIC_ROOT:  # NOQA
+        with create_dir("media", parent_path) as MEDIA_ROOT:  # NOQA
             args["MEDIA_ROOT"] = MEDIA_ROOT
             args["STATIC_ROOT"] = STATIC_ROOT
             if args["cms_check"]:

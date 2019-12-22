@@ -4,10 +4,10 @@
 History
 *******
 
-2.0.2 (unreleased)
+2.1.0 (unreleased)
 ==================
 
-* Nothing yet
+* Reformat code with black and improved flake8 configuration
 
 2.0.1 (2019-12-22)
 ==================

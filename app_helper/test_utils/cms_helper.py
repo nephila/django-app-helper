@@ -10,14 +10,14 @@ except ImportError:
 
 HELPER_SETTINGS = {
     "TIME_ZONE": "Europe/Rome",
-    "INSTALLED_APPS": ["example2", "filer",] + text_plugin,
+    "INSTALLED_APPS": ["example2", "filer"] + text_plugin,
     "CMS_LANGUAGES": {
         1: [
-            {"code": "en", "name": "English", "public": True,},
-            {"code": "it", "name": "Italiano", "public": True,},
-            {"code": "fr", "name": "French", "public": True,},
+            {"code": "en", "name": "English", "public": True},
+            {"code": "it", "name": "Italiano", "public": True},
+            {"code": "fr", "name": "French", "public": True},
         ],
-        "default": {"hide_untranslated": False,},
+        "default": {"hide_untranslated": False},
     },
     "FILE_UPLOAD_TEMP_DIR": mkdtemp(),
 }

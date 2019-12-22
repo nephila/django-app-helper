@@ -112,7 +112,7 @@ class BaseTestCaseMixin(object):
     @classmethod
     def tearDownClass(cls):
         super(BaseTestCaseMixin, cls).tearDownClass()
-        User = get_user_model()
+        User = get_user_model()  # NOQA
         User.objects.all().delete()
 
     @contextmanager

@@ -157,11 +157,11 @@ def extend_settings(settings, extra_settings, key, insertion_point):
     return settings
 
 
-def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
+def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQA
     """
     Setup the Django settings
     :param args: docopt arguments
-    :param default_settings: default Django settings
+    :param application: application module name
     :param settings: Django settings module
     :param STATIC_ROOT: static root directory
     :param MEDIA_ROOT: media root directory
@@ -192,17 +192,17 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     }
 
     if configs["USE_CMS"] or getattr(extra_settings, "USE_CMS", False):
-        CMS_APPS = [
+        CMS_APPS = [  # NOQA
             "cms",
             "menus",
             "sekizai",
         ]
-        CMS_APP_STYLE = ["djangocms_admin_style"]
-        CMS_PROCESSORS = [
+        CMS_APP_STYLE = ["djangocms_admin_style"]  # NOQA
+        CMS_PROCESSORS = [  # NOQA
             "cms.context_processors.cms_settings",
             "sekizai.context_processors.sekizai",
         ]
-        CMS_MIDDLEWARE = [
+        CMS_MIDDLEWARE = [  # NOQA
             "cms.middleware.language.LanguageCookieMiddleware",
             "cms.middleware.user.CurrentUserMiddleware",
             "cms.middleware.page.CurrentPageMiddleware",
@@ -210,13 +210,13 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
         ]
         if not CMS_31 and args["server"]:
             CMS_MIDDLEWARE.append("cms.middleware.utils.ApphookReloadMiddleware")
-        URLCONF = "app_helper.urls"
+        URLCONF = "app_helper.urls"  # NOQA
     else:
-        CMS_APPS = []
-        CMS_APP_STYLE = []
-        CMS_MIDDLEWARE = []
-        CMS_PROCESSORS = []
-        URLCONF = "app_helper.urls"
+        CMS_APPS = []  # NOQA
+        CMS_APP_STYLE = []  # NOQA
+        CMS_MIDDLEWARE = []  # NOQA
+        CMS_PROCESSORS = []  # NOQA
+        URLCONF = "app_helper.urls"  # NOQA
 
     default_settings = get_default_settings(
         CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application
@@ -358,7 +358,7 @@ def create_user(
 ):
     from django.contrib.auth.models import Permission
 
-    User = get_user_model()
+    User = get_user_model()  # NOQA
 
     try:
         if User.USERNAME_FIELD == "email":
@@ -398,7 +398,7 @@ def create_user(
 
 
 def get_user_model_labels():
-    User = get_user_model()
+    User = get_user_model()  # NOQA
 
     user_orm_label = "%s.%s" % (User._meta.app_label, User._meta.object_name)
     user_model_label = "%s.%s" % (User._meta.app_label, User._meta.model_name)
