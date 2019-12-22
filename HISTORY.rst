@@ -4,10 +4,10 @@
 History
 *******
 
-2.0.1 (unreleased)
+2.0.1 (2019-12-22)
 ==================
 
-* Nothing yet
+* Added Django 3.0 preliminary support
 
 2.0.0 (2019-10-13)
 ==================

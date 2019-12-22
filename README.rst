@@ -27,7 +27,7 @@ Supported versions
 
 Python: 2.7, 3.5, 3.6, 3.7
 
-Django: 1.11 - 2.2
+Django: 1.11 - 2.2 (3.0 when not using django CMS integration)
 
 django CMS: 3.4 - 3.7
 
@@ -61,14 +61,6 @@ Base test class
 A base test class is available to provide helpers and methods that
 implements repetitive tasks during development or compatibility shims
 (especially for django CMS).
-
-.. warning:: Changes in version 1.2 **might** reduce the number of queries executed in tests
-             rendering plugins.
-
-             If you are using ``assertNumQueries`` (or similar), this may
-             yield unexpected failures.
-
-             Please check your code before upgrading django-app-helper.
 
 *************
 Bootstrapping
