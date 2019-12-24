@@ -855,7 +855,8 @@ class CommandTests(unittest.TestCase):
                 args["--extra-settings"] = "helper_no_cms.py"
                 core(args, self.application)
         self.assertTrue("collected 15 items" in out.getvalue())
-        self.assertTrue("10 passed, 5 skipped, 3 warnings" in out.getvalue())
+        # warnings will depend on django version and adds too much noise
+        self.assertTrue("10 passed, 5 skipped" in out.getvalue())
 
     def test_runner_pytest(self):
         with work_in(self.basedir):
@@ -869,7 +870,8 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
         self.assertTrue("collected 15 items" in out.getvalue())
-        self.assertTrue("10 passed, 5 skipped, 3 warnings" in out.getvalue())
+        # warnings will depend on django version and adds too much noise
+        self.assertTrue("10 passed, 5 skipped" in out.getvalue())
         self.assertEqual(exit.exception.code, 0)
 
     def test_authors(self):
