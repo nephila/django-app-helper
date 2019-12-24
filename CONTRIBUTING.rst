@@ -55,14 +55,15 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `django-app-helper` for local development.
+Ready to contribute? Here's how to set up ``django-app-helper`` for local development.
 
-1. Fork the `django-app-helper` repo on GitHub.
+1. Fork the ``django-app-helper`` repo on GitHub.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/django-app-helper.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper
+   installed, this is how you set up your fork for local development::
 
     $ mkvirtualenv django-app-helper
     $ cd django-app-helper/
@@ -78,10 +79,10 @@ Now you can make your changes locally.
 tests, including testing other Python versions with tox::
 
     $ make lint
-	$ python setup.py test
+    $ python setup.py test
     $ tox
 
-To get flake8 and tox, just pip install them into your virtualenv.
+To get tox, just pip install them into your virtualenv.
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -100,6 +101,6 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.6, 2.7, and 3.3, and for PyPy. Check
-   https://travis-ci.org/nephila/django-app-helper/pull_requests
+3. The pull request should work for all python versions declared in tox.ini.
+   Check https://travis-ci.org/nephila/django-app-helper/pull_requests
    and make sure that the tests pass for all supported Python versions.
