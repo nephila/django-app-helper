@@ -22,6 +22,9 @@ functions to develop, run and test django CMS applications.
 It's a modified version of django CMS's own ``develop.py`` script, modified
 to handle generic application development process.
 
+It supports both tests writted using Django ``TestCase`` and pytest ones
+(see `pytest support`_).
+
 Supported versions
 ==================
 
@@ -157,3 +160,4 @@ deserve a huge thanks for their work.
 .. _readthedocs: https://django-app-helper.readthedocs.io
 .. _django CMS's: https://github.com/divio/django-cms:
 .. _usage: https://github.com/nephila/cookiecutter-djangopackage-helper#usage
+.. _pytest support: https://django-app-helper.readthedocs.io/en/latest/pytest.html
