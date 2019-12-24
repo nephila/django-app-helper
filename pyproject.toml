@@ -1,0 +1,4 @@
+[tool.black]
+line-length = 119
+target-version = ['py27']
+include = '/(app_helper,djangocms_helper)/.*\.pyi?$'

@@ -14,8 +14,15 @@ from six import text_type
 
 from . import __version__
 from .utils import (
-    DJANGO_1_11, _create_db, _make_settings, create_user, ensure_unicoded_and_unique,
-    get_user_model, persistent_dir, temp_dir, work_in,
+    DJANGO_1_11,
+    _create_db,
+    _make_settings,
+    create_user,
+    ensure_unicoded_and_unique,
+    get_user_model,
+    persistent_dir,
+    temp_dir,
+    work_in,
 )
 
 __doc__ = """django CMS applications development helper script.
@@ -58,41 +65,42 @@ Options:
 """  # NOQA # nopyflakes
 
 
-def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=[], verbose=1):
+def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
     warnings.filterwarnings(
-        'error', r'DateTimeField received a naive datetime',
-        RuntimeWarning, r'django\.db\.models\.fields')
+        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields"
+    )
     from django.conf import settings
     from django.test.utils import get_runner
+
     try:
         verbose = int(verbose)
     except (ValueError, TypeError):
         verbose = 1
-
+    runner_options = runner_options or []
     settings.TEST_RUNNER = test_runner
-    TestRunner = get_runner(settings)
+    TestRunner = get_runner(settings)  # NOQA
 
     if runner_options:
-        sys.argv.extend(runner_options.split(','))
+        sys.argv.extend(runner_options.split(","))
     test_runner = TestRunner(verbosity=verbose, interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 
 
-def test(test_labels, application, failfast=False, test_runner=None,
-         runner_options=[], verbose=1):
+def test(test_labels, application, failfast=False, test_runner=None, runner_options=None, verbose=1):
     """
     Runs the test suite
     :param test_labels: space separated list of test labels
     :param failfast: option to stop the testsuite on the first error
     """
     if not test_labels:
-        if os.path.exists('tests'):  # pragma: no cover
-            test_labels = ['tests']
-        elif os.path.exists(os.path.join(application, 'tests')):
-            test_labels = ['%s.tests' % application]
+        if os.path.exists("tests"):  # pragma: no cover
+            test_labels = ["tests"]
+        elif os.path.exists(os.path.join(application, "tests")):
+            test_labels = ["%s.tests" % application]
     elif type(test_labels) is text_type:
         test_labels = [test_labels]
+    runner_options = runner_options or []
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
 
 
@@ -104,9 +112,9 @@ def compilemessages(application):
 
     with work_in(application):
         if DJANGO_1_11:
-            call_command('compilemessages', all=True)
+            call_command("compilemessages", all=True)
         else:
-            call_command('compilemessages')
+            call_command("compilemessages")
 
 
 def makemessages(application, locale):
@@ -116,9 +124,9 @@ def makemessages(application, locale):
     from django.core.management import call_command
 
     if not locale:
-        locale = 'en'
+        locale = "en"
     with work_in(application):
-        call_command('makemessages', locale=(locale,))
+        call_command("makemessages", locale=(locale,))
 
 
 def cms_check(migrate_cmd=False):
@@ -126,12 +134,14 @@ def cms_check(migrate_cmd=False):
     Runs the django CMS ``cms check`` command
     """
     from django.core.management import call_command
+
     try:
         import cms  # NOQA # nopyflakes
+
         _create_db(migrate_cmd)
-        call_command('cms', 'check')
+        call_command("cms", "check")
     except ImportError:
-        print('cms_check available only if django CMS is installed')
+        print("cms_check available only if django CMS is installed")
 
 
 def makemigrations(application, merge=False, dry_run=False, empty=False, extra_applications=None):
@@ -148,25 +158,24 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
             apps += extra_applications
 
     for app in apps:
-        call_command('makemigrations', *(app,), merge=merge, dry_run=dry_run, empty=empty)
+        call_command("makemigrations", *(app,), merge=merge, dry_run=dry_run, empty=empty)
 
 
 def generate_authors():
     """
     Updates the authors list
     """
-    print('Generating AUTHORS')
+    print("Generating AUTHORS")
 
     # Get our list of authors
-    print('Collecting author names')
-    r = subprocess.Popen(['git', 'log', '--use-mailmap', '--format=%aN'],
-                         stdout=subprocess.PIPE)
+    print("Collecting author names")
+    r = subprocess.Popen(["git", "log", "--use-mailmap", "--format=%aN"], stdout=subprocess.PIPE)
     seen_authors = []
     authors = []
-    for authfile in ('AUTHORS', 'AUTHORS.rst'):
+    for authfile in ("AUTHORS", "AUTHORS.rst"):
         if os.path.exists(authfile):
             break
-    with open(authfile, 'r') as f:
+    with open(authfile, "r") as f:
         for line in f.readlines():
             if line.startswith("*"):
                 author = force_text(line).strip("* \n")
@@ -183,7 +192,7 @@ def generate_authors():
     authors = sorted(authors, key=lambda x: x.lower())
 
     # Write our authors to the AUTHORS file
-    print('Authors (%s):\n\n\n* %s' % (len(authors), '\n* '.join(authors)))
+    print("Authors (%s):\n\n\n* %s" % (len(authors), "\n* ".join(authors)))
 
 
 def static_analisys(application):
@@ -193,6 +202,7 @@ def static_analisys(application):
     """
     try:
         from cms.test_utils.util.static_analysis import pyflakes
+
         application_module = __import__(application)
         report = pyflakes((application_module,))
         if type(report) == tuple:
@@ -201,35 +211,36 @@ def static_analisys(application):
             assert report == 0
     except ImportError:
         print(
-            'Static analysis available only if django CMS and pyflakes are installed.\n'
-            'Install django-app-helper[pyflakes] to fix this.'
+            "Static analysis available only if django CMS and pyflakes are installed.\n"
+            "Install django-app-helper[pyflakes] to fix this."
         )
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
+def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
     try:
         from channels.log import setup_logger
         from channels.management.commands import runserver
-        logger = setup_logger('django.channels', 1)
+
+        logger = setup_logger("django.channels", 1)
         use_channels = True
     except ImportError:
         from django.contrib.staticfiles.management.commands import runserver
+
         use_channels = False
         logger = None
 
-    if os.environ.get('RUN_MAIN') != 'true':
+    if os.environ.get("RUN_MAIN") != "true":
         _create_db(migrate_cmd)
-        User = get_user_model()
+        User = get_user_model()  # NOQA
         if not User.objects.filter(is_superuser=True).exists():
-            usr = create_user('admin', 'admin@admin.com', 'admin', is_staff=True,
-                              is_superuser=True)
-            print('')
-            print('A admin user (username: %s, password: admin) '
-                  'has been created.' % usr.get_username())
-            print('')
+            usr = create_user("admin", "admin@admin.com", "admin", is_staff=True, is_superuser=True)
+            print("")
+            print("A admin user (username: %s, password: admin) " "has been created." % usr.get_username())
+            print("")
     rs = runserver.Command()
     try:
         from django.core.management.base import OutputWrapper
+
         rs.stdout = OutputWrapper(sys.stdout)
         rs.stderr = OutputWrapper(sys.stderr)
     except ImportError:
@@ -245,23 +256,29 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, verbose=1):  # pragma
         rs.http_timeout = 60
         rs.websocket_handshake_timeout = 5
     try:
-        autoreload.run_with_reloader(rs.inner_run, **{
-            'addrport': '%s:%s' % (bind, port),
-            'insecure_serving': True,
-            'use_static_handler': True,
-            'use_threading': True,
-            'verbosity': verbose,
-            'use_reloader': True
-        })
+        autoreload.run_with_reloader(
+            rs.inner_run,
+            **{
+                "addrport": "%s:%s" % (bind, port),
+                "insecure_serving": True,
+                "use_static_handler": True,
+                "use_threading": True,
+                "verbosity": verbose,
+                "use_reloader": True,
+            }
+        )
     except AttributeError:
-        autoreload.main(rs.inner_run, kwargs={
-            'addrport': '%s:%s' % (bind, port),
-            'insecure_serving': True,
-            'use_static_handler': True,
-            'use_threading': True,
-            'verbosity': verbose,
-            'use_reloader': True
-        })
+        autoreload.main(
+            rs.inner_run,
+            kwargs={
+                "addrport": "%s:%s" % (bind, port),
+                "insecure_serving": True,
+                "use_static_handler": True,
+                "use_threading": True,
+                "verbosity": verbose,
+                "use_reloader": True,
+            }
+        )
 
 
 def setup_env(settings):
@@ -272,27 +289,27 @@ def _map_argv(argv, application_module):
     try:
         # by default docopt uses sys.argv[1:]; ensure correct args passed
         args = docopt(__doc__, argv=argv[1:], version=application_module.__version__)
-        if argv[2] == 'help':
+        if argv[2] == "help":
             raise DocoptExit()
     except DocoptExit:
-        if argv[2] == 'help':
+        if argv[2] == "help":
             raise
         args = docopt(__doc__, argv[1:3], version=application_module.__version__)
-    args['--cms'] = '--cms' in argv
-    args['--persistent'] = '--persistent' in argv
+    args["--cms"] = "--cms" in argv
+    args["--persistent"] = "--persistent" in argv
     for arg in argv:
-        if arg.startswith('--extra-settings='):
-            args['--extra-settings'] = arg.split('=')[1]
-        if arg.startswith('--runner='):
-            args['--runner'] = arg.split('=')[1]
-        if arg.startswith('--persistent-path='):
-            args['--persistent-path'] = arg.split('=')[1]
-            args['--persistent'] = True
-    args['options'] = [argv[0]] + argv[2:]
-    if args['test'] and '--native' in args['options']:
-        args['test'] = False
-        args['<command>'] = 'test'
-        args['options'].remove('--native')
+        if arg.startswith("--extra-settings="):
+            args["--extra-settings"] = arg.split("=")[1]
+        if arg.startswith("--runner="):
+            args["--runner"] = arg.split("=")[1]
+        if arg.startswith("--persistent-path="):
+            args["--persistent-path"] = arg.split("=")[1]
+            args["--persistent"] = True
+    args["options"] = [argv[0]] + argv[2:]
+    if args["test"] and "--native" in args["options"]:
+        args["test"] = False
+        args["<command>"] = "test"
+        args["options"].remove("--native")
     return args
 
 
@@ -301,54 +318,58 @@ def core(args, application):
 
     # configure django
     warnings.filterwarnings(
-        'error', r'DateTimeField received a naive datetime',
-        RuntimeWarning, r'django\.db\.models\.fields')
-    if args['--persistent']:
+        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields"
+    )
+    if args["--persistent"]:
         create_dir = persistent_dir
-        if args['--persistent-path']:
-            parent_path = args['--persistent-path']
+        if args["--persistent-path"]:
+            parent_path = args["--persistent-path"]
         else:
-            parent_path = 'data'
+            parent_path = "data"
     else:
         create_dir = temp_dir
-        parent_path = '/dev/shm'
+        parent_path = "/dev/shm"
 
-    with create_dir('static', parent_path) as STATIC_ROOT:
-        with create_dir('media', parent_path) as MEDIA_ROOT:
-            args['MEDIA_ROOT'] = MEDIA_ROOT
-            args['STATIC_ROOT'] = STATIC_ROOT
-            if args['cms_check']:
-                args['--cms'] = True
+    with create_dir("static", parent_path) as STATIC_ROOT:  # NOQA
+        with create_dir("media", parent_path) as MEDIA_ROOT:  # NOQA
+            args["MEDIA_ROOT"] = MEDIA_ROOT
+            args["STATIC_ROOT"] = STATIC_ROOT
+            if args["cms_check"]:
+                args["--cms"] = True
 
-            if args['<command>']:
+            if args["<command>"]:
                 from django.core.management import execute_from_command_line
-                options = [option for option in args['options'] if (
-                    option != '--cms' and '--extra-settings' not in option and
-                    not option.startswith('--persistent')
-                )]
+
+                options = [
+                    option
+                    for option in args["options"]
+                    if (
+                        option != "--cms"
+                        and "--extra-settings" not in option
+                        and not option.startswith("--persistent")
+                    )
+                ]
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 execute_from_command_line(options)
 
             else:
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
                 # run
-                if args['test']:
-                    if args['--runner']:
-                        runner = args['--runner']
+                if args["test"]:
+                    if args["--runner"]:
+                        runner = args["--runner"]
                     else:
-                        runner = 'django.test.runner.DiscoverRunner'
+                        runner = "django.test.runner.DiscoverRunner"
 
                     # make "Address already in use" errors less likely, see Django
                     # docs for more details on this env variable.
-                    os.environ.setdefault(
-                        'DJANGO_LIVE_TEST_SERVER_ADDRESS',
-                        'localhost:8000-9000'
-                    )
-                    if args['--xvfb']:  # pragma: no cover
+                    os.environ.setdefault("DJANGO_LIVE_TEST_SERVER_ADDRESS", "localhost:8000-9000")
+                    if args["--xvfb"]:  # pragma: no cover
                         import xvfbwrapper
 
                         context = xvfbwrapper.Xvfb(width=1280, height=720)
                     else:
+
                         @contextlib.contextmanager
                         def null_context():
                             yield
@@ -356,37 +377,43 @@ def core(args, application):
                         context = null_context()
 
                     with context:
-                        num_failures = test(args['<test-label>'], application,
-                                            args['--failfast'], runner,
-                                            args['--runner-options'], args.get('--verbose', 1))
+                        num_failures = test(
+                            args["<test-label>"],
+                            application,
+                            args["--failfast"],
+                            runner,
+                            args["--runner-options"],
+                            args.get("--verbose", 1),
+                        )
                         sys.exit(num_failures)
-                elif args['server']:
-                    server(
-                        args['--bind'], args['--port'], args.get('--migrate', True),
-                        args.get('--verbose', 1)
-                    )
-                elif args['cms_check']:
-                    cms_check(args.get('--migrate', True))
-                elif args['compilemessages']:
+                elif args["server"]:
+                    server(args["--bind"], args["--port"], args.get("--migrate", True), args.get("--verbose", 1))
+                elif args["cms_check"]:
+                    cms_check(args.get("--migrate", True))
+                elif args["compilemessages"]:
                     compilemessages(application)
-                elif args['makemessages']:
-                    makemessages(application, locale=args['--locale'])
-                elif args['makemigrations']:
-                    makemigrations(application, merge=args['--merge'], dry_run=args['--dry-run'],
-                                   empty=args['--empty'],
-                                   extra_applications=args['<extra-applications>'])
-                elif args['pyflakes']:
+                elif args["makemessages"]:
+                    makemessages(application, locale=args["--locale"])
+                elif args["makemigrations"]:
+                    makemigrations(
+                        application,
+                        merge=args["--merge"],
+                        dry_run=args["--dry-run"],
+                        empty=args["--empty"],
+                        extra_applications=args["<extra-applications>"],
+                    )
+                elif args["pyflakes"]:
                     return static_analisys(application)
-                elif args['authors']:
+                elif args["authors"]:
                     return generate_authors()
-                elif args['setup']:
+                elif args["setup"]:
                     return setup_env(settings)
 
 
 def main(argv=sys.argv):  # pragma: no cover
     # Command is executed in the main directory of the plugin, and we must
     # include it in the current path for the imports to work
-    sys.path.insert(0, '.')
+    sys.path.insert(0, ".")
     if len(argv) > 1:
         application = argv[1]
         # ensure that argv, are unique and the same type as doc string

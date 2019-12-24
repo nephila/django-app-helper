@@ -14,26 +14,21 @@ from .utils import load_from_file
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^media/(?P<path>.*)$', serve,  # NOQA
-        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'^jsi18n/(?P<packages>\S+?)/$', JavaScriptCatalog.as_view()),  # NOQA
+    url(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT, "show_indexes": True}),  # NOQA
+    url(r"^jsi18n/(?P<packages>\S+?)/$", JavaScriptCatalog.as_view()),  # NOQA
 ]
 i18n_urls = [
-    url(r'^admin/', admin.site.urls),
+    url(r"^admin/", admin.site.urls),
 ]
 
 try:
-    load_from_file('%s.urls' % settings.BASE_APPLICATION)
-    i18n_urls.append(
-        url(r'^%s/' % settings.BASE_APPLICATION, include('%s.urls' % settings.BASE_APPLICATION))  # NOQA
-    )
+    load_from_file("%s.urls" % settings.BASE_APPLICATION)
+    i18n_urls.append(url(r"^%s/" % settings.BASE_APPLICATION, include("%s.urls" % settings.BASE_APPLICATION)))  # NOQA
 except IOError:
     pass
 
 if settings.USE_CMS:
-    i18n_urls.append(
-        url(r'^', include('cms.urls'))  # NOQA
-    )
+    i18n_urls.append(url(r"^", include("cms.urls")))  # NOQA
 
 urlpatterns += i18n_patterns(*i18n_urls)
 urlpatterns += staticfiles_urlpatterns()

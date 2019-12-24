@@ -24,17 +24,18 @@ except ImportError:
 
 try:
     import cms  # NOQA
+
     CMS = True
-    CMS_40 = LooseVersion('4.0') <= LooseVersion(cms.__version__) < LooseVersion('4.1')
-    CMS_38 = LooseVersion('3.8') <= LooseVersion(cms.__version__) < LooseVersion('3.9')
-    CMS_37 = LooseVersion('3.7') <= LooseVersion(cms.__version__) < LooseVersion('3.8')
-    CMS_36 = LooseVersion('3.6') <= LooseVersion(cms.__version__) < LooseVersion('3.7')
-    CMS_35 = LooseVersion('3.5') <= LooseVersion(cms.__version__) < LooseVersion('3.6')
-    CMS_34 = LooseVersion('3.4') <= LooseVersion(cms.__version__) < LooseVersion('3.5')
-    CMS_33 = LooseVersion('3.3') <= LooseVersion(cms.__version__) < LooseVersion('3.4')
-    CMS_32 = LooseVersion('3.2') <= LooseVersion(cms.__version__) < LooseVersion('3.3')
-    CMS_31 = LooseVersion('3.1') <= LooseVersion(cms.__version__) < LooseVersion('3.2')
-    CMS_30 = LooseVersion('3.0') <= LooseVersion(cms.__version__) < LooseVersion('3.1')
+    CMS_40 = LooseVersion("4.0") <= LooseVersion(cms.__version__) < LooseVersion("4.1")
+    CMS_38 = LooseVersion("3.8") <= LooseVersion(cms.__version__) < LooseVersion("3.9")
+    CMS_37 = LooseVersion("3.7") <= LooseVersion(cms.__version__) < LooseVersion("3.8")
+    CMS_36 = LooseVersion("3.6") <= LooseVersion(cms.__version__) < LooseVersion("3.7")
+    CMS_35 = LooseVersion("3.5") <= LooseVersion(cms.__version__) < LooseVersion("3.6")
+    CMS_34 = LooseVersion("3.4") <= LooseVersion(cms.__version__) < LooseVersion("3.5")
+    CMS_33 = LooseVersion("3.3") <= LooseVersion(cms.__version__) < LooseVersion("3.4")
+    CMS_32 = LooseVersion("3.2") <= LooseVersion(cms.__version__) < LooseVersion("3.3")
+    CMS_31 = LooseVersion("3.1") <= LooseVersion(cms.__version__) < LooseVersion("3.2")
+    CMS_30 = LooseVersion("3.0") <= LooseVersion(cms.__version__) < LooseVersion("3.1")
 except ImportError:  # pragma: no cover
     CMS = False
     CMS_40 = False
@@ -48,20 +49,20 @@ except ImportError:  # pragma: no cover
     CMS_31 = False
     CMS_30 = False
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
-DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion('1.6')
-DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion('1.7')
-DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion('1.8')
-DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion('1.9')
-DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion('1.10')
-DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion('1.11')
-DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion('2.0')
-DJANGO_2_0 = LooseVersion(django.get_version()) < LooseVersion('2.1')
-DJANGO_2_1 = LooseVersion(django.get_version()) < LooseVersion('2.2')
-DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion('3.0')
-DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion('3.1')
-DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion('3.2')
-DJANGO_3_2 = LooseVersion(django.get_version()) < LooseVersion('4.0')
+DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion("1.5")
+DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion("1.6")
+DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion("1.7")
+DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion("1.8")
+DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion("1.9")
+DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion("1.10")
+DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion("1.11")
+DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion("2.0")
+DJANGO_2_0 = LooseVersion(django.get_version()) < LooseVersion("2.1")
+DJANGO_2_1 = LooseVersion(django.get_version()) < LooseVersion("2.2")
+DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion("3.0")
+DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion("3.1")
+DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion("3.2")
+DJANGO_3_2 = LooseVersion(django.get_version()) < LooseVersion("4.0")
 
 
 def load_from_file(module_path):
@@ -74,8 +75,8 @@ def load_from_file(module_path):
 
     imported = None
     if module_path:
-        with open(module_path, 'r') as openfile:
-            imported = load_module('mod', openfile, module_path, ('imported', 'r', PY_SOURCE))
+        with open(module_path, "r") as openfile:
+            imported = load_module("mod", openfile, module_path, ("imported", "r", PY_SOURCE))
     return imported
 
 
@@ -100,27 +101,27 @@ def work_in(dirname=None):
 
 @contextlib.contextmanager
 def captured_output():
-    with patch('sys.stdout', new_callable=six.StringIO) as out:
-        with patch('sys.stderr', new_callable=six.StringIO) as err:
+    with patch("sys.stdout", new_callable=six.StringIO) as out:
+        with patch("sys.stderr", new_callable=six.StringIO) as err:
             yield out, err
 
 
 # Borrowed from django CMS codebase
 @contextlib.contextmanager
-def temp_dir(suffix='', container='/dev/shm/'):
+def temp_dir(suffix="", container="/dev/shm/"):
     name = make_temp_dir(suffix, container)
     yield name
     shutil.rmtree(name)
 
 
-def make_temp_dir(suffix='', container='/dev/shm/'):
+def make_temp_dir(suffix="", container="/dev/shm/"):
     if os.path.exists(container):
         return mkdtemp(suffix=suffix, dir=container)
     return mkdtemp(suffix=suffix)
 
 
 @contextlib.contextmanager
-def persistent_dir(suffix, container='data'):
+def persistent_dir(suffix, container="data"):
     name = os.path.abspath(os.path.join(container, suffix))
     if not os.path.exists(name):
         os.makedirs(name)
@@ -128,7 +129,6 @@ def persistent_dir(suffix, container='data'):
 
 
 class DisableMigrations(object):
-
     def __contains__(self, item):
         return True
 
@@ -144,6 +144,7 @@ def _reset_django(settings):
     if settings._wrapped != empty:
         clear_url_caches()
         from django.apps import apps
+
         apps.clear_cache()
         settings._wrapped = empty
         clear_url_caches()
@@ -156,11 +157,11 @@ def extend_settings(settings, extra_settings, key, insertion_point):
     return settings
 
 
-def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
+def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQA
     """
     Setup the Django settings
     :param args: docopt arguments
-    :param default_settings: default Django settings
+    :param application: application module name
     :param settings: Django settings module
     :param STATIC_ROOT: static root directory
     :param MEDIA_ROOT: media root directory
@@ -170,157 +171,155 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
     from .default_settings import get_default_settings, get_boilerplates_settings
 
     try:
-        extra_settings_file = args.get('--extra-settings')
+        extra_settings_file = args.get("--extra-settings")
         if not extra_settings_file:
             extra_settings_file = HELPER_FILE
-        if extra_settings_file[-3:] != '.py':
+        if extra_settings_file[-3:] != ".py":
             filename, __ = os.path.splitext(extra_settings_file)
-            extra_settings_file = '{0}.py'.format(filename)
+            extra_settings_file = "{0}.py".format(filename)
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
     except (IOError, AttributeError):
         extra_settings = None
-    default_name = ':memory:' if args['test'] else 'local.sqlite'
-    db_url = os.environ.get('DATABASE_URL', 'sqlite://localhost/%s' % default_name)
+    default_name = ":memory:" if args["test"] else "local.sqlite"
+    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
     configs = {
-        'DATABASES': {'default': dj_database_url.parse(db_url)},
-        'STATIC_ROOT': STATIC_ROOT,
-        'MEDIA_ROOT': MEDIA_ROOT,
-        'USE_TZ': True,
-        'USE_CMS': args['--cms'],
-        'BASE_APPLICATION': application
+        "DATABASES": {"default": dj_database_url.parse(db_url)},
+        "STATIC_ROOT": STATIC_ROOT,
+        "MEDIA_ROOT": MEDIA_ROOT,
+        "USE_TZ": True,
+        "USE_CMS": args["--cms"],
+        "BASE_APPLICATION": application,
     }
 
-    if configs['USE_CMS'] or getattr(extra_settings, 'USE_CMS', False):
-        CMS_APPS = [
-            'cms',
-            'menus',
-            'sekizai',
+    if configs["USE_CMS"] or getattr(extra_settings, "USE_CMS", False):
+        CMS_APPS = [  # NOQA
+            "cms",
+            "menus",
+            "sekizai",
         ]
-        CMS_APP_STYLE = [
-            'djangocms_admin_style'
+        CMS_APP_STYLE = ["djangocms_admin_style"]  # NOQA
+        CMS_PROCESSORS = [  # NOQA
+            "cms.context_processors.cms_settings",
+            "sekizai.context_processors.sekizai",
         ]
-        CMS_PROCESSORS = [
-            'cms.context_processors.cms_settings',
-            'sekizai.context_processors.sekizai',
+        CMS_MIDDLEWARE = [  # NOQA
+            "cms.middleware.language.LanguageCookieMiddleware",
+            "cms.middleware.user.CurrentUserMiddleware",
+            "cms.middleware.page.CurrentPageMiddleware",
+            "cms.middleware.toolbar.ToolbarMiddleware",
         ]
-        CMS_MIDDLEWARE = [
-            'cms.middleware.language.LanguageCookieMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-        ]
-        if not CMS_31 and args['server']:
-            CMS_MIDDLEWARE.append('cms.middleware.utils.ApphookReloadMiddleware')
-        URLCONF = 'app_helper.urls'
+        if not CMS_31 and args["server"]:
+            CMS_MIDDLEWARE.append("cms.middleware.utils.ApphookReloadMiddleware")
+        URLCONF = "app_helper.urls"  # NOQA
     else:
-        CMS_APPS = []
-        CMS_APP_STYLE = []
-        CMS_MIDDLEWARE = []
-        CMS_PROCESSORS = []
-        URLCONF = 'app_helper.urls'
+        CMS_APPS = []  # NOQA
+        CMS_APP_STYLE = []  # NOQA
+        CMS_MIDDLEWARE = []  # NOQA
+        CMS_PROCESSORS = []  # NOQA
+        URLCONF = "app_helper.urls"  # NOQA
 
     default_settings = get_default_settings(
         CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application
     )
-    migrate = args.get('--migrate') or not args.get('--no-migrate')
+    migrate = args.get("--migrate") or not args.get("--no-migrate")
     default_settings.update(configs)
 
     if extra_settings:
-        apps = extra_settings.pop('INSTALLED_APPS', [])
-        apps_top = extra_settings.pop('TOP_INSTALLED_APPS', [])
-        template_processors = extra_settings.pop('TEMPLATE_CONTEXT_PROCESSORS', [])
-        template_loaders = extra_settings.pop('TEMPLATE_LOADERS', [])
-        template_dirs = extra_settings.pop('TEMPLATE_DIRS', [])
-        middleware = extra_settings.pop('MIDDLEWARE_CLASSES', [])
-        middleware_top = extra_settings.pop('TOP_MIDDLEWARE_CLASSES', [])
+        apps = extra_settings.pop("INSTALLED_APPS", [])
+        apps_top = extra_settings.pop("TOP_INSTALLED_APPS", [])
+        template_processors = extra_settings.pop("TEMPLATE_CONTEXT_PROCESSORS", [])
+        template_loaders = extra_settings.pop("TEMPLATE_LOADERS", [])
+        template_dirs = extra_settings.pop("TEMPLATE_DIRS", [])
+        middleware = extra_settings.pop("MIDDLEWARE_CLASSES", [])
+        middleware_top = extra_settings.pop("TOP_MIDDLEWARE_CLASSES", [])
         default_settings.update(extra_settings)
         for app in apps_top:
-            default_settings['INSTALLED_APPS'].insert(0, app)
-        default_settings['INSTALLED_APPS'].extend(apps)
-        default_settings['TEMPLATE_CONTEXT_PROCESSORS'].extend(template_processors)
-        default_settings['TEMPLATE_LOADERS'].extend(template_loaders)
-        if 'TEMPLATE_DIRS' not in default_settings:
-            default_settings['TEMPLATE_DIRS'] = []
-        default_settings['TEMPLATE_DIRS'].extend(template_dirs)
-        default_settings['MIDDLEWARE_CLASSES'].extend(middleware)
+            default_settings["INSTALLED_APPS"].insert(0, app)
+        default_settings["INSTALLED_APPS"].extend(apps)
+        default_settings["TEMPLATE_CONTEXT_PROCESSORS"].extend(template_processors)
+        default_settings["TEMPLATE_LOADERS"].extend(template_loaders)
+        if "TEMPLATE_DIRS" not in default_settings:
+            default_settings["TEMPLATE_DIRS"] = []
+        default_settings["TEMPLATE_DIRS"].extend(template_dirs)
+        default_settings["MIDDLEWARE_CLASSES"].extend(middleware)
         for middleware in middleware_top:
-            default_settings['MIDDLEWARE_CLASSES'].insert(0, middleware)
+            default_settings["MIDDLEWARE_CLASSES"].insert(0, middleware)
 
-    if 'cms' in default_settings['INSTALLED_APPS']:
-        if 'treebeard' not in default_settings['INSTALLED_APPS']:
-            default_settings['INSTALLED_APPS'].append('treebeard')
-    if ('filer' in default_settings['INSTALLED_APPS'] and
-            'mptt' not in default_settings['INSTALLED_APPS']):
-        default_settings['INSTALLED_APPS'].append('mptt')
-    if ('filer' in default_settings['INSTALLED_APPS'] and
-            'easy_thumbnails' not in default_settings['INSTALLED_APPS']):
-        default_settings['INSTALLED_APPS'].append('easy_thumbnails')
+    if "cms" in default_settings["INSTALLED_APPS"]:
+        if "treebeard" not in default_settings["INSTALLED_APPS"]:
+            default_settings["INSTALLED_APPS"].append("treebeard")
+    if "filer" in default_settings["INSTALLED_APPS"] and "mptt" not in default_settings["INSTALLED_APPS"]:
+        default_settings["INSTALLED_APPS"].append("mptt")
+    if "filer" in default_settings["INSTALLED_APPS"] and "easy_thumbnails" not in default_settings["INSTALLED_APPS"]:
+        default_settings["INSTALLED_APPS"].append("easy_thumbnails")
 
-    if args['--boilerplate']:
+    if args["--boilerplate"]:
         boilerplate_settings = get_boilerplates_settings()
 
         # Do not override helper settings with defaults.
-        if 'ALDRYN_BOILERPLATE_NAME' in default_settings.keys():
-            del boilerplate_settings['ALDRYN_BOILERPLATE_NAME']
+        if "ALDRYN_BOILERPLATE_NAME" in default_settings.keys():
+            del boilerplate_settings["ALDRYN_BOILERPLATE_NAME"]
 
         default_settings = extend_settings(
-            default_settings, boilerplate_settings, 'STATICFILES_FINDERS',
-            'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+            default_settings,
+            boilerplate_settings,
+            "STATICFILES_FINDERS",
+            "django.contrib.staticfiles.finders.AppDirectoriesFinder",
         )
-        del boilerplate_settings['STATICFILES_FINDERS']
+        del boilerplate_settings["STATICFILES_FINDERS"]
 
         default_settings = extend_settings(
-            default_settings, boilerplate_settings, 'TEMPLATE_LOADERS',
-            'django.template.loaders.app_directories.Loader'
+            default_settings,
+            boilerplate_settings,
+            "TEMPLATE_LOADERS",
+            "django.template.loaders.app_directories.Loader",
         )
-        del boilerplate_settings['TEMPLATE_LOADERS']
+        del boilerplate_settings["TEMPLATE_LOADERS"]
 
-        for setting in ('INSTALLED_APPS', 'TEMPLATE_CONTEXT_PROCESSORS'):
+        for setting in ("INSTALLED_APPS", "TEMPLATE_CONTEXT_PROCESSORS"):
             default_settings[setting].extend(boilerplate_settings[setting])
             del boilerplate_settings[setting]
         default_settings.update(boilerplate_settings)
 
-    default_settings['TEMPLATES'] = [
-        {'NAME': 'django',
-         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-         'OPTIONS': {
-             'context_processors': [
-                 template_processor.replace('django.core', 'django.template')
-                 for template_processor in default_settings.pop('TEMPLATE_CONTEXT_PROCESSORS')
-             ],
-             'loaders': default_settings.pop('TEMPLATE_LOADERS')
-         }}
+    default_settings["TEMPLATES"] = [
+        {
+            "NAME": "django",
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "OPTIONS": {
+                "context_processors": [
+                    template_processor.replace("django.core", "django.template")
+                    for template_processor in default_settings.pop("TEMPLATE_CONTEXT_PROCESSORS")
+                ],
+                "loaders": default_settings.pop("TEMPLATE_LOADERS"),
+            },
+        }
     ]
-    if 'TEMPLATE_DIRS' in default_settings:
-        default_settings['TEMPLATES'][0]['DIRS'] = default_settings.pop('TEMPLATE_DIRS')
+    if "TEMPLATE_DIRS" in default_settings:
+        default_settings["TEMPLATES"][0]["DIRS"] = default_settings.pop("TEMPLATE_DIRS")
 
     # Support for custom user models
-    if 'AUTH_USER_MODEL' in os.environ:
-        custom_user_app = os.environ['AUTH_USER_MODEL'].rpartition('.')[0]
-        custom_user_model = '.'.join(os.environ['AUTH_USER_MODEL'].split('.')[-2:])
-        if 'cms' in default_settings['INSTALLED_APPS']:
-            default_settings['INSTALLED_APPS'].insert(
-                default_settings['INSTALLED_APPS'].index('cms'),
-                custom_user_app
-            )
+    if "AUTH_USER_MODEL" in os.environ:
+        custom_user_app = os.environ["AUTH_USER_MODEL"].rpartition(".")[0]
+        custom_user_model = ".".join(os.environ["AUTH_USER_MODEL"].split(".")[-2:])
+        if "cms" in default_settings["INSTALLED_APPS"]:
+            default_settings["INSTALLED_APPS"].insert(default_settings["INSTALLED_APPS"].index("cms"), custom_user_app)
         else:
-            default_settings['INSTALLED_APPS'].insert(
-                default_settings['INSTALLED_APPS'].index('django.contrib.auth') + 1,
-                custom_user_app
+            default_settings["INSTALLED_APPS"].insert(
+                default_settings["INSTALLED_APPS"].index("django.contrib.auth") + 1, custom_user_app
             )
-        default_settings['AUTH_USER_MODEL'] = custom_user_model
+        default_settings["AUTH_USER_MODEL"] = custom_user_model
 
-    if args['test']:
-        default_settings['SESSION_ENGINE'] = 'django.contrib.sessions.backends.cache'
-    if application not in default_settings['INSTALLED_APPS']:
-        default_settings['INSTALLED_APPS'].append(application)
+    if args["test"]:
+        default_settings["SESSION_ENGINE"] = "django.contrib.sessions.backends.cache"
+    if application not in default_settings["INSTALLED_APPS"]:
+        default_settings["INSTALLED_APPS"].append(application)
 
     if not migrate:
-        default_settings['MIGRATION_MODULES'] = DisableMigrations()
+        default_settings["MIGRATION_MODULES"] = DisableMigrations()
 
-    if 'MIDDLEWARE' not in default_settings:
-        default_settings['MIDDLEWARE'] = default_settings['MIDDLEWARE_CLASSES']
-        del default_settings['MIDDLEWARE_CLASSES']
+    if "MIDDLEWARE" not in default_settings:
+        default_settings["MIDDLEWARE"] = default_settings["MIDDLEWARE_CLASSES"]
+        del default_settings["MIDDLEWARE_CLASSES"]
 
     _reset_django(settings)
     settings.configure(**default_settings)
@@ -330,8 +329,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):
 
 
 def reload_urls(settings, urlconf=None, cms_apps=True):
-    if 'cms.urls' in sys.modules:
-        six.moves.reload_module(sys.modules['cms.urls'])
+    if "cms.urls" in sys.modules:
+        six.moves.reload_module(sys.modules["cms.urls"])
     if urlconf is None:
         urlconf = settings.ROOT_URLCONF
     if urlconf in sys.modules:
@@ -339,33 +338,37 @@ def reload_urls(settings, urlconf=None, cms_apps=True):
     clear_url_caches()
     if cms_apps:
         from cms.appresolver import clear_app_resolvers, get_app_patterns
+
         clear_app_resolvers()
         get_app_patterns()
 
 
 def _create_db(migrate_cmd=False):
-    call_command('migrate')
+    call_command("migrate")
 
 
 def get_user_model():
     from django.contrib.auth import get_user_model
+
     return get_user_model()
 
 
-def create_user(username, email, password, is_staff=False, is_superuser=False,
-                base_cms_permissions=False, permissions=None):
+def create_user(
+    username, email, password, is_staff=False, is_superuser=False, base_cms_permissions=False, permissions=None
+):
     from django.contrib.auth.models import Permission
-    User = get_user_model()
+
+    User = get_user_model()  # NOQA
 
     try:
-        if User.USERNAME_FIELD == 'email':
+        if User.USERNAME_FIELD == "email":
             user = User.objects.get(**{User.USERNAME_FIELD: email})
         else:
             user = User.objects.get(**{User.USERNAME_FIELD: username})
     except User.DoesNotExist:
         user = User()
 
-    if User.USERNAME_FIELD != 'email':
+    if User.USERNAME_FIELD != "email":
         setattr(user, User.USERNAME_FIELD, username)
 
     try:
@@ -380,14 +383,14 @@ def create_user(username, email, password, is_staff=False, is_superuser=False,
     user.is_active = True
     user.save()
     if user.is_staff and not is_superuser and base_cms_permissions:
-        user.user_permissions.add(Permission.objects.get(codename='add_text'))
-        user.user_permissions.add(Permission.objects.get(codename='delete_text'))
-        user.user_permissions.add(Permission.objects.get(codename='change_text'))
-        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
+        user.user_permissions.add(Permission.objects.get(codename="add_text"))
+        user.user_permissions.add(Permission.objects.get(codename="delete_text"))
+        user.user_permissions.add(Permission.objects.get(codename="change_text"))
+        user.user_permissions.add(Permission.objects.get(codename="publish_page"))
 
-        user.user_permissions.add(Permission.objects.get(codename='add_page'))
-        user.user_permissions.add(Permission.objects.get(codename='change_page'))
-        user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+        user.user_permissions.add(Permission.objects.get(codename="add_page"))
+        user.user_permissions.add(Permission.objects.get(codename="change_page"))
+        user.user_permissions.add(Permission.objects.get(codename="delete_page"))
     if is_staff and not is_superuser and permissions:
         for permission in permissions:
             user.user_permissions.add(Permission.objects.get(codename=permission))
@@ -395,10 +398,10 @@ def create_user(username, email, password, is_staff=False, is_superuser=False,
 
 
 def get_user_model_labels():
-    User = get_user_model()
+    User = get_user_model()  # NOQA
 
-    user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
-    user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
+    user_orm_label = "%s.%s" % (User._meta.app_label, User._meta.object_name)
+    user_model_label = "%s.%s" % (User._meta.app_label, User._meta.model_name)
     return user_orm_label, user_model_label
 
 
@@ -411,9 +414,9 @@ class UserLoginContext(object):
         self.password = password
 
     def __enter__(self):
-        loginok = self.testcase.client.login(username=getattr(self.user,
-                                                              get_user_model().USERNAME_FIELD),
-                                             password=self.password)
+        loginok = self.testcase.client.login(
+            username=getattr(self.user, get_user_model().USERNAME_FIELD), password=self.password
+        )
         self.testcase.assertTrue(loginok)
         self.testcase._login_context = self
 
@@ -430,8 +433,7 @@ def ensure_unicoded_and_unique(args_list, application):
     """
     unicoded_args = []
     for argument in args_list:
-        argument = (six.u(argument)
-                    if not isinstance(argument, six.text_type) else argument)
+        argument = six.u(argument) if not isinstance(argument, six.text_type) else argument
         if argument not in unicoded_args or argument == application:
             unicoded_args.append(argument)
     return unicoded_args

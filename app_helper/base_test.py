@@ -27,6 +27,7 @@ class BaseTestCaseMixin(object):
     Utils mixin that provides some helper methods to setup and interact with
     Django testing framework.
     """
+
     request_factory = None
     user = None
     user_staff = None
@@ -34,28 +35,28 @@ class BaseTestCaseMixin(object):
     site_1 = None
     languages = None
     _login_context = None
-    image_name = 'test_image.jpg'
+    image_name = "test_image.jpg"
 
     #: Username for auto-generated superuser
-    _admin_user_username = 'admin'
+    _admin_user_username = "admin"
     #: Password for auto-generated superuser
-    _admin_user_password = 'admin'
+    _admin_user_password = "admin"
     #: Email for auto-generated superuser
-    _admin_user_email = 'admin@admin.com'
+    _admin_user_email = "admin@admin.com"
 
     #: Username for auto-generated staff user
-    _staff_user_username = 'staff'
+    _staff_user_username = "staff"
     #: Password for auto-generated staff user
-    _staff_user_password = 'staff'
+    _staff_user_password = "staff"
     #: Email for auto-generated staff user
-    _staff_user_email = 'staff@admin.com'
+    _staff_user_email = "staff@admin.com"
 
     #: Username for auto-generated non-staff user
-    _user_user_username = 'normal'
+    _user_user_username = "normal"
     #: Password for auto-generated non-staff user
-    _user_user_password = 'normal'
+    _user_user_password = "normal"
     #: Email for auto-generated non-staff user
-    _user_user_email = 'user@admin.com'
+    _user_user_email = "user@admin.com"
 
     _pages_data = ()
     """
@@ -83,23 +84,26 @@ class BaseTestCaseMixin(object):
     @classmethod
     def setUpClass(cls):
         from django.contrib.sites.models import Site
+
         cls.request_factory = RequestFactory()
         cls.user = create_user(
-            cls._admin_user_username, cls._admin_user_email, cls._admin_user_password,
-            is_staff=True, is_superuser=True
+            cls._admin_user_username, cls._admin_user_email, cls._admin_user_password, is_staff=True, is_superuser=True
         )
         cls.user_staff = create_user(
-            cls._staff_user_username, cls._staff_user_email, cls._staff_user_password,
-            is_staff=True, is_superuser=False
+            cls._staff_user_username,
+            cls._staff_user_email,
+            cls._staff_user_password,
+            is_staff=True,
+            is_superuser=False,
         )
         cls.user_normal = create_user(
-            cls._user_user_username, cls._user_user_email, cls._user_user_password,
-            is_staff=False, is_superuser=False
+            cls._user_user_username, cls._user_user_email, cls._user_user_password, is_staff=False, is_superuser=False
         )
         cls.site_1 = Site.objects.all().first()
 
         try:
             from cms.utils import get_language_list
+
             cls.languages = get_language_list()
         except ImportError:
             cls.languages = [x[0] for x in settings.LANGUAGES]
@@ -108,7 +112,7 @@ class BaseTestCaseMixin(object):
     @classmethod
     def tearDownClass(cls):
         super(BaseTestCaseMixin, cls).tearDownClass()
-        User = get_user_model()
+        User = get_user_model()  # NOQA
         User.objects.all().delete()
 
     @contextmanager
@@ -138,8 +142,16 @@ class BaseTestCaseMixin(object):
         """
         return UserLoginContext(self, user, password)
 
-    def create_user(self, username, email, password, is_staff=False, is_superuser=False,
-                    base_cms_permissions=False, permissions=None):
+    def create_user(
+        self,
+        username,
+        email,
+        password,
+        is_staff=False,
+        is_superuser=False,
+        base_cms_permissions=False,
+        permissions=None,
+    ):
         """
         Creates a user with the given properties
 
@@ -152,8 +164,7 @@ class BaseTestCaseMixin(object):
         :param permissions: Other permissions
         :return: User instance
         """
-        return create_user(username, email, password, is_staff, is_superuser, base_cms_permissions,
-                           permissions)
+        return create_user(username, email, password, is_staff, is_superuser, base_cms_permissions, permissions)
 
     def get_pages_data(self):
         """
@@ -180,35 +191,33 @@ class BaseTestCaseMixin(object):
         and returns the list of the draft version of each
         """
         from cms.api import create_page, create_title
+
         pages = OrderedDict()
         has_apphook = False
         home_set = False
         for page_data in source:
             main_data = deepcopy(page_data[languages[0]])
-            if 'publish' in main_data:
-                main_data['published'] = main_data.pop('publish')
-            main_data['language'] = languages[0]
-            if main_data.get('parent', None):
-                main_data['parent'] = pages[main_data['parent']]
+            if "publish" in main_data:
+                main_data["published"] = main_data.pop("publish")
+            main_data["language"] = languages[0]
+            if main_data.get("parent", None):
+                main_data["parent"] = pages[main_data["parent"]]
             page = create_page(**main_data)
-            has_apphook = has_apphook or 'apphook' in main_data
+            has_apphook = has_apphook or "apphook" in main_data
             for lang in languages[1:]:
                 if lang in page_data:
                     publish = False
                     title_data = deepcopy(page_data[lang])
-                    if 'publish' in title_data:
-                        publish = title_data.pop('publish')
-                    if 'published' in title_data:
-                        publish = title_data.pop('published')
-                    title_data['language'] = lang
-                    title_data['page'] = page
+                    if "publish" in title_data:
+                        publish = title_data.pop("publish")
+                    if "published" in title_data:
+                        publish = title_data.pop("published")
+                    title_data["language"] = lang
+                    title_data["page"] = page
                     create_title(**title_data)
                     if publish:
                         page.publish(lang)
-            if (
-                not home_set and hasattr(page, 'set_as_homepage') and
-                main_data.get('published', False)
-            ):
+            if not home_set and hasattr(page, "set_as_homepage") and main_data.get("published", False):
                 page.set_as_homepage()
                 home_set = True
             page = page.get_draft_object()
@@ -225,6 +234,7 @@ class BaseTestCaseMixin(object):
         :return: ContentRenderer instance
         """
         from cms.plugin_rendering import ContentRenderer
+
         return ContentRenderer(request)
 
     def get_plugin_context(self, page, lang, plugin, edit=False):
@@ -241,12 +251,10 @@ class BaseTestCaseMixin(object):
         from sekizai.context_processors import sekizai
 
         request = self.get_page_request(page, self.user, lang=lang, edit=edit)
-        context = {
-            'request': request
-        }
+        context = {"request": request}
         renderer = self.get_content_renderer(request)
         if renderer:
-            context['cms_content_renderer'] = renderer
+            context["cms_content_renderer"] = renderer
         context.update(sekizai(request))
         return PluginContext(context, plugin, plugin.placeholder)
 
@@ -261,16 +269,11 @@ class BaseTestCaseMixin(object):
         :return: Rendered plugin
         """
         context = self.get_plugin_context(page, lang, plugin, edit)
-        content_renderer = context['cms_content_renderer']
-        rendered = content_renderer.render_plugin(
-            instance=plugin,
-            context=context,
-            placeholder=plugin.placeholder,
-        )
+        content_renderer = context["cms_content_renderer"]
+        rendered = content_renderer.render_plugin(instance=plugin, context=context, placeholder=plugin.placeholder,)
         return rendered
 
-    def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False,
-                         secure=False):
+    def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False, secure=False):
         from django.contrib.auth.models import AnonymousUser
         from importlib import import_module
 
@@ -285,24 +288,25 @@ class BaseTestCaseMixin(object):
         if user.is_authenticated:
             session_key = user._meta.pk.value_to_string(user)
         else:
-            session_key = 'session_key'
+            session_key = "session_key"
 
         request.user = user
         request._cached_user = user
         request.session = engine.SessionStore(session_key)
         if secure:
-            request.environ['SERVER_PORT'] = str('443')
-            request.environ['wsgi.url_scheme'] = str('https')
+            request.environ["SERVER_PORT"] = str("443")
+            request.environ["wsgi.url_scheme"] = str("https")
         request.cookies = SimpleCookie()
         request.errors = StringIO()
         request.LANGUAGE_CODE = lang
-        if request.method == 'POST':
+        if request.method == "POST":
             request._dont_enforce_csrf_checks = True
         # Let's use middleware in case requested, otherwise just use CMS toolbar if needed
         if use_middlewares:
             self._apply_middlewares(request)
         elif use_toolbar:
             from cms.middleware.toolbar import ToolbarMiddleware
+
             mid = ToolbarMiddleware()
             mid.process_request(request)
         return request
@@ -310,15 +314,24 @@ class BaseTestCaseMixin(object):
     def _apply_middlewares(self, request):
         handler = BaseHandler()
         from django.utils.module_loading import import_string
+
         for middleware_path in reversed(settings.MIDDLEWARE):
             middleware = import_string(middleware_path)
             mw_instance = middleware(handler)
-            if hasattr(mw_instance, 'process_request'):
+            if hasattr(mw_instance, "process_request"):
                 mw_instance.process_request(request)
 
     def request(
-        self, path, method='get', data=None, page=None, lang='', user=None,
-        use_middlewares=False, secure=False, use_toolbar=False
+        self,
+        path,
+        method="get",
+        data=None,
+        page=None,
+        lang="",
+        user=None,
+        use_middlewares=False,
+        secure=False,
+        use_toolbar=False,
     ):
         """
         Create a request for the given parameters.
@@ -356,10 +369,7 @@ class BaseTestCaseMixin(object):
             request, page, user, lang, use_middlewares, secure=secure, use_toolbar=use_toolbar
         )
 
-    def get_request(
-        self, page, lang, user=None, path=None, use_middlewares=False, secure=False,
-        use_toolbar=False
-    ):
+    def get_request(self, page, lang, user=None, path=None, use_middlewares=False, secure=False, use_toolbar=False):
         """
         Create a GET request for the given page and language
 
@@ -374,12 +384,20 @@ class BaseTestCaseMixin(object):
         """
         path = path or page and page.get_absolute_url(lang)
         return self.request(
-            path, method='get', data={}, page=page, lang=lang, user=user,
-            use_middlewares=use_middlewares, secure=secure, use_toolbar=use_toolbar
+            path,
+            method="get",
+            data={},
+            page=page,
+            lang=lang,
+            user=user,
+            use_middlewares=use_middlewares,
+            secure=secure,
+            use_toolbar=use_toolbar,
         )
 
-    def post_request(self, page, lang, data, user=None, path=None, use_middlewares=False,
-                     secure=False, use_toolbar=False):
+    def post_request(
+        self, page, lang, data, user=None, path=None, use_middlewares=False, secure=False, use_toolbar=False
+    ):
         """
         Create a POST request for the given page and language with CSRF disabled
 
@@ -395,12 +413,18 @@ class BaseTestCaseMixin(object):
         """
         path = path or page and page.get_absolute_url(lang)
         return self.request(
-            path, method='post', data=data, page=page, lang=lang, user=user,
-            use_middlewares=use_middlewares, secure=secure, use_toolbar=use_toolbar
+            path,
+            method="post",
+            data=data,
+            page=page,
+            lang=lang,
+            user=user,
+            use_middlewares=use_middlewares,
+            secure=secure,
+            use_toolbar=use_toolbar,
         )
 
-    def get_page_request(self, page, user, path=None, edit=False, lang='en',
-                         use_middlewares=False, secure=False):
+    def get_page_request(self, page, user, path=None, edit=False, lang="en", use_middlewares=False, secure=False):
         """
         Create a GET request for the given page suitable for use the
         django CMS toolbar
@@ -418,16 +442,16 @@ class BaseTestCaseMixin(object):
         :return: request
         """
         from cms.utils.conf import get_cms_setting
-        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+
+        edit_on = get_cms_setting("CMS_TOOLBAR_URL__EDIT_ON")
         path = path or page and page.get_absolute_url(lang)
         if edit:
-            path = '{0}?{1}'.format(path, edit_on)
+            path = "{0}?{1}".format(path, edit_on)
         request = self.request_factory.get(path, secure=secure)
-        return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True,
-                                     secure=secure)
+        return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True, secure=secure)
 
     @staticmethod
-    def create_image(mode='RGB', size=(800, 600)):
+    def create_image(mode="RGB", size=(800, 600)):
         """
         Create a random image suitable for saving as DjangoFile
         :param mode: color mode
@@ -442,8 +466,8 @@ class BaseTestCaseMixin(object):
         image = PilImage.new(mode, size)
         draw = ImageDraw.Draw(image)
         x_bit, y_bit = size[0] // 10, size[1] // 10
-        draw.rectangle((x_bit, y_bit * 2, x_bit * 7, y_bit * 3), 'red')
-        draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), 'red')
+        draw.rectangle((x_bit, y_bit * 2, x_bit * 7, y_bit * 3), "red")
+        draw.rectangle((x_bit * 2, y_bit, x_bit * 3, y_bit * 8), "red")
         return image
 
     def create_django_image_obj(self):  # pragma: no cover
@@ -482,14 +506,14 @@ class BaseTestCaseMixin(object):
         from django.core.files import File as DjangoFile
 
         img = BaseTestCase.create_image()
-        image_name = 'test_file.jpg'
+        image_name = "test_file.jpg"
         if settings.FILE_UPLOAD_TEMP_DIR:
             tmp_dir = settings.FILE_UPLOAD_TEMP_DIR
         else:
             tmp_dir = mkdtemp()
         filename = os.path.join(tmp_dir, image_name)
-        img.save(filename, 'JPEG')
-        return DjangoFile(open(filename, 'rb'), name=image_name), filename
+        img.save(filename, "JPEG")
+        return DjangoFile(open(filename, "rb"), name=image_name), filename
 
     def create_filer_image_object(self):
         """
@@ -528,9 +552,7 @@ class BaseTestCaseMixin(object):
         from filer.models import Image
 
         file_obj, filename = BaseTestCase.create_django_image()
-        filer_image = Image.objects.create(
-            owner=user, file=file_obj, original_filename=image_name
-        )
+        filer_image = Image.objects.create(owner=user, file=file_obj, original_filename=image_name)
         return filer_image
 
     @contextmanager
@@ -541,8 +563,8 @@ class BaseTestCaseMixin(object):
 
         :return: stdout, stderr wrappers
         """
-        with patch('sys.stdout', new_callable=StringIO) as out:
-            with patch('sys.stderr', new_callable=StringIO) as err:
+        with patch("sys.stdout", new_callable=StringIO) as out:
+            with patch("sys.stderr", new_callable=StringIO) as err:
                 yield out, err
 
 

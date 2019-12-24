@@ -10,26 +10,19 @@ except ImportError:
 
 
 class CapturedOutputRunner(DiscoverRunner):
-
     def run_suite(self, suite, **kwargs):
-        return unittest.TextTestRunner(
-            verbosity=self.verbosity,
-            failfast=self.failfast,
-            stream=sys.stderr
-        ).run(suite)
+        return unittest.TextTestRunner(verbosity=self.verbosity, failfast=self.failfast, stream=sys.stderr).run(suite)
 
 
 try:
     from django.test.simple import DjangoTestSuiteRunner
 
     class CapturedOutputSimpleRunner(DjangoTestSuiteRunner):
-
         def run_suite(self, suite, **kwargs):
-            return unittest.TextTestRunner(
-                verbosity=self.verbosity,
-                failfast=self.failfast,
-                stream=sys.stderr
-            ).run(suite)
+            return unittest.TextTestRunner(verbosity=self.verbosity, failfast=self.failfast, stream=sys.stderr).run(
+                suite
+            )
+
 
 except ImportError:
     CapturedOutputSimpleRunner = CapturedOutputRunner

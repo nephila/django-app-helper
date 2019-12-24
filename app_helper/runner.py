@@ -17,9 +17,9 @@ def run(app, argv=sys.argv, extra_args=None):
     if app not in argv[:2]:
         # app is automatically added if not present
         argv.insert(1, app)
-    if len(argv) < 3 and 'test' not in argv[:2]:
+    if len(argv) < 3 and "test" not in argv[:2]:
         # test argument is given if not argument is passed
-        argv.insert(2, 'test')
+        argv.insert(2, "test")
     if extra_args:
         argv.extend(extra_args)
     return runner(argv)
@@ -36,17 +36,17 @@ def cms(app, argv=sys.argv, extra_args=None):
     try:
         import cms  # NOQA  # nopyflakes
     except ImportError:
-        print('runner.cms is available only if django CMS is installed')
+        print("runner.cms is available only if django CMS is installed")
         raise
     if app not in argv[:2]:
         # app is automatically added if not present
         argv.insert(1, app)
-    if len(argv) < 3 and 'test' not in argv[:2]:
+    if len(argv) < 3 and "test" not in argv[:2]:
         # test argument is given if not argument is passed
-        argv.insert(2, 'test')
-    if '--cms' not in argv:
+        argv.insert(2, "test")
+    if "--cms" not in argv:
         # this is the cms runner, just add the cms argument
-        argv.append('--cms')
+        argv.append("--cms")
     if extra_args:
         argv.extend(extra_args)
     return runner(argv)
@@ -63,9 +63,9 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     :return: Django settings module
     """
     helper = helper_module.__file__
-    argv = [os.path.basename(helper), app, 'setup', '--extra-settings={0}'.format(helper)]
+    argv = [os.path.basename(helper), app, "setup", "--extra-settings={0}".format(helper)]
     if use_cms:
-        argv.append('--cms')
+        argv.append("--cms")
     if extra_args:
         argv.extend(extra_args)
     return runner(argv)
@@ -80,7 +80,7 @@ def runner(argv):
     helper = os.path.abspath(inspect.getframeinfo(inspect.stack()[2][0]).filename)
     # check if extra settings has been passed
     # if not, user the helper file
-    extra_settings = any(map(lambda x: x.startswith('--extra-settings='), argv))
+    extra_settings = any(map(lambda x: x.startswith("--extra-settings="), argv))
     if os.path.basename(helper) not in (HELPER_FILE,) and not extra_settings:
-        argv.append('--extra-settings=%s' % helper)
+        argv.append("--extra-settings=%s" % helper)
     return main(argv)
