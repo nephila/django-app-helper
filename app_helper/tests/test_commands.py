@@ -835,6 +835,43 @@ class CommandTests(unittest.TestCase):
                 core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
 
+    def test_testrun_pytest(self):
+        try:
+            import cms
+        except ImportError:
+            raise unittest.SkipTest("django CMS not available, skipping test")
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                try:
+                    from django.test.utils import _TestState
+
+                    del _TestState.saved_data
+                except (ImportError, AttributeError):
+                    pass
+                args = copy(DEFAULT_ARGS)
+                args["<command>"] = "test"
+                args["--cms"] = False
+                args["--runner"] = "app_helper.pytest_runner.PytestTestRunner"
+                args["--extra-settings"] = "helper_no_cms.py"
+                core(args, self.application)
+        self.assertTrue("collected 15 items" in out.getvalue())
+        self.assertTrue("10 passed, 5 skipped, 3 warnings" in out.getvalue())
+
+    def test_runner_pytest(self):
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit:
+                    args = list()
+                    args.append("helper_no_cms")
+                    args.append("example1")
+                    args.append("test")
+                    args.append("--extra-settings=helper_no_cms.py")
+                    args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
+                    runner.run("example1", args)
+        self.assertTrue("collected 15 items" in out.getvalue())
+        self.assertTrue("10 passed, 5 skipped, 3 warnings" in out.getvalue())
+        self.assertEqual(exit.exception.code, 0)
+
     def test_authors(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
