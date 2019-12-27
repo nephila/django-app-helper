@@ -26,17 +26,15 @@ Standards & policies
 ********************
 
 Django App Helper is a django CMS application, and shares much of django CMS's standards and
-policies.
+policies (when relevant).
 
 These include:
 
 * `guidelines and policies
-  <http://docs.django-cms.org/en/support-3.0.x/contributing/contributing.html>`_ for contributing
-  to the project, including standards for code and documentation
-* standards for `managing the project's development
-  <http://docs.django-cms.org/en/support-3.0.x/contributing/management.html>`_
+  <http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_ for contributing
+  to the project
 * a `code of conduct
-  <http://docs.django-cms.org/en/support-3.0.x/contributing/code_of_conduct.html>`_ for community
+  <http://docs.django-cms.org/en/latest/contributing/code_of_conduct.html>`_ for community
   activity
 
 Please familiarise yourself with this documentation if you'd like to contribute to
