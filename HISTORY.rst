@@ -7,7 +7,8 @@ History
 2.1.0 (unreleased)
 ==================
 
-* Reformat code with black and improved flake8 configuration
+* Reformatted code with black and improved flake8 configuration
+* Added pytest-compatible runner
 
 2.0.1 (2019-12-22)
 ==================
