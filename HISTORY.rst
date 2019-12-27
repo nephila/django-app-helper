@@ -4,7 +4,7 @@
 History
 *******
 
-2.1.0 (unreleased)
+2.1.0 (2019-12-27)
 ==================
 
 * Reformatted code with black and improved flake8 configuration
