@@ -1,8 +1,10 @@
 -r requirements.txt
-coverage
+coverage<5.0
 coveralls
 wheel
 tox>=1.8
 aldryn-boilerplates
 https://github.com/divio/django-filer/archive/develop.zip
 pyflakes<2.1
+pytest
+pytest-django

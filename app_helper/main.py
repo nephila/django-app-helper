@@ -93,7 +93,7 @@ def test(test_labels, application, failfast=False, test_runner=None, runner_opti
     :param test_labels: space separated list of test labels
     :param failfast: option to stop the testsuite on the first error
     """
-    if not test_labels:
+    if not test_labels and "PytestTestRunner" not in test_runner:
         if os.path.exists("tests"):  # pragma: no cover
             test_labels = ["tests"]
         elif os.path.exists(os.path.join(application, "tests")):
@@ -359,7 +359,7 @@ def core(args, application):
                     if args["--runner"]:
                         runner = args["--runner"]
                     else:
-                        runner = "django.test.runner.DiscoverRunner"
+                        runner = settings.TEST_RUNNER
 
                     # make "Address already in use" errors less likely, see Django
                     # docs for more details on this env variable.

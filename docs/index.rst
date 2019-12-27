@@ -9,6 +9,7 @@
    runner
    migrating
    basetest
+   pytest
    development
    contributing
    history
