@@ -1,4 +1,8 @@
+[build-system]
+requires = ["setuptools>=40.6.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [tool.black]
 line-length = 119
-target-version = ['py27']
-include = '/(app_helper,djangocms_helper)/.*\.pyi?$'
+target-version = ["py27"]
+include = "/(app_helper,djangocms_helper)/.*\\.pyi?$"
