@@ -6,3 +6,8 @@ build-backend = "setuptools.build_meta"
 line-length = 119
 target-version = ["py27"]
 include = "/(app_helper,djangocms_helper)/.*\\.pyi?$"
+
+[tool.towncrier]
+directory = "changes"
+filename = "HISTORY.rst"
+title_format = "{version} ({project_date})"
