@@ -1,4 +1,4 @@
-.PHONY: clean-pyc clean-build docs bump-dev release upload
+.PHONY: clean-pyc clean-build docs bump-dev
 
 help:
 	@echo "clean - Cleanup all artifacts"
@@ -8,8 +8,6 @@ help:
 	@echo "test - Run tests in current environment"
 	@echo "test-all - Run tests on every environment version with tox"
 	@echo "coverage - Check code coverage in current environment"
-	@echo "upload - Upload package to PyPi"
-	@echo "release - Build package"
 	@echo "tag-dev - Create dev release"
 
 clean: clean-build clean-pyc
@@ -18,7 +16,7 @@ clean-build:
 	python setup.py clean --all
 	rm -fr build/
 	rm -fr dist/
-	rm -fr *.egg-info
+	rm -fr *.egg*
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -39,11 +37,5 @@ coverage:
 	coverage run setup.py test
 	coverage report -m
 
-upload: release
-	twine upload dist/*
-
 tag-dev:
 	bumpversion --list patch --message="Bump develop version [ci skip]" --no-tag
-
-release: clean
-	python -m pep517.build .
