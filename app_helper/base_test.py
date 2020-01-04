@@ -87,7 +87,11 @@ class BaseTestCaseMixin(object):
 
         cls.request_factory = RequestFactory()
         cls.user = create_user(
-            cls._admin_user_username, cls._admin_user_email, cls._admin_user_password, is_staff=True, is_superuser=True
+            cls._admin_user_username,
+            cls._admin_user_email,
+            cls._admin_user_password,
+            is_staff=True,
+            is_superuser=True,
         )
         cls.user_staff = create_user(
             cls._staff_user_username,
@@ -97,7 +101,7 @@ class BaseTestCaseMixin(object):
             is_superuser=False,
         )
         cls.user_normal = create_user(
-            cls._user_user_username, cls._user_user_email, cls._user_user_password, is_staff=False, is_superuser=False
+            cls._user_user_username, cls._user_user_email, cls._user_user_password, is_staff=False, is_superuser=False,
         )
         cls.site_1 = Site.objects.all().first()
 
@@ -270,7 +274,7 @@ class BaseTestCaseMixin(object):
         """
         context = self.get_plugin_context(page, lang, plugin, edit)
         content_renderer = context["cms_content_renderer"]
-        rendered = content_renderer.render_plugin(instance=plugin, context=context, placeholder=plugin.placeholder,)
+        rendered = content_renderer.render_plugin(instance=plugin, context=context, placeholder=plugin.placeholder)
         return rendered
 
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False, secure=False):
@@ -366,7 +370,7 @@ class BaseTestCaseMixin(object):
         """
         request = getattr(RequestFactory(), method)(path, data=data, secure=secure)
         return self._prepare_request(
-            request, page, user, lang, use_middlewares, secure=secure, use_toolbar=use_toolbar
+            request, page, user, lang, use_middlewares, secure=secure, use_toolbar=use_toolbar,
         )
 
     def get_request(self, page, lang, user=None, path=None, use_middlewares=False, secure=False, use_toolbar=False):
@@ -396,7 +400,7 @@ class BaseTestCaseMixin(object):
         )
 
     def post_request(
-        self, page, lang, data, user=None, path=None, use_middlewares=False, secure=False, use_toolbar=False
+        self, page, lang, data, user=None, path=None, use_middlewares=False, secure=False, use_toolbar=False,
     ):
         """
         Create a POST request for the given page and language with CSRF disabled

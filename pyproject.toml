@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.black]
 line-length = 119
 target-version = ["py27"]
-include = "/(app_helper,djangocms_helper)/.*\\.pyi?$"
+include = 'app_helper/*py'
 
 [tool.towncrier]
 directory = "changes"
