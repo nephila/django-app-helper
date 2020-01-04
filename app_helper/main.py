@@ -67,7 +67,7 @@ Options:
 
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
     warnings.filterwarnings(
-        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields"
+        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields",
     )
     from django.conf import settings
     from django.test.utils import get_runner
@@ -277,7 +277,7 @@ def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma
                 "use_threading": True,
                 "verbosity": verbose,
                 "use_reloader": True,
-            }
+            },
         )
 
 
@@ -318,7 +318,7 @@ def core(args, application):
 
     # configure django
     warnings.filterwarnings(
-        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields"
+        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields",
     )
     if args["--persistent"]:
         create_dir = persistent_dir

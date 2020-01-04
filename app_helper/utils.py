@@ -219,7 +219,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
         URLCONF = "app_helper.urls"  # NOQA
 
     default_settings = get_default_settings(
-        CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application
+        CMS_APPS, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application,
     )
     migrate = args.get("--migrate") or not args.get("--no-migrate")
     default_settings.update(configs)
@@ -292,7 +292,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
                 ],
                 "loaders": default_settings.pop("TEMPLATE_LOADERS"),
             },
-        }
+        },
     ]
     if "TEMPLATE_DIRS" in default_settings:
         default_settings["TEMPLATES"][0]["DIRS"] = default_settings.pop("TEMPLATE_DIRS")
@@ -305,7 +305,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
             default_settings["INSTALLED_APPS"].insert(default_settings["INSTALLED_APPS"].index("cms"), custom_user_app)
         else:
             default_settings["INSTALLED_APPS"].insert(
-                default_settings["INSTALLED_APPS"].index("django.contrib.auth") + 1, custom_user_app
+                default_settings["INSTALLED_APPS"].index("django.contrib.auth") + 1, custom_user_app,
             )
         default_settings["AUTH_USER_MODEL"] = custom_user_model
 
@@ -354,7 +354,7 @@ def get_user_model():
 
 
 def create_user(
-    username, email, password, is_staff=False, is_superuser=False, base_cms_permissions=False, permissions=None
+    username, email, password, is_staff=False, is_superuser=False, base_cms_permissions=False, permissions=None,
 ):
     from django.contrib.auth.models import Permission
 
@@ -415,7 +415,7 @@ class UserLoginContext(object):
 
     def __enter__(self):
         loginok = self.testcase.client.login(
-            username=getattr(self.user, get_user_model().USERNAME_FIELD), password=self.password
+            username=getattr(self.user, get_user_model().USERNAME_FIELD), password=self.password,
         )
         self.testcase.assertTrue(loginok)
         self.testcase._login_context = self
