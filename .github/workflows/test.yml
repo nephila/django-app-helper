@@ -1,13 +1,49 @@
-name: tox tests
+name: Linting - Tests
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+        toxenv: [pep8, isort, black, pypi-description, docs]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-lint-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-lint-
+          ${{ runner.os }}-
+    - name: Cache tox
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-tox-lint-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-tox-lint-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools tox>=1.8 coveralls codecov
+    - name: Test with tox
+      run: |
+        tox -e${{ matrix.toxenv }}
+
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        python-version: [3.8, 3.7, 3.6, 3.5, 2.7]
         django: [30, 22, 111]
         cms: [no, 37, 36, 35, 34]
         exclude:
@@ -69,4 +105,4 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: unittests
         file: ./coverage.xml
-        fail_ci_if_error: true
+        fail_ci_if_error: false

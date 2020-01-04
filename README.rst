@@ -2,7 +2,7 @@
 Django App helper
 =================
 
-|Gitter| |PyPiVersion| |PyVersion| |Status| |TestCoverage| |CodeClimate| |License|
+|Gitter| |PyPiVersion| |PyVersion| |GAStatus| |TestCoverage| |CodeClimate| |License|
 
 .. warning::  This project used to be called djangocms-helper. It's been renamed
               in version 2.0 to clarify that it's not limited to django CMS apps.
@@ -136,9 +136,9 @@ deserve a huge thanks for their work.
     :target: https://pypi.python.org/pypi/django-app-helper
     :alt: Python versions
 
-.. |Status| image:: https://img.shields.io/travis/nephila/django-app-helper.svg?style=flat-square
-    :target: https://travis-ci.org/nephila/django-app-helper
-    :alt: Latest Travis CI build status
+.. |GAStatus| image:: https://github.com/nephila/django-app-helper/workflows/Linting%20-%20Tests/badge.svg
+    :target: https://github.com/nephila/django-app-helper
+    :alt: Latest CI build status
 
 .. |TestCoverage| image:: https://img.shields.io/coveralls/nephila/django-app-helper/master.svg?style=flat-square
     :target: https://coveralls.io/r/nephila/django-app-helper?branch=master
