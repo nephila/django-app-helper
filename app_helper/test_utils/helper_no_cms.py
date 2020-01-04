@@ -14,7 +14,7 @@ HELPER_SETTINGS = {
     },
     "FILE_UPLOAD_TEMP_DIR": mkdtemp(),
     "TEST_RUNNER": "app_helper.pytest_runner.PytestTestRunner",
-    "ALLOWED_HOSTS": ["testserver"]
+    "ALLOWED_HOSTS": ["testserver"],
 }
 
 
