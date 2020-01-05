@@ -5,6 +5,7 @@ from invoke import task
 
 DOCS_PORT = os.environ.get("DOCS_PORT", 8000)
 
+
 @task
 def clean(c):
     """ Remove artifacts and binary files. """
@@ -24,7 +25,7 @@ def lint(c):
 
 
 @task
-def format(c):
+def codeformat(c):
     """ Run code formatting tasks. """
     c.run("tox -eblacken,isort_format")
 
@@ -64,7 +65,7 @@ def docbuild(c):
 
 @task(docbuild)
 def docserve(c):
-    """Serve docs at http://localhost:$DOCS_PORT/ (default port is 8000)"""
+    """ Serve docs at http://localhost:$DOCS_PORT/ (default port is 8000). """
     from livereload import Server
 
     server = Server()
