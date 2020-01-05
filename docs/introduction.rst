@@ -9,6 +9,7 @@ Once you have django CMS installed, it'll be available using ``django-app-helper
 ``cd`` into the root directory of your application (that is, the outer directory containing its
 ``setup.py``). You need to be here to run the ``django-app-helper`` command.
 
+
 *********************************
 Running Django App Helper command
 *********************************
