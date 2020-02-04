@@ -38,6 +38,6 @@ The runner support translates the following Django test runner options to pytest
 
 All the other pytest and pytest plugins are supported via ``PYTEST_ARGS`` enviroment variable::
 
-    PYTEST_ARGS='-s -k my_test' python app_helper.py
+    PYTEST_ARGS='-s -k my_test' python helper.py
 
 .. _pytest-django: https://pytest-django.readthedocs.io/en/latest/faq.html#how-can-i-use-manage-py-test-with-pytest-django
