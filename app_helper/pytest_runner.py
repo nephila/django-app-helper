@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+import os
+
 
 class PytestTestRunner(object):
     """Runs pytest to discover and run tests."""
@@ -17,7 +19,7 @@ class PytestTestRunner(object):
         """
         import pytest
 
-        argv = []
+        argv = os.environ.get("PYTEST_ARGS", "").split(" ")
         if self.verbosity == 0:
             argv.append("--quiet")
         if self.verbosity == 2:
@@ -28,7 +30,6 @@ class PytestTestRunner(object):
             argv.append("--exitfirst")
         if self.keepdb:
             argv.append("--reuse-db")
-        argv.append("-vv")
 
         argv.extend(test_labels)
         return pytest.main(argv)
