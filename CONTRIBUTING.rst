@@ -67,7 +67,7 @@ Ready to contribute? Here's how to set up ``django-app-helper`` for local develo
 
     $ mkvirtualenv django-app-helper
     $ cd django-app-helper/
-    $ python setup.py develop
+    $ pip install -r requirements-test.txt
 
 4. Create a branch for local development::
 
@@ -78,11 +78,9 @@ Now you can make your changes locally.
 5. When you're done making changes, check that your changes pass flake8 and the
 tests, including testing other Python versions with tox::
 
-    $ make lint
-    $ python setup.py test
     $ tox
 
-To get tox, just pip install them into your virtualenv.
+To get tox, pip install them into your virtualenv.
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -98,9 +96,26 @@ Pull Request Guidelines
 Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated. Put
-   your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for all python versions declared in tox.ini.
-   Check https://travis-ci.org/nephila/django-app-helper/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+2. If the pull request adds functionality, the docs should be updated.
+   Documentation must be added in ``docs`` directory, and must include usage
+   information for the end user.
+   In case of public API method, add extended docstrings with full parameters
+   description and usage example.
+3. Add a changes file in ``changes`` directory describing the contribution in
+   one line. It will be added automatically to the history file upon release.
+   File must be named as ``<issue-number>.<type>`` with type being:
+
+    * ``.feature``: For new features.
+    * ``.bugfix``: For bug fixes.
+    * ``.doc``: For documentation improvement.
+    * ``.removal``: For deprecation or removal of public API.
+    * ``.misc``: For general issues.
+
+   Check `towncrier`_ documentation for more details.
+
+4. The pull request should work for all python / django / django CMS versions
+   declared in tox.ini.
+   Check the CI and make sure that the tests pass for all supported versions.
+
+
+.. _towncrier: https://pypi.org/project/towncrier/#news-fragments
