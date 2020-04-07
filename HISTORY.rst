@@ -4,10 +4,10 @@
 History
 *******
 
-Unreleased
+2.1.1 (2020-02-04)
 ==================
 
-* Nothing yet
+* Improved pytest compatibility
 
 .. towncrier release notes start
 
