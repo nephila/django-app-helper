@@ -1,14 +1,14 @@
-.PHONY: clean-pyc clean-build docs
+.PHONY: clean-pyc clean-build docs bump-dev
 
 help:
-	@echo "clean-build - remove build artifacts"
-	@echo "clean-pyc - remove Python file artifacts"
-	@echo "lint - check style with flake8"
-	@echo "test - run tests quickly with the default Python"
-	@echo "test-all - run tests on every Python version with tox"
-	@echo "coverage - check code coverage quickly with the default Python"
-	@echo "release - package and upload a release"
-	@echo "sdist - package"
+	@echo "clean - Cleanup all artifacts"
+	@echo "clean-build - Remove build artifacts"
+	@echo "clean-pyc - Remove Python file artifacts"
+	@echo "lint - Check code style"
+	@echo "test - Run tests in current environment"
+	@echo "test-all - Run tests on every environment version with tox"
+	@echo "coverage - Check code coverage in current environment"
+	@echo "tag-dev - Create dev release"
 
 clean: clean-build clean-pyc
 
@@ -16,7 +16,7 @@ clean-build:
 	python setup.py clean --all
 	rm -fr build/
 	rm -fr dist/
-	rm -fr *.egg-info
+	rm -fr *.egg*
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -37,10 +37,5 @@ coverage:
 	coverage run setup.py test
 	coverage report -m
 
-release: clean
-	python setup.py clean --all sdist bdist_wheel
-	twine upload dist/*
-
-sdist: clean
-	python setup.py sdist
-	ls -l dist
+tag-dev:
+	bumpversion --list patch --message="Bump develop version [ci skip]" --no-tag

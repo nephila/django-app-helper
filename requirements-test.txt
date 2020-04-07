@@ -2,9 +2,12 @@
 coverage<5.0
 coveralls
 wheel
+pep517
 tox>=1.8
 aldryn-boilerplates
 https://github.com/divio/django-filer/archive/develop.zip
 pyflakes<2.1
 pytest
 pytest-django
+bump2version
+https://github.com/hawkowl/towncrier/archive/master.zip

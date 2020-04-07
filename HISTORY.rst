@@ -9,110 +9,112 @@ History
 
 * Improved pytest compatibility
 
+.. towncrier release notes start
+
 2.1.0 (2019-12-27)
 ==================
 
-* Reformatted code with black and improved flake8 configuration
-* Added pytest-compatible runner
+* Reformat code with black and improve flake8 configuration
+* Add pytest-compatible runner
 
 2.0.1 (2019-12-22)
 ==================
 
-* Added Django 3.0 preliminary support
+* Add Django 3.0 preliminary support
 
 2.0.0 (2019-10-13)
 ==================
 
-* Renamed application to django-app-helper
+* Rename application to django-app-helper
 
 1.2.5 (2019-08-16)
 ==================
 
-* Added django CMS 3.7
-* Added Django 2.2
+* Add django CMS 3.7
+* Add Django 2.2
 
 1.2.4 (2019-08-08)
 ==================
 
-* Fixed regression introduced by #116
+* Fix regression introduced by #116
 
 1.2.3 (2019-08-05)
 ==================
 
-* Moved pyflakes to extras_require
-* Fixed error in get_request / post_request not preserving current_page
+* Move pyflakes to extras_require
+* Fix error in get_request / post_request not preserving current_page
 
 1.2.2 (2019-07-05)
 ==================
 
-* Improved request generation by adding a more generic request method
+* Improve request generation by adding a more generic request method
 
 1.2.1 (2019-07-04)
 ==================
 
-* Fixed error when creating users with non-writable email attribute
+* Fix error when creating users with non-writable email attribute
 
 1.2.0 (2019-03-22)
 ==================
 
-* Dropped compatiblity with Django <1.11, Python 3.4
-* Added django CMS 3.6
-* Added django 2.0, 2.1
+* Drop compatiblity with Django <1.11, Python 3.4
+* Add django CMS 3.6
+* Add django 2.0, 2.1
 
 1.1.1 (2019-07-03)
 ==================
 
-* Fixed error when creating users with non-writable email attribute
+* Fix error when creating users with non-writable email attribute
 
 1.1.0 (2018-02-20)
 ==================
 
-* Removed Django <1.8, Python 2.6, 3.3 from setup.py
-* Added Django 1.11, Python 3.6
-* Switched to new-style middlewares for Django 1.10+
-* Created static methods to generate images
-* Fixed persistent option behavior with arbitrary commands
-* Added minimal changes to allow third party application to run test on django 2.0
-* Fixed options for channels runserver
-* Removed support for django-nose test runner
+* Remove Django <1.8, Python 2.6, 3.3 from setup.py
+* Add Django 1.11, Python 3.6
+* Switch to new-style middlewares for Django 1.10+
+* Create static methods to generate images
+* Fix persistent option behavior with arbitrary commands
+* Add minimal changes to allow third party application to run test on django 2.0
+* Fix options for channels runserver
+* Remove support for django-nose test runner
 
 1.0.0 (2017-07-25)
 ==================
 
-* Added ApphookReloadMiddleware in server mode
-* Added a default for FILE_UPLOAD_TEMP_DIR
-* Added fix for django CMS 3.4.4 render_plugin
+* Add ApphookReloadMiddleware in server mode
+* Add a default for FILE_UPLOAD_TEMP_DIR
+* Add fix for django CMS 3.4.4 render_plugin
 
 0.9.8 (2017-03-04)
 ==================
 
-* Fixed compatibility with newer channels releases
+* Fix compatibility with newer channels releases
 
 0.9.7 (2016-12-03)
 ==================
 
-* Added support for django-sekizai 0.10
-* Fixed mock dependency in setup.py
-* Fixed issue with server command in Django 1.10
-* Fixed issue with urls.py in Django 1.10
-* Fixed issue in tests with django CMS 3.4
+* Add support for django-sekizai 0.10
+* Fix mock dependency in setup.py
+* Fix issue with server command in Django 1.10
+* Fix issue with urls.py in Django 1.10
+* Fix issue in tests with django CMS 3.4
 
 0.9.6 (2016-08-25)
 ==================
 
-* Added support for channels runserver.
-* Added verbosity level to server command.
-* Added support for Django 1.10.
-* Added support for django CMS 3.4.
+* Add support for channels runserver.
+* Add verbosity level to server command.
+* Add support for Django 1.10.
+* Add support for django CMS 3.4.
 
 0.9.5 (2016-06-06)
 ==================
 
-* Fixed issue with mocked session storage
-* Added verbosity level to tests
-* Fixed user creation
-* Added option to allow parametrizing auto-created user
-* Fixed extra_applications
+* Fix issue with mocked session storage
+* Add verbosity level to tests
+* Fix user creation
+* Add option to allow parametrizing auto-created user
+* Fix extra_applications
 
 0.9.4 (2016-01-20)
 ==================
