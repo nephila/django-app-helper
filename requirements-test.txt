@@ -6,7 +6,7 @@ pep517
 tox>=1.8
 aldryn-boilerplates
 https://github.com/divio/django-filer/archive/develop.zip
-pyflakes<2.1
+pyflakes<2.3
 pytest
 pytest-django
 bump2version
