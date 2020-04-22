@@ -48,8 +48,6 @@ jobs:
         cms: [no, 37, 36, 35, 34]
         exclude:
           - django: 30
-            cms: 37
-          - django: 30
             cms: 36
           - django: 30
             cms: 35
