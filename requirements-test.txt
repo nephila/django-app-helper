@@ -3,6 +3,7 @@ coverage<5.0
 coveralls
 wheel
 pep517
+invoke
 tox>=1.8
 aldryn-boilerplates
 https://github.com/divio/django-filer/archive/develop.zip
