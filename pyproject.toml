@@ -8,6 +8,7 @@ target-version = ["py27"]
 include = 'app_helper/*py'
 
 [tool.towncrier]
+package = "app_helper"
 directory = "changes"
 filename = "HISTORY.rst"
 title_format = "{version} ({project_date})"

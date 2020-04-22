@@ -30,7 +30,7 @@ Supported versions
 
 Python: 2.7, 3.5, 3.6, 3.7
 
-Django: 1.11 - 2.2 (3.0 when not using django CMS integration)
+Django: 1.11 - 3.0
 
 django CMS: 3.4 - 3.7
 
