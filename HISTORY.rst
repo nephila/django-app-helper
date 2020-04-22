@@ -4,12 +4,12 @@
 History
 *******
 
+.. towncrier release notes start
+
 2.1.1 (2020-02-04)
 ==================
 
 * Improved pytest compatibility
-
-.. towncrier release notes start
 
 2.1.0 (2019-12-27)
 ==================
