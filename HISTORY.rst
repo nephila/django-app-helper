@@ -6,6 +6,16 @@ History
 
 .. towncrier release notes start
 
+2.2.0 (2020-04-23)
+==================
+
+Features
+--------
+
+- Add Django 3.0 / django CMS 3.7.2 support (#142)
+- Replace makefile with invoke (#143)
+
+
 2.1.1 (2020-02-04)
 ==================
 
