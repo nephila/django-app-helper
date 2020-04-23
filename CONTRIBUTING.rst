@@ -117,5 +117,19 @@ Before you submit a pull request, check that it meets these guidelines:
    declared in tox.ini.
    Check the CI and make sure that the tests pass for all supported versions.
 
+Release a version
+-----------------
+
+#. Merge ``develop`` on ``master`` branch
+#. Bump release via task: ``inv tag-release (major|minor|patch)``
+#. Update changelog via towncrier: ``towncrier --yes``
+#. Commit changelog with ``git commit --amend`` to merge with bumpversion commit
+#. Create tag ``git tag <version>``
+#. Push tag to github
+#. Publish the release from the tags page
+#. If pipeline succeeds, push ``master``
+#. Merge ``master`` back on ``develop``
+#. Bump developement version via task: ``inv tag-dev -l (major|minor|patch)``
+#. Push ``develop``
 
 .. _towncrier: https://pypi.org/project/towncrier/#news-fragments
