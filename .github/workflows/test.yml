@@ -3,9 +3,9 @@ name: Linting - Tests
 on: [push]
 
 jobs:
-
   lint:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     strategy:
       matrix:
         python-version: [3.8]
@@ -40,6 +40,7 @@ jobs:
         tox -e${{ matrix.toxenv }}
 
   test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     strategy:
       matrix:
