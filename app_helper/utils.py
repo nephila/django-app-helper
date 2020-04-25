@@ -4,6 +4,7 @@ import shutil
 import sys
 from distutils.version import LooseVersion
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 import django
 import six
@@ -12,12 +13,6 @@ from django.urls import clear_url_caches
 from django.utils.functional import empty
 
 from . import HELPER_FILE
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
 
 try:
     import cms  # NOQA

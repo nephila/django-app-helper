@@ -3,6 +3,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from copy import deepcopy
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
@@ -12,11 +13,6 @@ from django.utils.functional import SimpleLazyObject
 from six import StringIO
 
 from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
 
 class BaseTestCaseMixin:
