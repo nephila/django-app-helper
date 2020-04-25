@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-🐛<!--
+<!--
 Please fill in each section to help maintainers to be helpful and quick to respond.
 -->
 
