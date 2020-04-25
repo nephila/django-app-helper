@@ -1,30 +1,19 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import os
 import os.path
 import shutil
 import sys
+import unittest
 from copy import copy
 from distutils.version import LooseVersion
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 import django
 
 from app_helper import runner
 from app_helper.default_settings import get_boilerplates_settings
-from app_helper.main import _make_settings, _map_argv, core
+from app_helper.main import _make_settings, core
 from app_helper.utils import DJANGO_1_9, captured_output, temp_dir, work_in
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 
 DEFAULT_ARGS = {
     "shell": False,
@@ -89,7 +78,7 @@ class CommandTests(unittest.TestCase):
                     os.path.join(cls.application_2, "migrations", "0001_initial.py")
                 )
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             DEFAULT_ARGS["--cms"] = False
 
@@ -114,11 +103,11 @@ class CommandTests(unittest.TestCase):
             pass
         try:
             del sys.modules["example1.migrations"]
-        except KeyError as e:
+        except KeyError:
             pass
         try:
             del sys.modules["example2.migrations"]
-        except KeyError as e:
+        except KeyError:
             pass
 
     def tearDown(self):
@@ -452,7 +441,7 @@ class CommandTests(unittest.TestCase):
 
     def test_cms_check(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -470,7 +459,7 @@ class CommandTests(unittest.TestCase):
     @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion("1.9"), reason="Test for Django up until 1.8")
     def test_cms_check_nocms(self):
         try:
-            import cms
+            import cms  # noqa
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
@@ -488,7 +477,7 @@ class CommandTests(unittest.TestCase):
     @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion("1.9"), reason="Test for Django 1.9+")
     def test_cms_check_nocms_19(self):
         try:
-            import cms
+            import cms  # noqa
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
@@ -536,11 +525,10 @@ class CommandTests(unittest.TestCase):
             self.assertTrue("Create model ExampleModel2" in out.getvalue())
             self.assertTrue(os.path.exists(self.migration_file_2))
 
-    @unittest.skipIf(sys.version_info[:2] in ((3, 8),),
-                     reason='This test fails on Python 3.8+')
+    @unittest.skipIf(sys.version_info[:2] in ((3, 8),), reason="This test fails on Python 3.8+")
     def test_pyflakes(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -553,7 +541,7 @@ class CommandTests(unittest.TestCase):
 
     def test_pyflakes_nocms(self):
         try:
-            import cms
+            import cms  # noqa
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
@@ -571,13 +559,13 @@ class CommandTests(unittest.TestCase):
 
     def test_testrun(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         path = os.path.join(self.basedir, "data")
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit:
+                with self.assertRaises(SystemExit) as exit_state:
                     try:
                         from django.test.utils import _TestState
 
@@ -590,7 +578,7 @@ class CommandTests(unittest.TestCase):
                     args["--runner"] = "runners.CapturedOutputRunner"
                     core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
         self.assertTrue(args["STATIC_ROOT"].startswith(path))
         self.assertTrue(args["MEDIA_ROOT"].startswith(path))
         self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
@@ -598,13 +586,13 @@ class CommandTests(unittest.TestCase):
 
     def test_testrun_persistent_path(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         path = mkdtemp()
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit:
+                with self.assertRaises(SystemExit) as exit_state:
                     try:
                         from django.test.utils import _TestState
 
@@ -618,7 +606,7 @@ class CommandTests(unittest.TestCase):
                     args["--runner"] = "runners.CapturedOutputRunner"
                     core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
         self.assertTrue(args["STATIC_ROOT"].startswith(path))
         self.assertTrue(args["MEDIA_ROOT"].startswith(path))
         self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
@@ -626,7 +614,7 @@ class CommandTests(unittest.TestCase):
 
     def test_runner_wrong(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -635,8 +623,8 @@ class CommandTests(unittest.TestCase):
             else:
                 exception = SystemExit
             with captured_output() as (out, err):
-                with self.assertRaises(exception) as exit:
-                    args = list()
+                with self.assertRaises(exception) as exit_state:
+                    args = []
                     args.append("helper")
                     args.append("test")
                     args.append("example1")
@@ -644,11 +632,11 @@ class CommandTests(unittest.TestCase):
                     args.append("whatever")
                     runner.cms("example1", args)
         if sys.version_info >= (3, 5):
-            self.assertEqual(exit.exception.code, 1)
+            self.assertEqual(exit_state.exception.code, 1)
 
     def test_runner(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         from app_helper.test_utils.runners import CapturedOutputRunner
@@ -656,8 +644,8 @@ class CommandTests(unittest.TestCase):
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
-                    with self.assertRaises(SystemExit) as exit:
-                        args = list()
+                    with self.assertRaises(SystemExit) as exit_state:
+                        args = []
                         args.append("helper")
                         args.append("test")
                         args.append("--extra-settings=helper.py")
@@ -667,11 +655,11 @@ class CommandTests(unittest.TestCase):
         self.assertFalse("hidden string" in out.getvalue())
         self.assertFalse("hidden string" in err.getvalue())
         self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
 
     def test_runner_compat(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         from app_helper.test_utils.runners import CapturedOutputRunner
@@ -679,8 +667,8 @@ class CommandTests(unittest.TestCase):
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
-                    with self.assertRaises(SystemExit) as exit:
-                        args = list()
+                    with self.assertRaises(SystemExit) as exit_state:
+                        args = []
                         args.append("cms_helper")
                         args.append("test")
                         args.append("example1")
@@ -689,11 +677,11 @@ class CommandTests(unittest.TestCase):
         self.assertFalse("hidden string" in out.getvalue())
         self.assertFalse("hidden string" in err.getvalue())
         self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
 
     def test_runner_cms_exception(self):
         try:
-            import cms
+            import cms  # noqa
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
@@ -702,15 +690,15 @@ class CommandTests(unittest.TestCase):
 
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    with self.assertRaises(ImportError) as exit:
-                        args = list()
+                with captured_output() as (__a, __b):
+                    with self.assertRaises(ImportError):
+                        args = []
                         args.append("helper")
                         runner.cms("example1", args)
 
     def test_runner_cms_argv(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
 
@@ -722,7 +710,7 @@ class CommandTests(unittest.TestCase):
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
-                    args = list()
+                    args = []
                     args.append("helper")
                     with patch("app_helper.runner.runner", fake_runner):
                         data = runner.cms("example1", args)
@@ -737,7 +725,7 @@ class CommandTests(unittest.TestCase):
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
                 with captured_output() as (out, err):
-                    args = list()
+                    args = []
                     args.append("helper")
                     with patch("app_helper.runner.runner", fake_runner):
                         data = runner.run("example1", args)
@@ -745,7 +733,7 @@ class CommandTests(unittest.TestCase):
 
     def test_setup_cms(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -760,7 +748,7 @@ class CommandTests(unittest.TestCase):
     def test_setup_custom_user(self):
         os.environ["AUTH_USER_MODEL"] = "custom_user.CustomUser"
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -787,7 +775,7 @@ class CommandTests(unittest.TestCase):
     def test_testrun_nocms(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit:
+                with self.assertRaises(SystemExit) as exit_state:
                     try:
                         from django.test.utils import _TestState
 
@@ -800,13 +788,13 @@ class CommandTests(unittest.TestCase):
                     args["--runner"] = "runners.CapturedOutputRunner"
                     core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
 
     def test_runner_nocms(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit:
-                    args = list()
+                with self.assertRaises(SystemExit) as exit_state:
+                    args = []
                     args.append("helper")
                     args.append("example1")
                     args.append("test")
@@ -814,11 +802,11 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner=runners.CapturedOutputRunner")
                     runner.run("example1", args)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
 
     def test_testrun_native(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -839,7 +827,7 @@ class CommandTests(unittest.TestCase):
 
     def test_testrun_pytest(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -863,8 +851,8 @@ class CommandTests(unittest.TestCase):
     def test_runner_pytest(self):
         with work_in(self.basedir):
             with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit:
-                    args = list()
+                with self.assertRaises(SystemExit) as exit_state:
+                    args = []
                     args.append("helper_no_cms")
                     args.append("example1")
                     args.append("test")
@@ -874,7 +862,7 @@ class CommandTests(unittest.TestCase):
         self.assertTrue("collected 15 items" in out.getvalue())
         # warnings will depend on django version and adds too much noise
         self.assertTrue("10 passed, 5 skipped" in out.getvalue())
-        self.assertEqual(exit.exception.code, 0)
+        self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):
         with work_in(self.basedir):
@@ -888,7 +876,7 @@ class CommandTests(unittest.TestCase):
 
     def test_urls(self):
         try:
-            import cms
+            import cms  # noqa
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         try:

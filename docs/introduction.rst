@@ -119,4 +119,3 @@ Using the :ref:`naked_runner` it's easy to let helper setup an environment for y
     sys.path.insert(0, os.path.abspath('..'))
     import app_helper
     app_helper.setup()
-

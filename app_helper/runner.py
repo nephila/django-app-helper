@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import inspect
 import os.path
 import sys
@@ -63,7 +60,7 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     :return: Django settings module
     """
     helper = helper_module.__file__
-    argv = [os.path.basename(helper), app, "setup", "--extra-settings={0}".format(helper)]
+    argv = [os.path.basename(helper), app, "setup", "--extra-settings={}".format(helper)]
     if use_cms:
         argv.append("--cms")
     if extra_args:

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import contextlib
 import os
 import shutil
@@ -49,16 +46,6 @@ except ImportError:  # pragma: no cover
     CMS_31 = False
     CMS_30 = False
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion("1.5")
-DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion("1.6")
-DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion("1.7")
-DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion("1.8")
-DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion("1.9")
-DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion("1.10")
-DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion("1.11")
-DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion("2.0")
-DJANGO_2_0 = LooseVersion(django.get_version()) < LooseVersion("2.1")
-DJANGO_2_1 = LooseVersion(django.get_version()) < LooseVersion("2.2")
 DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion("3.0")
 DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion("3.1")
 DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion("3.2")
@@ -75,7 +62,7 @@ def load_from_file(module_path):
 
     imported = None
     if module_path:
-        with open(module_path, "r") as openfile:
+        with open(module_path) as openfile:
             imported = load_module("mod", openfile, module_path, ("imported", "r", PY_SOURCE))
     return imported
 
@@ -128,7 +115,7 @@ def persistent_dir(suffix, container="data"):
     yield name
 
 
-class DisableMigrations(object):
+class DisableMigrations:
     def __contains__(self, item):
         return True
 
@@ -176,9 +163,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
             extra_settings_file = HELPER_FILE
         if extra_settings_file[-3:] != ".py":
             filename, __ = os.path.splitext(extra_settings_file)
-            extra_settings_file = "{0}.py".format(filename)
+            extra_settings_file = "{}.py".format(filename)
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
-    except (IOError, AttributeError):
+    except (OSError, AttributeError):
         extra_settings = None
     default_name = ":memory:" if args["test"] else "local.sqlite"
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
@@ -400,12 +387,12 @@ def create_user(
 def get_user_model_labels():
     User = get_user_model()  # NOQA
 
-    user_orm_label = "%s.%s" % (User._meta.app_label, User._meta.object_name)
-    user_model_label = "%s.%s" % (User._meta.app_label, User._meta.model_name)
+    user_orm_label = "{}.{}".format(User._meta.app_label, User._meta.object_name)
+    user_model_label = "{}.{}".format(User._meta.app_label, User._meta.model_name)
     return user_orm_label, user_model_label
 
 
-class UserLoginContext(object):
+class UserLoginContext:
     def __init__(self, testcase, user, password=None):
         self.testcase = testcase
         self.user = user
@@ -433,7 +420,7 @@ def ensure_unicoded_and_unique(args_list, application):
     """
     unicoded_args = []
     for argument in args_list:
-        argument = six.u(argument) if not isinstance(argument, six.text_type) else argument
+        argument = argument if not isinstance(argument, str) else argument
         if argument not in unicoded_args or argument == application:
             unicoded_args.append(argument)
     return unicoded_args

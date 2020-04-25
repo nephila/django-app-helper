@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 
 try:
@@ -38,7 +37,7 @@ try:
             from django.conf import settings
 
             data = self.get_pages_data()
-            self.assertEqual(set(data[0].keys()), set(("en", "fr", "it")))
+            self.assertEqual(set(data[0].keys()), {"en", "fr", "it"})
 
             if "cms" in settings.INSTALLED_APPS:
                 pages = self.get_pages()

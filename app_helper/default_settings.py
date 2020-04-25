@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-
 def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application):  # NOQA
     return dict(  # NOQA
         INSTALLED_APPS=[
