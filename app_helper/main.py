@@ -12,7 +12,6 @@ from docopt import DocoptExit, docopt
 
 from . import __version__
 from .utils import (
-    DJANGO_1_11,
     _create_db,
     _make_settings,
     create_user,
@@ -109,10 +108,7 @@ def compilemessages(application):
     from django.core.management import call_command
 
     with work_in(application):
-        if DJANGO_1_11:
-            call_command("compilemessages", all=True)
-        else:
-            call_command("compilemessages")
+        call_command("compilemessages")
 
 
 def makemessages(application, locale):

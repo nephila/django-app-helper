@@ -13,7 +13,7 @@ import django
 from app_helper import runner
 from app_helper.default_settings import get_boilerplates_settings
 from app_helper.main import _make_settings, core
-from app_helper.utils import DJANGO_1_9, captured_output, temp_dir, work_in
+from app_helper.utils import captured_output, temp_dir, work_in
 
 DEFAULT_ARGS = {
     "shell": False,
@@ -313,19 +313,11 @@ class CommandTests(unittest.TestCase):
                     self.assertEqual("djangocms_admin_style", local_settings.INSTALLED_APPS[0])
                     self.assertTrue("some_app" in local_settings.INSTALLED_APPS)
 
-                    # Ditto for middlewares
-                    if DJANGO_1_9:
-                        self.assertEqual("top_middleware", local_settings.MIDDLEWARE_CLASSES[0])
-                        self.assertTrue("some_middleware" in local_settings.MIDDLEWARE_CLASSES)
-                        self.assertTrue(
-                            "django.contrib.sessions.middleware.SessionMiddleware" in local_settings.MIDDLEWARE_CLASSES
-                        )
-                    else:
-                        self.assertTrue(
-                            "django.contrib.sessions.middleware.SessionMiddleware" in local_settings.MIDDLEWARE
-                        )
-                        self.assertEqual("top_middleware", local_settings.MIDDLEWARE[0])
-                        self.assertTrue("some_middleware" in local_settings.MIDDLEWARE)
+                    self.assertTrue(
+                        "django.contrib.sessions.middleware.SessionMiddleware" in local_settings.MIDDLEWARE
+                    )
+                    self.assertEqual("top_middleware", local_settings.MIDDLEWARE[0])
+                    self.assertTrue("some_middleware" in local_settings.MIDDLEWARE)
 
                     boilerplate_settings = get_boilerplates_settings()
 
