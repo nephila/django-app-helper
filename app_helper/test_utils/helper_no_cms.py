@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from tempfile import mkdtemp
 
 HELPER_SETTINGS = {

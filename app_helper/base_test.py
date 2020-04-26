@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import os.path
 from collections import OrderedDict
 from contextlib import contextmanager
 from copy import deepcopy
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
@@ -16,13 +14,8 @@ from six import StringIO
 
 from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
-
-class BaseTestCaseMixin(object):
+class BaseTestCaseMixin:
     """
     Utils mixin that provides some helper methods to setup and interact with
     Django testing framework.
@@ -111,11 +104,11 @@ class BaseTestCaseMixin(object):
             cls.languages = get_language_list()
         except ImportError:
             cls.languages = [x[0] for x in settings.LANGUAGES]
-        super(BaseTestCaseMixin, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(BaseTestCaseMixin, cls).tearDownClass()
+        super().tearDownClass()
         User = get_user_model()  # NOQA
         User.objects.all().delete()
 
@@ -298,8 +291,8 @@ class BaseTestCaseMixin(object):
         request._cached_user = user
         request.session = engine.SessionStore(session_key)
         if secure:
-            request.environ["SERVER_PORT"] = str("443")
-            request.environ["wsgi.url_scheme"] = str("https")
+            request.environ["SERVER_PORT"] = "443"
+            request.environ["wsgi.url_scheme"] = "https"
         request.cookies = SimpleCookie()
         request.errors = StringIO()
         request.LANGUAGE_CODE = lang
@@ -450,7 +443,7 @@ class BaseTestCaseMixin(object):
         edit_on = get_cms_setting("CMS_TOOLBAR_URL__EDIT_ON")
         path = path or page and page.get_absolute_url(lang)
         if edit:
-            path = "{0}?{1}".format(path, edit_on)
+            path = "{}?{}".format(path, edit_on)
         request = self.request_factory.get(path, secure=secure)
         return self._prepare_request(request, page, user, lang, use_middlewares, use_toolbar=True, secure=secure)
 

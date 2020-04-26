@@ -4,10 +4,7 @@ Django App helper
 
 |Gitter| |PyPiVersion| |PyVersion| |GAStatus| |TestCoverage| |CodeClimate| |License|
 
-.. warning::  This project used to be called djangocms-helper. It's been renamed
-              in version 2.0 to clarify that it's not limited to django CMS apps.
-
-              See `Migrating from djangocms-helper to django-app-helper`_ for further information.
+.. warning:: Starting 3.0 django-app-helper only supports Django 2.2+ and django CMS 3.7+. If you need support for older (unsupported) versions, use django-app-helper 2.
 
 ******************************************
 Helper for django applications development
@@ -28,11 +25,11 @@ It supports both tests writted using Django ``TestCase`` and pytest ones
 Supported versions
 ==================
 
-Python: 2.7, 3.5, 3.6, 3.7
+Python: 3.5, 3.6, 3.7
 
-Django: 1.11 - 3.0
+Django: 2.2 - 3.0
 
-django CMS: 3.4 - 3.7
+django CMS: 3.7
 
 Newer versions might work but are not tested yet.
 

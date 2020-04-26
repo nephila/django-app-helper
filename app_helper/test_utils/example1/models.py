@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, with_statement
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 

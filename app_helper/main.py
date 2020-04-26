@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, print_function, unicode_literals
 
 import contextlib
 import os
@@ -10,11 +9,9 @@ import warnings
 from django.utils import autoreload
 from django.utils.encoding import force_text
 from docopt import DocoptExit, docopt
-from six import text_type
 
 from . import __version__
 from .utils import (
-    DJANGO_1_11,
     _create_db,
     _make_settings,
     create_user,
@@ -98,7 +95,7 @@ def test(test_labels, application, failfast=False, test_runner=None, runner_opti
             test_labels = ["tests"]
         elif os.path.exists(os.path.join(application, "tests")):
             test_labels = ["%s.tests" % application]
-    elif type(test_labels) is text_type:
+    elif type(test_labels) is str:  # pragma: no cover
         test_labels = [test_labels]
     runner_options = runner_options or []
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
@@ -111,10 +108,7 @@ def compilemessages(application):
     from django.core.management import call_command
 
     with work_in(application):
-        if DJANGO_1_11:
-            call_command("compilemessages", all=True)
-        else:
-            call_command("compilemessages")
+        call_command("compilemessages")
 
 
 def makemessages(application, locale):
@@ -152,7 +146,7 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
 
     apps = [application]
     if extra_applications:
-        if isinstance(extra_applications, text_type):
+        if isinstance(extra_applications, str):  # pragma: no cover
             apps += [extra_applications]
         elif isinstance(extra_applications, list):
             apps += extra_applications
@@ -175,7 +169,7 @@ def generate_authors():
     for authfile in ("AUTHORS", "AUTHORS.rst"):
         if os.path.exists(authfile):
             break
-    with open(authfile, "r") as f:
+    with open(authfile) as f:
         for line in f.readlines():
             if line.startswith("*"):
                 author = force_text(line).strip("* \n")
@@ -192,7 +186,7 @@ def generate_authors():
     authors = sorted(authors, key=lambda x: x.lower())
 
     # Write our authors to the AUTHORS file
-    print("Authors (%s):\n\n\n* %s" % (len(authors), "\n* ".join(authors)))
+    print("Authors ({}):\n\n\n* {}".format(len(authors), "\n* ".join(authors)))
 
 
 def static_analisys(application):
@@ -259,7 +253,7 @@ def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma
         autoreload.run_with_reloader(
             rs.inner_run,
             **{
-                "addrport": "%s:%s" % (bind, port),
+                "addrport": "{}:{}".format(bind, port),
                 "insecure_serving": True,
                 "use_static_handler": True,
                 "use_threading": True,
@@ -271,13 +265,13 @@ def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma
         autoreload.main(
             rs.inner_run,
             kwargs={
-                "addrport": "%s:%s" % (bind, port),
+                "addrport": "{}:{}".format(bind, port),
                 "insecure_serving": True,
                 "use_static_handler": True,
                 "use_threading": True,
                 "verbosity": verbose,
                 "use_reloader": True,
-            }
+            },
         )
 
 
@@ -350,6 +344,7 @@ def core(args, application):
                     )
                 ]
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
+                print("OPTIONS", options)
                 execute_from_command_line(options)
 
             else:
