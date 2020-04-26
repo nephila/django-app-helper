@@ -17,15 +17,15 @@ class PytestTestRunner:
         import pytest
 
         argv = os.environ.get("PYTEST_ARGS", "").split(" ")
-        if self.verbosity == 0:
+        if self.verbosity == 0:  # pragma: no cover
             argv.append("--quiet")
-        if self.verbosity == 2:
+        if self.verbosity == 2:  # pragma: no cover
             argv.append("--verbose")
-        if self.verbosity == 3:
+        if self.verbosity == 3:  # pragma: no cover
             argv.append("-vv")
-        if self.failfast:
+        if self.failfast:  # pragma: no cover
             argv.append("--exitfirst")
-        if self.keepdb:
+        if self.keepdb:  # pragma: no cover
             argv.append("--reuse-db")
 
         argv.extend(test_labels)

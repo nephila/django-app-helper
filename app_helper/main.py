@@ -344,6 +344,7 @@ def core(args, application):
                     )
                 ]
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
+                print("OPTIONS", options)
                 execute_from_command_line(options)
 
             else:

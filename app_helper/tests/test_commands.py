@@ -835,6 +835,7 @@ class CommandTests(unittest.TestCase):
                 args["--cms"] = False
                 args["--runner"] = "app_helper.pytest_runner.PytestTestRunner"
                 args["--extra-settings"] = "helper_no_cms.py"
+                args["options"] = ["helper", "test", "--failfast", "--verbosity=2"]
                 core(args, self.application)
         self.assertTrue("collected 15 items" in out.getvalue())
         # warnings will depend on django version and adds too much noise
