@@ -461,7 +461,7 @@ class CommandTests(unittest.TestCase):
                 shutil.copy(self.poexample, self.pofile)
                 args = copy(DEFAULT_ARGS)
                 args["cms_check"] = True
-                args["--extra-settings"] = "helper.py"
+                args["--extra-settings"] = "helper"
                 args["--migrate"] = False
                 core(args, self.application)
             self.assertTrue("cms_check available only if django CMS is installed" in out.getvalue())

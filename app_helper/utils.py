@@ -111,10 +111,10 @@ def persistent_dir(suffix, container="data"):
 
 
 class DisableMigrations:
-    def __contains__(self, item):
+    def __contains__(self, item):  # pragma: no cover
         return True
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # pragma: no cover
         return None
 
 
@@ -156,7 +156,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
         extra_settings_file = args.get("--extra-settings")
         if not extra_settings_file:
             extra_settings_file = HELPER_FILE
-        if extra_settings_file[-3:] != ".py":
+        if extra_settings_file[-3:] != ".py":  # pragma: no cover
             filename, __ = os.path.splitext(extra_settings_file)
             extra_settings_file = "{}.py".format(filename)
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS

@@ -21,7 +21,7 @@ i18n_urls = [
 try:
     load_from_file("%s.urls" % settings.BASE_APPLICATION)
     i18n_urls.append(url(r"^%s/" % settings.BASE_APPLICATION, include("%s.urls" % settings.BASE_APPLICATION)))  # NOQA
-except OSError:
+except OSError:  # pragma: no cover
     pass
 
 if settings.USE_CMS:

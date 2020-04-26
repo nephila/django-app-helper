@@ -1,6 +1,6 @@
 -r requirements.txt
-coverage<5.0
-coveralls
+coverage
+coveralls>=2.0
 wheel
 pep517
 invoke

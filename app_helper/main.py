@@ -95,7 +95,7 @@ def test(test_labels, application, failfast=False, test_runner=None, runner_opti
             test_labels = ["tests"]
         elif os.path.exists(os.path.join(application, "tests")):
             test_labels = ["%s.tests" % application]
-    elif type(test_labels) is str:
+    elif type(test_labels) is str:  # pragma: no cover
         test_labels = [test_labels]
     runner_options = runner_options or []
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
@@ -146,7 +146,7 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
 
     apps = [application]
     if extra_applications:
-        if isinstance(extra_applications, str):
+        if isinstance(extra_applications, str):  # pragma: no cover
             apps += [extra_applications]
         elif isinstance(extra_applications, list):
             apps += extra_applications

@@ -66,7 +66,8 @@ def tag_dev(c, level="patch"):
 def docbuild(c):
     """ Build documentation. """
     os.chdir("docs")
-    c.run("python -msphinx -W -b html -d _build/doctrees . _build/html")
+    build_dir = os.environ.get("BUILD_DIR", "_build/html")
+    c.run("python -msphinx -W -b html -d _build/doctrees . %s" % build_dir)
 
 
 @task(docbuild)
