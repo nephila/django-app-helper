@@ -7,6 +7,8 @@ from glob import glob
 from invoke import task
 
 DOCS_PORT = os.environ.get("DOCS_PORT", 8000)
+#: branch prefixes for which some checks are skipped
+SPECIAL_BRANCHES = ("master", "develop", "release")
 
 
 @task
@@ -42,6 +44,8 @@ def towncrier_check(c):  # NOQA
     towncrier_file = None
     branch = branches[0]
     for branch in branches:
+        if any(branch.startswith(prefix) for prefix in SPECIAL_BRANCHES):
+            sys.exit(0)
         try:
             parts = re.search(r"(?P<type>\w+)/\D*(?P<number>\d+)\D*", branch).groups()
             towncrier_file = os.path.join("changes", "{1}.{0}".format(*parts))
