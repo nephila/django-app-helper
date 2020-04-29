@@ -95,13 +95,19 @@ Pull Request Guidelines
 
 Before you submit a pull request, check that it meets these guidelines:
 
-1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated.
+#. Pull request must be named with the following naming scheme:
+
+    ``<type>/(<optional-task-type>-)<number>-description``
+
+   See below for available types.
+
+#. The pull request should include tests.
+#. If the pull request adds functionality, the docs should be updated.
    Documentation must be added in ``docs`` directory, and must include usage
    information for the end user.
    In case of public API method, add extended docstrings with full parameters
    description and usage example.
-3. Add a changes file in ``changes`` directory describing the contribution in
+#. Add a changes file in ``changes`` directory describing the contribution in
    one line. It will be added automatically to the history file upon release.
    File must be named as ``<issue-number>.<type>`` with type being:
 
@@ -113,7 +119,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
    Check `towncrier`_ documentation for more details.
 
-4. The pull request should work for all python / django / django CMS versions
+#. The pull request should work for all python / django / django CMS versions
    declared in tox.ini.
    Check the CI and make sure that the tests pass for all supported versions.
 
