@@ -1,4 +1,7 @@
+import io
 import os
+import re
+import sys
 from glob import glob
 
 from invoke import task
@@ -28,6 +31,41 @@ def lint(c):
 def format(c):  # NOQA
     """ Run code formatting tasks. """
     c.run("tox -eblacken,isort_format")
+
+
+@task
+def towncrier_check(c):  # NOQA
+    """ Check towncrier files. """
+    output = io.StringIO()
+    c.run("git branch -a --contains HEAD", out_stream=output)
+    branches = [branch.replace("remotes/origin/", "") for branch in output.getvalue().strip("*").split()]
+    towncrier_file = None
+    branch = branches[0]
+    for branch in branches:
+        try:
+            parts = re.search(r"(?P<type>\w+)/\D*(?P<number>\d+)\D*", branch).groups()
+            towncrier_file = os.path.join("changes", "{1}.{0}".format(*parts))
+            if not os.path.exists(towncrier_file) or os.path.getsize(towncrier_file) == 0:
+                print(
+                    "=========================\n"
+                    "Current tree does not contain the towncrier file {} or file is empty\n"
+                    "please check CONTRIBUTING documentation.\n"
+                    "========================="
+                    "".format(towncrier_file)
+                )
+                sys.exit(2)
+            else:
+                break
+        except AttributeError:
+            pass
+    if not towncrier_file:
+        print(
+            "=========================\n"
+            "Branch {} does not respect the '<type>/(<optional-task-type>-)<number>-description' format\n"
+            "=========================\n"
+            "".format(branch)
+        )
+        sys.exit(1)
 
 
 @task
@@ -72,7 +110,7 @@ def docbuild(c):
 
 @task(docbuild)
 def docserve(c):
-    """Serve docs at http://localhost:$DOCS_PORT/ (default port is 8000)"""
+    """ Serve docs at http://localhost:$DOCS_PORT/ (default port is 8000). """
     from livereload import Server
 
     server = Server()

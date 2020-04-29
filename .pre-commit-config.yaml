@@ -34,3 +34,11 @@ repos:
       - id: pyupgrade
         args:
           - --py3-plus
+  - repo: local
+    hooks:
+      - id: towncrier
+        name: towncrier
+        entry: inv towncrier-check
+        language: system
+        pass_filenames: false
+        always_run: true
