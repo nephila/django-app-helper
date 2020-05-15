@@ -1,4 +1,5 @@
 import os
+import shlex
 
 
 class PytestTestRunner:
@@ -16,7 +17,7 @@ class PytestTestRunner:
         """
         import pytest
 
-        argv = os.environ.get("PYTEST_ARGS", "").split(" ")
+        argv = shlex.split(os.environ.get("PYTEST_ARGS", ""))
         if self.verbosity == 0:  # pragma: no cover
             argv.append("--quiet")
         if self.verbosity == 2:  # pragma: no cover

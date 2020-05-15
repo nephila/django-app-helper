@@ -212,10 +212,9 @@ def static_analisys(application):
 
 def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
     try:
-        from channels.log import setup_logger
         from channels.management.commands import runserver
 
-        logger = setup_logger("django.channels", 1)
+        logger = None
         use_channels = True
     except ImportError:
         from django.contrib.staticfiles.management.commands import runserver
