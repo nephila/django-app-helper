@@ -68,16 +68,16 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install gettext
-        python -m pip install --upgrade pip setuptools tox>=1.8 coveralls>=2 codecov coverage>=5
+        python -m pip install --upgrade pip tox>=3.5
     - name: Test with tox
       env:
-        TOX_ENV: ${{ format('{{py{0}-django{1}-cms{2}}}', matrix.python-version, matrix.django, matrix.cms) }}
+        TOX_ENV: ${{ format('py{0}-django{1}-cms{2}', matrix.python-version, matrix.django, matrix.cms) }}
         COMMAND: coverage run
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
         tox -e$TOX_ENV
-        python -mcoverage xml
-        coveralls
+        .tox/$TOX_ENV/bin/coverage xml
+        .tox/$TOX_ENV/bin/coveralls
     - uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
