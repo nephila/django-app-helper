@@ -77,9 +77,13 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=No
     settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)  # NOQA
 
+    kwargs = {"verbosity": verbose, "interactive": False, "failfast": failfast}
     if runner_options:
-        sys.argv.extend(runner_options.split(","))
-    test_runner = TestRunner(verbosity=verbose, interactive=False, failfast=failfast)
+        if "PytestTestRunner" in test_runner:
+            kwargs["pytest_args"] = runner_options
+        else:
+            sys.argv.extend(runner_options.split(","))
+    test_runner = TestRunner(**kwargs)
     failures = test_runner.run_tests(test_labels)
     return failures
 
@@ -343,7 +347,6 @@ def core(args, application):
                     )
                 ]
                 _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT)
-                print("OPTIONS", options)
                 execute_from_command_line(options)
 
             else:

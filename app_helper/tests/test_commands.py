@@ -778,6 +778,7 @@ class CommandTests(unittest.TestCase):
                     args["test"] = True
                     args["--cms"] = False
                     args["--runner"] = "runners.CapturedOutputRunner"
+                    args["--runner-options"] = "--capture"
                     core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
         self.assertEqual(exit_state.exception.code, 0)
@@ -810,11 +811,15 @@ class CommandTests(unittest.TestCase):
                 except (ImportError, AttributeError):
                     pass
                 args = copy(DEFAULT_ARGS)
-                args["<command>"] = "test"
+                args["<command>"] = None
+                args["test"] = True
                 args["--cms"] = False
                 args["--native"] = True
                 args["--extra-settings"] = "cms_helper_extra_runner.py"
-                core(args, self.application)
+                try:
+                    core(args, self.application)
+                except SystemExit:
+                    pass
         self.assertTrue("Ran 14 tests in" in err.getvalue())
 
     def test_testrun_pytest(self):
@@ -831,15 +836,20 @@ class CommandTests(unittest.TestCase):
                 except (ImportError, AttributeError):
                     pass
                 args = copy(DEFAULT_ARGS)
-                args["<command>"] = "test"
+                args["<command>"] = None
+                args["test"] = True
                 args["--cms"] = False
                 args["--runner"] = "app_helper.pytest_runner.PytestTestRunner"
                 args["--extra-settings"] = "helper_no_cms.py"
+                args["--runner-options"] = "'-k test_create_django_image_object'"
                 args["options"] = ["helper", "test", "--failfast", "--verbosity=2"]
-                core(args, self.application)
-        self.assertTrue("collected 15 items" in out.getvalue())
+                try:
+                    core(args, self.application)
+                except SystemExit:
+                    pass
+        self.assertTrue("collected 15 items / 14 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("10 passed, 5 skipped" in out.getvalue())
+        self.assertTrue("1 passed, 14 deselected" in out.getvalue())
 
     def test_runner_pytest(self):
         with work_in(self.basedir):
@@ -850,11 +860,12 @@ class CommandTests(unittest.TestCase):
                     args.append("example1")
                     args.append("test")
                     args.append("--extra-settings=helper_no_cms.py")
+                    args.append("--runner-options='-k test_create_django_image_object'")
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
-        self.assertTrue("collected 15 items" in out.getvalue())
+        self.assertTrue("collected 15 items / 14 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("10 passed, 5 skipped" in out.getvalue())
+        self.assertTrue("1 passed, 14 deselected" in out.getvalue())
         self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):
