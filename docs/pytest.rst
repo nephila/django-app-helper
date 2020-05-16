@@ -10,13 +10,13 @@ To enable pytest compatible runner:
 
 * Add to project ``helper.py`` file:
 
-    .. code-block:: python
+  .. code-block:: python
 
-        HELPER_SETTINGS = {
-            ...
-            "TEST_RUNNER": "app_helper.pytest_runner.PytestTestRunner",
-            ...
-        }
+      HELPER_SETTINGS = {
+          ...
+          "TEST_RUNNER": "app_helper.pytest_runner.PytestTestRunner",
+          ...
+      }
 
 * Run tests as usual::
 
@@ -36,8 +36,18 @@ The runner support translates the following Django test runner options to pytest
 * ``failfast``: ``--exitfirst``
 * ``keepdb``: ``--reuse-db``
 
-All the other pytest and pytest plugins are supported via ``PYTEST_ARGS`` enviroment variable::
+All the other pytest and pytest plugins are supported either via ``PYTEST_ARGS`` enviroment variable or
+``--runner-options`` cmdline argument.
 
-    PYTEST_ARGS='-s -k my_test' python helper.py
+Environment variable example::
+
+    PYTEST_ARGS='-s -k my_test' python helper.py test
+
+argument variable example::
+
+    python helper.py test --runner-options="-k my_test"
+
+In case arguments are passed via both channels they are merged together, with runner-options arguments having priority
+over environment variables in case of overlapping options.
 
 .. _pytest-django: https://pytest-django.readthedocs.io/en/latest/faq.html#how-can-i-use-manage-py-test-with-pytest-django

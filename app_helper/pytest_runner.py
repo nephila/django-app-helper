@@ -9,6 +9,7 @@ class PytestTestRunner:
         self.verbosity = verbosity
         self.failfast = failfast
         self.keepdb = keepdb
+        self.extra_args = kwargs.pop("pytest_args", "")
 
     def run_tests(self, test_labels):
         """Run pytest and return the exitcode.
@@ -18,6 +19,8 @@ class PytestTestRunner:
         import pytest
 
         argv = shlex.split(os.environ.get("PYTEST_ARGS", ""))
+        if self.extra_args:
+            argv.extend(shlex.split(self.extra_args))
         if self.verbosity == 0:  # pragma: no cover
             argv.append("--quiet")
         if self.verbosity == 2:  # pragma: no cover
