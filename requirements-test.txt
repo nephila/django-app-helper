@@ -5,7 +5,7 @@ wheel==0.34.2
 pep517==0.8.2
 invoke==1.4.1
 tox>=1.8
-aldryn-boilerplates
+aldryn-boilerplates==0.8.0
 https://github.com/divio/django-filer/archive/develop.zip
 pyflakes<2.1
 pytest
