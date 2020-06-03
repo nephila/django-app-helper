@@ -1,7 +1,7 @@
 -r requirements.txt
 coverage==5.1
 coveralls>=2.0
-wheel
+wheel==0.34.2
 pep517
 invoke
 tox>=1.8
