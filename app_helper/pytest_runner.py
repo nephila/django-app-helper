@@ -11,13 +11,16 @@ class PytestTestRunner:
         self.keepdb = keepdb
         self.extra_args = kwargs.pop("pytest_args", "")
 
-    def run_tests(self, test_labels):
+    def run_tests(self, test_labels, *args, **kwargs):
         """Run pytest and return the exitcode.
 
         It translates some of Django's test command option to pytest's.
         """
         import pytest
 
+        self.verbosity = kwargs.get("verbosity", self.verbosity)
+        self.failfast = kwargs.get("failfast", self.failfast)
+        self.keepdb = kwargs.get("keepdb", self.keepdb)
         argv = shlex.split(os.environ.get("PYTEST_ARGS", ""))
         if self.extra_args:
             argv.extend(shlex.split(self.extra_args))
