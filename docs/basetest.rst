@@ -13,6 +13,10 @@ repetitive tasks during development.
     :members:
     :private-members:
 
+    .. automethod:: app_helper.base_test.BaseTestCase._setup_users
+    .. automethod:: app_helper.base_test.BaseTestCase._teardown_users
+    .. automethod:: app_helper.base_test.BaseTestCase._setup_utils
+
     .. autoattribute:: app_helper.base_test.BaseTestCase._admin_user_username
     .. autoattribute:: app_helper.base_test.BaseTestCase._admin_user_password
     .. autoattribute:: app_helper.base_test.BaseTestCase._admin_user_email

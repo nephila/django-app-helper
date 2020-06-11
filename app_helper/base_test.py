@@ -76,9 +76,40 @@ class BaseTestCaseMixin:
 
     @classmethod
     def setUpClass(cls):
+        cls._setup_utils()
+        cls._setup_users()
+        super().setUpClass()
+
+    @classmethod
+    def _setup_utils(cls):
+        """
+        Setup generic utils as class attributes.
+
+        * :py:attr:`request_factory`: instance of :py:class:`RequestFactory`
+        * :py:attr:`site_1`: instance of the first ``Django`` :py:class:`Site`
+        * :py:attr:`languages`: list of configured languages
+        """
         from django.contrib.sites.models import Site
 
         cls.request_factory = RequestFactory()
+        cls.site_1 = Site.objects.all().first()
+
+        try:
+            from cms.utils import get_language_list
+
+            cls.languages = get_language_list()
+        except ImportError:
+            cls.languages = [x[0] for x in settings.LANGUAGES]
+
+    @classmethod
+    def _setup_users(cls):
+        """
+        Create standard users.
+
+        * :py:attr:`user`: superuser
+        * :py:attr:`user_staff`: staff user
+        * :py:attr:`user_normal`: plain django user
+        """
         cls.user = create_user(
             cls._admin_user_username,
             cls._admin_user_email,
@@ -96,21 +127,17 @@ class BaseTestCaseMixin:
         cls.user_normal = create_user(
             cls._user_user_username, cls._user_user_email, cls._user_user_password, is_staff=False, is_superuser=False,
         )
-        cls.site_1 = Site.objects.all().first()
 
-        try:
-            from cms.utils import get_language_list
-
-            cls.languages = get_language_list()
-        except ImportError:
-            cls.languages = [x[0] for x in settings.LANGUAGES]
-        super().setUpClass()
+    @classmethod
+    def _teardown_users(cls):
+        """Delete existing users."""
+        User = get_user_model()  # NOQA
+        User.objects.all().delete()
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        User = get_user_model()  # NOQA
-        User.objects.all().delete()
+        cls._teardown_users()
 
     @contextmanager
     def temp_dir(self):
