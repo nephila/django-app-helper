@@ -8,7 +8,7 @@ tox>=1.8
 aldryn-boilerplates
 https://github.com/divio/django-filer/archive/develop.zip
 pyflakes<2.1
-pytest
+pytest==5.4.3
 pytest-django
 bump2version
 https://github.com/hawkowl/towncrier/archive/master.zip
