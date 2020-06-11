@@ -10,5 +10,5 @@ https://github.com/divio/django-filer/archive/develop.zip
 pyflakes<2.1
 pytest
 pytest-django
-bump2version
+bump2version==1.0.0
 https://github.com/hawkowl/towncrier/archive/master.zip
