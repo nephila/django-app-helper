@@ -2,7 +2,7 @@
 coverage
 coveralls>=2.0
 wheel
-pep517
+pep517==0.8.2
 invoke
 tox>=1.8
 aldryn-boilerplates
