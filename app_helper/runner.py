@@ -59,13 +59,25 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     :param use_cms: setup a django CMS environemtn
     :return: Django settings module
     """
+
+    def _pytest_setup(settings, module):
+        for setting in dir(settings):
+            if setting.isupper():
+                setting_value = getattr(settings, setting)
+                if setting == "SECRET_KEY" and not setting_value:
+                    setting_value = "SECRET"
+                setattr(module, setting, setting_value)
+
     helper = helper_module.__file__
     argv = [os.path.basename(helper), app, "setup", "--extra-settings={}".format(helper)]
     if use_cms:
         argv.append("--cms")
     if extra_args:
         argv.extend(extra_args)
-    return runner(argv)
+    settings = runner(argv)
+    if "pytest_django" in sys.modules:
+        _pytest_setup(settings, helper_module)
+    return settings
 
 
 def runner(argv):
