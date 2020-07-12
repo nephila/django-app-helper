@@ -46,7 +46,8 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 intersphinx_mapping = {
-    "djangocms": ("http://readthedocs.org/docs/django-cms/en/latest/", None),
+    "djangocms": ("https://django-cms.readthedocs.io/en/latest/", None),
+    "django": ("https://django.readthedocs.io/en/latest/", None),
 }
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
