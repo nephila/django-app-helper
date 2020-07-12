@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import argparse
 import contextlib
 import os
 import subprocess
@@ -62,6 +62,15 @@ Options:
 """  # NOQA # nopyflakes
 
 
+def _parse_runner_options(test_runner_class, options):
+    if hasattr(test_runner_class, "add_arguments"):
+        parser = argparse.ArgumentParser()
+        test_runner_class.add_arguments(parser)
+        args = parser.parse_args(options)
+        return vars(args)
+    return {}
+
+
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
     warnings.filterwarnings(
         "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields",
@@ -82,7 +91,9 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=No
         if "PytestTestRunner" in test_runner:
             kwargs["pytest_args"] = runner_options
         else:
-            sys.argv.extend(runner_options.split(","))
+            extra = _parse_runner_options(TestRunner, runner_options)
+            extra.update(kwargs)
+            kwargs = extra
     test_runner = TestRunner(**kwargs)
     failures = test_runner.run_tests(test_labels)
     return failures
