@@ -294,73 +294,73 @@ class CommandTests(unittest.TestCase):
         from django.conf import settings
 
         with work_in(self.basedir):
-            # with captured_output() as (out, err):
-            args = copy(DEFAULT_ARGS)
-            with temp_dir() as STATIC_ROOT:
-                with temp_dir() as MEDIA_ROOT:
-                    local_settings = _make_settings(args, self.application, settings, STATIC_ROOT, MEDIA_ROOT)
-                    # Testing that helper.py in custom project is loaded
-                    self.assertEqual(local_settings.TIME_ZONE, "Europe/Rome")
+            with captured_output():
+                args = copy(DEFAULT_ARGS)
+                with temp_dir() as STATIC_ROOT:  # noqa: N806
+                    with temp_dir() as MEDIA_ROOT:  # noqa: N806
+                        local_settings = _make_settings(args, self.application, settings, STATIC_ROOT, MEDIA_ROOT)
+                        # Testing that helper.py in custom project is loaded
+                        self.assertEqual(local_settings.TIME_ZONE, "Europe/Rome")
 
-                    args["--boilerplate"] = True
-                    args["--extra-settings"] = "cms_helper_extra.py"
-                    local_settings = _make_settings(args, self.application, settings, STATIC_ROOT, MEDIA_ROOT)
-                    # Testing that helper.py in the command option is loaded
-                    self.assertEqual(local_settings.TIME_ZONE, "Europe/Paris")
-                    # Existing application is kept
-                    self.assertTrue("app_helper.test_data" in local_settings.INSTALLED_APPS)
-                    # New ones are added both on top and in random positions
-                    self.assertEqual("djangocms_admin_style", local_settings.INSTALLED_APPS[0])
-                    self.assertTrue("some_app" in local_settings.INSTALLED_APPS)
+                        args["--boilerplate"] = True
+                        args["--extra-settings"] = "cms_helper_extra.py"
+                        local_settings = _make_settings(args, self.application, settings, STATIC_ROOT, MEDIA_ROOT)
+                        # Testing that helper.py in the command option is loaded
+                        self.assertEqual(local_settings.TIME_ZONE, "Europe/Paris")
+                        # Existing application is kept
+                        self.assertTrue("app_helper.test_data" in local_settings.INSTALLED_APPS)
+                        # New ones are added both on top and in random positions
+                        self.assertEqual("djangocms_admin_style", local_settings.INSTALLED_APPS[0])
+                        self.assertTrue("some_app" in local_settings.INSTALLED_APPS)
 
-                    self.assertTrue(
-                        "django.contrib.sessions.middleware.SessionMiddleware" in local_settings.MIDDLEWARE
-                    )
-                    self.assertEqual("top_middleware", local_settings.MIDDLEWARE[0])
-                    self.assertTrue("some_middleware" in local_settings.MIDDLEWARE)
+                        self.assertTrue(
+                            "django.contrib.sessions.middleware.SessionMiddleware" in local_settings.MIDDLEWARE
+                        )
+                        self.assertEqual("top_middleware", local_settings.MIDDLEWARE[0])
+                        self.assertTrue("some_middleware" in local_settings.MIDDLEWARE)
 
-                    boilerplate_settings = get_boilerplates_settings()
+                        boilerplate_settings = get_boilerplates_settings()
 
-                    # Check the loaders
-                    self.assertTrue(
-                        "django.template.loaders.app_directories.Loader"
-                        in local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]
-                    )
-                    # Loaders declared in settings
-                    self.assertTrue(
-                        "admin_tools.template_loaders.Loader" in local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]
-                    )
-                    # Existing application is kept
-                    self.assertTrue(
-                        "django.template.context_processors.request"
-                        in local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]
-                    )
-                    # New one is added
-                    self.assertTrue(
-                        "django.template.context_processors.debug"
-                        in local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]
-                    )
-                    # Check template dirs
-                    self.assertTrue("some/dir" in local_settings.TEMPLATES[0]["DIRS"])
-                    # Check for aldryn boilerplates
-                    for name, value in boilerplate_settings.items():
-                        if not name.startswith("TEMPLATE"):
-                            if type(value) in (list, tuple):
-                                self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
-                            elif name == "ALDRYN_BOILERPLATE_NAME":
-                                self.assertEqual(getattr(local_settings, name), "legacy")
-                            else:
-                                self.assertTrue(value in getattr(local_settings, name))
-                        elif name == "TEMPLATE_CONTEXT_PROCESSORS":
-                            self.assertTrue(
-                                set(local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]).intersection(
-                                    set(value)
+                        # Check the loaders
+                        self.assertTrue(
+                            "django.template.loaders.app_directories.Loader"
+                            in local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]
+                        )
+                        # Loaders declared in settings
+                        self.assertTrue(
+                            "admin_tools.template_loaders.Loader" in local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]
+                        )
+                        # Existing application is kept
+                        self.assertTrue(
+                            "django.template.context_processors.request"
+                            in local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]
+                        )
+                        # New one is added
+                        self.assertTrue(
+                            "django.template.context_processors.debug"
+                            in local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]
+                        )
+                        # Check template dirs
+                        self.assertTrue("some/dir" in local_settings.TEMPLATES[0]["DIRS"])
+                        # Check for aldryn boilerplates
+                        for name, value in boilerplate_settings.items():
+                            if not name.startswith("TEMPLATE"):
+                                if type(value) in (list, tuple):
+                                    self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
+                                elif name == "ALDRYN_BOILERPLATE_NAME":
+                                    self.assertEqual(getattr(local_settings, name), "legacy")
+                                else:
+                                    self.assertTrue(value in getattr(local_settings, name))
+                            elif name == "TEMPLATE_CONTEXT_PROCESSORS":
+                                self.assertTrue(
+                                    set(local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]).intersection(
+                                        set(value)
+                                    )
                                 )
-                            )
-                        elif name == "TEMPLATE_LOADERS":
-                            self.assertTrue(
-                                set(local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]).intersection(set(value))
-                            )
+                            elif name == "TEMPLATE_LOADERS":
+                                self.assertTrue(
+                                    set(local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]).intersection(set(value))
+                                )
 
     @patch("app_helper.main.autoreload")
     def test_server(self, mocked_command):
@@ -897,9 +897,9 @@ class CommandTests(unittest.TestCase):
 
     def test_urls_nocms(self):
         try:
-            from django.urls import reverse, NoReverseMatch
+            from django.urls import NoReverseMatch, reverse
         except ImportError:
-            from django.core.urlresolvers import reverse, NoReverseMatch
+            from django.core.urlresolvers import NoReverseMatch, reverse
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 shutil.copy(self.poexample, self.pofile)
