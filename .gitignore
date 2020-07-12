@@ -518,3 +518,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/vim,node,sass,vuejs,linux,macos,django,python,pycharm,windows,virtualenv,sublimetext,visualstudiocode
+local.sqlite
