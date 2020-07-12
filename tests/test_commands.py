@@ -1,19 +1,38 @@
+import contextlib
 import os
 import os.path
 import shutil
 import sys
 import unittest
 from copy import copy
-from distutils.version import LooseVersion
 from tempfile import mkdtemp
 from unittest.mock import patch
 
-import django
+from django.test.utils import setup_test_environment, teardown_test_environment
 
 from app_helper import runner
 from app_helper.default_settings import get_boilerplates_settings
 from app_helper.main import _make_settings, core
 from app_helper.utils import captured_output, temp_dir, work_in
+
+
+@contextlib.contextmanager
+def wrap_test_environment():
+    """
+    Create a clean test environment context in which test env can be initialized again.
+
+    Needed by tests in which we run tests in the fake applications invoked by app_helper API.
+    """
+    try:
+        teardown_test_environment()
+    except AttributeError:
+        pass
+    yield
+    try:
+        setup_test_environment()
+    except AttributeError:
+        pass
+
 
 DEFAULT_ARGS = {
     "shell": False,
@@ -57,7 +76,7 @@ class CommandTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         os.environ.setdefault("DATABASE_URL", "sqlite://localhost/:memory:")
-        cls.basedir = os.path.abspath(os.path.join("app_helper", "test_utils"))
+        cls.basedir = os.path.abspath(os.path.join("tests", "test_utils"))
         cls.application = "example1"
         cls.application_2 = "example2"
         with work_in(cls.basedir):
@@ -78,11 +97,15 @@ class CommandTests(unittest.TestCase):
                     os.path.join(cls.application_2, "migrations", "0001_initial.py")
                 )
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             DEFAULT_ARGS["--cms"] = False
 
-    def setUp(self):
+    def _clean_modules_directories(self):
+        """
+        Cleanup all the leftover of migration and po files tests.
+        Executed in setup and teardown for simplicity.
+        """
         try:
             os.unlink(self.pofile)
         except (OSError, TypeError):
@@ -109,13 +132,29 @@ class CommandTests(unittest.TestCase):
             del sys.modules["example2.migrations"]
         except KeyError:
             pass
+        try:
+            del sys.modules["tests.test_utils.example1.migrations"]
+        except KeyError:
+            pass
+        try:
+            del sys.modules["tests.test_utils.example1.migrations.0001_initial"]
+        except KeyError:
+            pass
+        try:
+            del sys.modules["tests.test_utils.example2.migrations"]
+        except KeyError:
+            pass
+
+    def setUp(self):
+        self._clean_modules_directories()
 
     def tearDown(self):
         os.environ["AUTH_USER_MODEL"] = "auth.User"
-        self.setUp()
+        self._clean_modules_directories()
 
     def test_map_argv(self):
-        from ..main import _map_argv
+        """CLI arguments are mapped to internal options."""
+        from app_helper.main import _map_argv
 
         argv_1 = [
             "helper.py",
@@ -291,6 +330,7 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(target_3, args)
 
     def test_extra_settings(self):
+        """Settings declared in helper file are merged in default settings."""
         from django.conf import settings
 
         with work_in(self.basedir):
@@ -364,6 +404,7 @@ class CommandTests(unittest.TestCase):
 
     @patch("app_helper.main.autoreload")
     def test_server(self, mocked_command):
+        """Run server command and create default user."""
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
@@ -372,104 +413,89 @@ class CommandTests(unittest.TestCase):
             self.assertTrue("A admin user (username: admin, password: admin) has been created." in out.getvalue())
 
     def test_makemigrations(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args["makemigrations"] = True
-                args["<extra-applications>"] = ["example2"]
-                core(args, self.application)
-            self.assertTrue(os.path.exists(self.migration_file))
-            self.assertTrue(os.path.exists(self.migration_file_2))
+        """Run makemigrations command."""
+        with captured_output() as (out, err):
+            args = copy(DEFAULT_ARGS)
+            args["makemigrations"] = True
+            args["<extra-applications>"] = ["example2"]
+            core(args, self.application)
+        self.assertTrue(os.path.exists(self.migration_file))
+        self.assertTrue(os.path.exists(self.migration_file_2))
         self.assertTrue("Create model ExampleModel1" in out.getvalue())
         self.assertTrue("Create model ExampleModel2" in out.getvalue())
 
-    def skip_test_makemigrations_update(self):
+    def test_makemigrations_update(self):
+        """Update migrations if code changes."""
         os.makedirs(self.migration_dir)
         open(os.path.join(self.migration_dir, "__init__.py"), "w")
         shutil.copy(self.migration_partial, self.migration_file)
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args["makemigrations"] = True
-                core(args, self.application)
+        with captured_output() as (out, err):
+            args = copy(DEFAULT_ARGS)
+            args["makemigrations"] = True
+            core(args, self.application)
         self.assertTrue("Migrations for 'example1':" in out.getvalue())
 
     def test_makemigrations_empty(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                os.makedirs(self.migration_dir)
-                open(os.path.join(self.migration_dir, "__init__.py"), "w")
-                shutil.copy(self.migration_example, self.migration_file)
-                args = copy(DEFAULT_ARGS)
-                args["makemigrations"] = True
-                args["--empty"] = True
-                core(args, self.application)
+        """Create empty migrations with makemigrations --empty."""
+        with captured_output() as (out, err):
+            os.makedirs(self.migration_dir)
+            open(os.path.join(self.migration_dir, "__init__.py"), "w")
+            shutil.copy(self.migration_example, self.migration_file)
+            args = copy(DEFAULT_ARGS)
+            args["makemigrations"] = True
+            args["--empty"] = True
+            core(args, self.application)
         self.assertTrue("Migrations for 'example1':" in out.getvalue())
 
     def test_makemigrations_merge(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args["makemigrations"] = True
-                args["--merge"] = True
-                core(args, self.application)
-                self.assertTrue("No conflicts detected to merge" in out.getvalue())
+        """Run makemigrations --merge."""
+        with captured_output() as (out, err):
+            args = copy(DEFAULT_ARGS)
+            args["makemigrations"] = True
+            args["--merge"] = True
+            core(args, self.application)
+            self.assertTrue("No conflicts detected to merge" in out.getvalue())
 
     def test_makemessages(self):
+        """Run makemessages command runs."""
         with work_in(self.basedir):
-            with captured_output() as (out, err):
+            with captured_output():
                 args = copy(DEFAULT_ARGS)
                 args["makemessages"] = True
                 core(args, self.application)
                 self.assertTrue(os.path.exists(self.pofile))
 
     def test_compilemessages(self):
+        """Run compilemessages command."""
         with work_in(self.basedir):
-            shutil.copy(self.poexample, self.pofile)
-            args = copy(DEFAULT_ARGS)
-            args["compilemessages"] = True
-            core(args, self.application)
-            self.assertTrue(os.path.exists(self.mofile))
+            with captured_output():
+                shutil.copy(self.poexample, self.pofile)
+                args = copy(DEFAULT_ARGS)
+                args["compilemessages"] = True
+                core(args, self.application)
+                self.assertTrue(os.path.exists(self.mofile))
 
     def test_cms_check(self):
+        """Run cms check command via app-helper."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                shutil.copy(self.poexample, self.pofile)
-                args = copy(DEFAULT_ARGS)
-                args["cms_check"] = True
-                args["--extra-settings"] = "helper.py"
-                args["--migrate"] = False
-                core(args, self.application)
-            self.assertTrue("Installation okay" in out.getvalue())
-            self.assertFalse("[WARNING]" in out.getvalue())
-            self.assertFalse("[ERROR]" in out.getvalue())
+        with captured_output() as (out, err):
+            shutil.copy(self.poexample, self.pofile)
+            args = copy(DEFAULT_ARGS)
+            args["cms_check"] = True
+            args["--extra-settings"] = "helper.py"
+            args["--migrate"] = False
+            core(args, self.application)
+        self.assertTrue("Installation okay" in out.getvalue())
+        self.assertFalse("[WARNING]" in out.getvalue())
+        self.assertFalse("[ERROR]" in out.getvalue())
 
-    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion("1.9"), reason="Test for Django up until 1.8")
     def test_cms_check_nocms(self):
+        """cms check raise exception if cms is not available."""
         try:
-            import cms  # noqa
-
-            raise unittest.SkipTest("django CMS available, skipping test")
-        except ImportError:
-            pass
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                shutil.copy(self.poexample, self.pofile)
-                args = copy(DEFAULT_ARGS)
-                args["cms_check"] = True
-                args["--extra-settings"] = "helper"
-                args["--migrate"] = False
-                core(args, self.application)
-            self.assertTrue("cms_check available only if django CMS is installed" in out.getvalue())
-
-    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion("1.9"), reason="Test for Django 1.9+")
-    def test_cms_check_nocms_19(self):
-        try:
-            import cms  # noqa
+            import cms  # noqa: F401
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
@@ -483,10 +509,8 @@ class CommandTests(unittest.TestCase):
                 args["--migrate"] = False
                 core(args, self.application)
 
-    @unittest.skipIf(
-        LooseVersion(django.get_version()) < LooseVersion("1.7"), reason="check command available in Django 1.7+ only"
-    )
     def test_any_command_check(self):
+        """Run any django command via app-helper."""
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
@@ -496,6 +520,7 @@ class CommandTests(unittest.TestCase):
         self.assertTrue("no issues" in out.getvalue())
 
     def test_any_command_compilemessages(self):
+        """Run compilemessages as plain django command."""
         with work_in(os.path.join(self.basedir, self.application)):
             with captured_output() as (out, err):
                 shutil.copy(self.poexample, self.pofile)
@@ -506,21 +531,21 @@ class CommandTests(unittest.TestCase):
                 self.assertTrue(os.path.exists(self.mofile))
 
     def test_any_command_migrations(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args["<command>"] = "makemigrations"
-                args["options"] = "helper makemigrations example2 --verbosity=2".split(" ")
-                core(args, self.application)
-            self.assertFalse("Create model ExampleModel1" in out.getvalue())
-            self.assertFalse(os.path.exists(self.migration_file))
-            self.assertTrue("Create model ExampleModel2" in out.getvalue())
-            self.assertTrue(os.path.exists(self.migration_file_2))
+        """Run makemigrations as plain django command."""
+        with captured_output() as (out, err):
+            args = copy(DEFAULT_ARGS)
+            args["<command>"] = "makemigrations"
+            args["options"] = "helper makemigrations example2 --verbosity=2".split(" ")
+            core(args, self.application)
+        self.assertFalse("Create model ExampleModel1" in out.getvalue())
+        self.assertFalse(os.path.exists(self.migration_file))
+        self.assertTrue("Create model ExampleModel2" in out.getvalue())
+        self.assertTrue(os.path.exists(self.migration_file_2))
 
     @unittest.skipIf(sys.version_info[:2] in ((3, 8),), reason="This test fails on Python 3.8+")
     def test_pyflakes(self):
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         with work_in(self.basedir):
@@ -532,8 +557,9 @@ class CommandTests(unittest.TestCase):
         self.assertFalse(os.path.exists(args["MEDIA_ROOT"]))
 
     def test_pyflakes_nocms(self):
+        """pyflakes command exists with message if django CMS is not installed."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
@@ -550,71 +576,65 @@ class CommandTests(unittest.TestCase):
         self.assertFalse(os.path.exists(args["MEDIA_ROOT"]))
 
     def test_testrun(self):
+        """Run test via API using custom runner which only picks tests in sample applications."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        path = os.path.join(self.basedir, "data")
-        with work_in(self.basedir):
+        path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data"))
+        with wrap_test_environment():
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit_state:
-                    try:
-                        from django.test.utils import _TestState
-
-                        del _TestState.saved_data
-                    except (ImportError, AttributeError):
-                        pass
                     args = copy(DEFAULT_ARGS)
                     args["test"] = True
+                    args["<application>"] = "example1"
                     args["--persistent"] = True
                     args["--runner"] = "runners.CapturedOutputRunner"
+                    args["<test-label>"] = self.application
                     core(args, self.application)
-        self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit_state.exception.code, 0)
-        self.assertTrue(args["STATIC_ROOT"].startswith(path))
-        self.assertTrue(args["MEDIA_ROOT"].startswith(path))
-        self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
-        self.assertTrue(os.path.exists(args["MEDIA_ROOT"]))
+            self.assertTrue("Ran 14 tests in" in err.getvalue())
+            self.assertEqual(exit_state.exception.code, 0)
+            self.assertTrue(args["STATIC_ROOT"].startswith(path))
+            self.assertTrue(args["MEDIA_ROOT"].startswith(path))
+            self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
+            self.assertTrue(os.path.exists(args["MEDIA_ROOT"]))
 
     def test_testrun_persistent_path(self):
+        """Run test via API using custom runner which only picks tests in sample applications with persistent data."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
         path = mkdtemp()
-        with work_in(self.basedir):
+        with wrap_test_environment():
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit_state:
-                    try:
-                        from django.test.utils import _TestState
-
-                        del _TestState.saved_data
-                    except (ImportError, AttributeError):
-                        pass
                     args = copy(DEFAULT_ARGS)
                     args["test"] = True
                     args["--persistent"] = True
                     args["--persistent-path"] = path
                     args["--runner"] = "runners.CapturedOutputRunner"
+                    args["<test-label>"] = self.application
                     core(args, self.application)
-        self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit_state.exception.code, 0)
-        self.assertTrue(args["STATIC_ROOT"].startswith(path))
-        self.assertTrue(args["MEDIA_ROOT"].startswith(path))
-        self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
-        self.assertTrue(os.path.exists(args["MEDIA_ROOT"]))
+            self.assertTrue("Ran 14 tests in" in err.getvalue())
+            self.assertEqual(exit_state.exception.code, 0)
+            self.assertTrue(args["STATIC_ROOT"].startswith(path))
+            self.assertTrue(args["MEDIA_ROOT"].startswith(path))
+            self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
+            self.assertTrue(os.path.exists(args["MEDIA_ROOT"]))
 
     def test_runner_wrong(self):
+        """Run non existing test labels via runner file using custom runner."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
-            if sys.version_info < (3, 5):
-                exception = ImportError
-            else:
-                exception = SystemExit
-            with captured_output() as (out, err):
+        if sys.version_info < (3, 5):
+            exception = ImportError
+        else:
+            exception = SystemExit
+        with wrap_test_environment():
+            with captured_output():
                 with self.assertRaises(exception) as exit_state:
                     args = []
                     args.append("helper")
@@ -627,44 +647,42 @@ class CommandTests(unittest.TestCase):
             self.assertEqual(exit_state.exception.code, 1)
 
     def test_runner(self):
+        """Run tests from helper file."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        from app_helper.test_utils.runners import CapturedOutputRunner
 
-        with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
-            with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    with self.assertRaises(SystemExit) as exit_state:
-                        args = []
-                        args.append("helper")
-                        args.append("test")
-                        args.append("--extra-settings=helper.py")
-                        args.append("example1")
-                        runner.cms("example1", args)
-        self.assertTrue("visible string" in out.getvalue())
-        self.assertFalse("hidden string" in out.getvalue())
-        self.assertFalse("hidden string" in err.getvalue())
-        self.assertTrue("Ran 14 tests in" in err.getvalue())
-        self.assertEqual(exit_state.exception.code, 0)
+        with wrap_test_environment():
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit_state:
+                    args = []
+                    args.append("helper")
+                    args.append("test")
+                    args.append("--extra-settings=helper.py")
+                    args.append("example1")
+                    runner.cms("example1", args)
+            self.assertTrue("visible string" in out.getvalue())
+            self.assertFalse("hidden string" in out.getvalue())
+            self.assertFalse("hidden string" in err.getvalue())
+            self.assertTrue("Ran 14 tests in" in err.getvalue())
+            self.assertEqual(exit_state.exception.code, 0)
 
     def test_runner_compat(self):
+        """Run tests from previous helper file default name cms_helper."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        from app_helper.test_utils.runners import CapturedOutputRunner
 
-        with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
-            with work_in(self.basedir):
-                with captured_output() as (out, err):
-                    with self.assertRaises(SystemExit) as exit_state:
-                        args = []
-                        args.append("cms_helper")
-                        args.append("test")
-                        args.append("example1")
-                        runner.cms("example1", args)
+        with wrap_test_environment():
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit_state:
+                    args = []
+                    args.append("cms_helper")
+                    args.append("test")
+                    args.append("example1")
+                    runner.cms("example1", args)
         self.assertTrue("visible string" in out.getvalue())
         self.assertFalse("hidden string" in out.getvalue())
         self.assertFalse("hidden string" in err.getvalue())
@@ -672,13 +690,14 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(exit_state.exception.code, 0)
 
     def test_runner_cms_exception(self):
+        """Raise exception if cms-enabled tests are invoked without django CMS."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
 
             raise unittest.SkipTest("django CMS available, skipping test")
         except ImportError:
             pass
-        from app_helper.test_utils.runners import CapturedOutputRunner
+        from tests.test_utils.runners import CapturedOutputRunner
 
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
@@ -689,15 +708,16 @@ class CommandTests(unittest.TestCase):
                         runner.cms("example1", args)
 
     def test_runner_cms_argv(self):
+        """Arguments are mapped via cms helper."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
 
         def fake_runner(argv):
             return argv
 
-        from app_helper.test_utils.runners import CapturedOutputRunner
+        from tests.test_utils.runners import CapturedOutputRunner
 
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
@@ -709,10 +729,12 @@ class CommandTests(unittest.TestCase):
                     self.assertEqual(data, ["helper", "example1", "test", "--cms"])
 
     def test_runner_argv(self):
+        """Arguments are mapped via non-cms helper."""
+
         def fake_runner(argv):
             return argv
 
-        from app_helper.test_utils.runners import CapturedOutputRunner
+        from tests.test_utils.runners import CapturedOutputRunner
 
         with patch("django.test.runner.DiscoverRunner", CapturedOutputRunner):
             with work_in(self.basedir):
@@ -724,30 +746,30 @@ class CommandTests(unittest.TestCase):
                     self.assertEqual(data, ["helper", "example1", "test"])
 
     def test_setup_cms(self):
+        """Settings are set from runner setup."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                from app_helper.test_utils import helper
+        with captured_output():
+            from tests.test_utils import helper
 
-                settings = runner.setup("example1", helper, use_cms=True, extra_args=["--boilerplate"])
+            settings = runner.setup("example1", helper, use_cms=True, extra_args=["--boilerplate"])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
         self.assertTrue("aldryn_boilerplates" in settings.INSTALLED_APPS)
         self.assertTrue("cms" in settings.INSTALLED_APPS)
 
     def test_setup_custom_user(self):
+        """Settings are set by cms runner setup."""
         os.environ["AUTH_USER_MODEL"] = "custom_user.CustomUser"
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                from app_helper.test_utils import cms_helper_custom
+        with captured_output():
+            from tests.test_utils import cms_helper_custom
 
-                settings = runner.setup("example1", cms_helper_custom, use_cms=True, extra_args=["--boilerplate"])
+            settings = runner.setup("example1", cms_helper_custom, use_cms=True, extra_args=["--boilerplate"])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
         self.assertTrue("custom_user" in settings.INSTALLED_APPS)
         self.assertTrue("aldryn_boilerplates" in settings.INSTALLED_APPS)
@@ -755,86 +777,74 @@ class CommandTests(unittest.TestCase):
         del os.environ["AUTH_USER_MODEL"]
 
     def test_setup_nocms(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                from app_helper.test_utils import helper
+        """Settings are set by non cms runner setup."""
+        with captured_output():
+            from tests.test_utils import helper
 
-                settings = runner.setup("example1", helper, extra_args=[])
+            settings = runner.setup("example1", helper, extra_args=[])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
         self.assertFalse("aldryn_boilerplates" in settings.INSTALLED_APPS)
         self.assertFalse("cms" in settings.INSTALLED_APPS)
 
     def test_testrun_nocms(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit_state:
-                    try:
-                        from django.test.utils import _TestState
-
-                        del _TestState.saved_data
-                    except (ImportError, AttributeError):
-                        pass
-                    args = copy(DEFAULT_ARGS)
-                    args["test"] = True
-                    args["--cms"] = False
-                    args["--runner"] = "runners.CapturedOutputRunner"
-                    args["--runner-options"] = "--capture"
-                    core(args, self.application)
+        with wrap_test_environment():
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    with self.assertRaises(SystemExit) as exit_state:
+                        args = copy(DEFAULT_ARGS)
+                        args["test"] = True
+                        args["--cms"] = False
+                        args["--runner"] = "runners.CapturedOutputRunner"
+                        args["--runner-options"] = "--capture"
+                        core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
         self.assertEqual(exit_state.exception.code, 0)
 
     def test_runner_nocms(self):
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                with self.assertRaises(SystemExit) as exit_state:
-                    args = []
-                    args.append("helper")
-                    args.append("example1")
-                    args.append("test")
-                    args.append("--extra-settings=helper.py")
-                    args.append("--runner=runners.CapturedOutputRunner")
-                    runner.run("example1", args)
+        """Run tests via non cms runner."""
+        with wrap_test_environment():
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    with self.assertRaises(SystemExit) as exit_state:
+                        args = []
+                        args.append("helper")
+                        args.append("example1")
+                        args.append("test")
+                        args.append("--extra-settings=helper.py")
+                        args.append("--runner=runners.CapturedOutputRunner")
+                        runner.run("example1", args)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
         self.assertEqual(exit_state.exception.code, 0)
 
     def test_testrun_native(self):
+        """Run tests via api with extra settings file."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                try:
-                    from django.test.utils import _TestState
-
-                    del _TestState.saved_data
-                except (ImportError, AttributeError):
-                    pass
-                args = copy(DEFAULT_ARGS)
-                args["<command>"] = None
-                args["test"] = True
-                args["--cms"] = False
-                args["--native"] = True
-                args["--extra-settings"] = "cms_helper_extra_runner.py"
-                try:
-                    core(args, self.application)
-                except SystemExit:
-                    pass
+        with wrap_test_environment():
+            with work_in(self.basedir):
+                with captured_output() as (out, err):
+                    args = copy(DEFAULT_ARGS)
+                    args["<command>"] = None
+                    args["test"] = True
+                    args["--cms"] = False
+                    args["--native"] = True
+                    args["--extra-settings"] = "cms_helper_extra_runner.py"
+                    try:
+                        core(args, self.application)
+                    except SystemExit:
+                        pass
         self.assertTrue("Ran 14 tests in" in err.getvalue())
 
     def test_testrun_pytest(self):
+        """Run tests via pytest via API."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
+        with wrap_test_environment():
             with captured_output() as (out, err):
-                try:
-                    from django.test.utils import _TestState
-
-                    del _TestState.saved_data
-                except (ImportError, AttributeError):
-                    pass
                 args = copy(DEFAULT_ARGS)
                 args["<command>"] = None
                 args["test"] = True
@@ -847,12 +857,13 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
                 except SystemExit:
                     pass
-        self.assertTrue("collected 15 items / 14 deselected / 1 selected" in out.getvalue())
+        self.assertTrue("50 items / 49 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("1 passed, 14 deselected" in out.getvalue())
+        self.assertTrue("1 passed, 49 deselected" in out.getvalue())
 
     def test_runner_pytest(self):
-        with work_in(self.basedir):
+        """Run tests via pytest via helper runner."""
+        with wrap_test_environment():
             with captured_output() as (out, err):
                 with self.assertRaises(SystemExit) as exit_state:
                     args = []
@@ -863,12 +874,13 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner-options='-k test_create_django_image_object'")
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
-        self.assertTrue("collected 15 items / 14 deselected / 1 selected" in out.getvalue())
-        # warnings will depend on django version and adds too much noise
-        self.assertTrue("1 passed, 14 deselected" in out.getvalue())
-        self.assertEqual(exit_state.exception.code, 0)
+            self.assertTrue("50 items / 49 deselected / 1 selected" in out.getvalue())
+            # warnings will depend on django version and adds too much noise
+            self.assertTrue("1 passed, 49 deselected" in out.getvalue())
+            self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):
+        """Generate authors file."""
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
@@ -879,14 +891,13 @@ class CommandTests(unittest.TestCase):
         self.assertTrue("Authors (" in out.getvalue())
 
     def test_urls(self):
+        """cms urlconf is loaded if django CMS is installed."""
         try:
-            import cms  # noqa
+            import cms  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("django CMS not available, skipping test")
-        try:
-            from django.urls import reverse
-        except ImportError:
-            from django.core.urlresolvers import reverse
+        from django.urls import reverse
+
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 shutil.copy(self.poexample, self.pofile)
@@ -896,10 +907,9 @@ class CommandTests(unittest.TestCase):
                 self.assertTrue(reverse("pages-root"))
 
     def test_urls_nocms(self):
-        try:
-            from django.urls import NoReverseMatch, reverse
-        except ImportError:
-            from django.core.urlresolvers import NoReverseMatch, reverse
+        """cms urlconf is not loaded if django CMS is not installed."""
+        from django.urls import NoReverseMatch, reverse
+
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 shutil.copy(self.poexample, self.pofile)
