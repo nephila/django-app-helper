@@ -62,7 +62,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Django App Helper"
-copyright = "2014, Iacopo Spalletti"
+copyright = "2014, Iacopo Spalletti"  # noqa: A001
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
