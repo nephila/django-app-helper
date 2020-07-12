@@ -68,7 +68,7 @@ def _parse_runner_options(test_runner_class, options):
         test_runner_class.add_arguments(parser)
         args = parser.parse_args(options)
         return vars(args)
-    return {}
+    return {}  # pragma: no cover
 
 
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
@@ -149,7 +149,7 @@ def cms_check(migrate_cmd=False):
 
         _create_db(migrate_cmd)
         call_command("cms", "check")
-    except ImportError:
+    except ImportError:  # pragma: no cover
         print("cms_check available only if django CMS is installed")
 
 
