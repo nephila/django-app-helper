@@ -75,6 +75,21 @@ class RequestTestCaseMixin:
             if hasattr(mw_instance, "process_request"):
                 mw_instance.process_request(request)
 
+    def login_user_context(self, user, password=None):
+        """
+        Context manager to make logged in requests.
+
+        Usage::
+
+            with self.login_user_context("<username>", password="<password>"):
+                request = self.request("/", lang="en")
+                ... # this request has <username> as user
+
+        :param user: user username
+        :param password: user password (if omitted, username is used)
+        """
+        return UserLoginContext(self, user, password)
+
     def request(
         self,
         path,
@@ -191,14 +206,6 @@ class CreateTestDataMixin:
     def tearDownClass(cls):
         super().tearDownClass()
         cls._teardown_users()
-
-    def login_user_context(self, user, password=None):
-        """
-        Context manager to make logged in requests
-        :param user: user username
-        :param password: user password (if omitted, username is used)
-        """
-        return UserLoginContext(self, user, password)
 
     def create_user(
         self,
@@ -577,12 +584,18 @@ class CMSPageRenderingMixin(RequestTestCaseMixin):
 
 
 class GenericHelpersMixin:
-    @contextmanager
     def temp_dir(self):
         """
-        Context manager to operate on a temporary directory.
+        Return the context manager of a temporary directory that is removed upon exit.
+
+        Usage::
+
+            with self.temp_dir() as temp_path:
+                test_file = os.path.join(temp_path, "afile")
+                ... # do something with test_file
+            ... # test_file and containing directory is removed
         """
-        yield temp_dir()
+        return temp_dir()
 
     def reload_model(self, obj):
         """
@@ -609,9 +622,8 @@ class GenericHelpersMixin:
 
         :return: stdout, stderr wrappers
         """
-        with patch("sys.stdout", new_callable=StringIO) as out:
-            with patch("sys.stderr", new_callable=StringIO) as err:
-                yield out, err
+        with patch("sys.stdout", new_callable=StringIO) as out, patch("sys.stderr", new_callable=StringIO) as err:
+            yield out, err
 
 
 class BaseNoDataTestCaseMixin(CreateTestDataMixin, CMSPageRenderingMixin, GenericHelpersMixin):

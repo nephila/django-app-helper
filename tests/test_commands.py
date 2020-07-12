@@ -641,8 +641,9 @@ class CommandTests(unittest.TestCase):
                     args.append("test")
                     args.append("example1")
                     args.append("--runner=runners.CapturedOutputRunner")
-                    args.append("whatever")
-                    runner.cms("example1", args)
+                    # passing extra_args is the same as appending to args, except that in real life, args are taken
+                    # from sys.argv and extra_args is an argument for developer to use
+                    runner.cms("example1", args, extra_args=["whatever"])
         if sys.version_info >= (3, 5):
             self.assertEqual(exit_state.exception.code, 1)
 
@@ -811,8 +812,7 @@ class CommandTests(unittest.TestCase):
                         args.append("example1")
                         args.append("test")
                         args.append("--extra-settings=helper.py")
-                        args.append("--runner=runners.CapturedOutputRunner")
-                        runner.run("example1", args)
+                        runner.run("example1", args, extra_args=["--runner=runners.CapturedOutputRunner"])
         self.assertTrue("Ran 14 tests in" in err.getvalue())
         self.assertEqual(exit_state.exception.code, 0)
 
@@ -857,9 +857,9 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
                 except SystemExit:
                     pass
-        self.assertTrue("50 items / 49 deselected / 1 selected" in out.getvalue())
+        self.assertTrue("63 items / 62 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("1 passed, 49 deselected" in out.getvalue())
+        self.assertTrue("1 passed, 62 deselected" in out.getvalue())
 
     def test_runner_pytest(self):
         """Run tests via pytest via helper runner."""
@@ -874,9 +874,9 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner-options='-k test_create_django_image_object'")
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
-            self.assertTrue("50 items / 49 deselected / 1 selected" in out.getvalue())
+            self.assertTrue("63 items / 62 deselected / 1 selected" in out.getvalue())
             # warnings will depend on django version and adds too much noise
-            self.assertTrue("1 passed, 49 deselected" in out.getvalue())
+            self.assertTrue("1 passed, 62 deselected" in out.getvalue())
             self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):
