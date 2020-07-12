@@ -25,6 +25,7 @@ def run():
 
 def setup():
     import sys
+
     from app_helper import runner
 
     runner.setup("example1", sys.modules[__name__], use_cms=False)

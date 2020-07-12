@@ -27,8 +27,9 @@ class RequestTestCaseMixin:
     _login_context = None
 
     def _prepare_request(self, request, page, user, lang, use_middlewares, use_toolbar=False, secure=False):
-        from django.contrib.auth.models import AnonymousUser
         from importlib import import_module
+
+        from django.contrib.auth.models import AnonymousUser
 
         engine = import_module(settings.SESSION_ENGINE)
 

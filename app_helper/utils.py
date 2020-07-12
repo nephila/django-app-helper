@@ -53,7 +53,7 @@ def load_from_file(module_path):
 
     Borrowed from django-cms
     """
-    from imp import load_module, PY_SOURCE
+    from imp import PY_SOURCE, load_module
 
     imported = None
     if module_path:
@@ -150,7 +150,8 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
     :return:
     """
     import dj_database_url
-    from .default_settings import get_default_settings, get_boilerplates_settings
+
+    from .default_settings import get_boilerplates_settings, get_default_settings
 
     try:
         extra_settings_file = args.get("--extra-settings")
