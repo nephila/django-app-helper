@@ -133,7 +133,7 @@ deserve a huge thanks for their work.
     :target: https://pypi.python.org/pypi/django-app-helper
     :alt: Python versions
 
-.. |GAStatus| image:: https://github.com/nephila/django-app-helper/workflows/Linting%20-%20Tests/badge.svg
+.. |GAStatus| image:: https://github.com/nephila/django-app-helper/workflows/workflows/Tox%20tests/badge.svg
     :target: https://github.com/nephila/django-app-helper
     :alt: Latest CI build status
 
