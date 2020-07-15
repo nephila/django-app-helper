@@ -191,7 +191,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
             "cms.middleware.page.CurrentPageMiddleware",
             "cms.middleware.toolbar.ToolbarMiddleware",
         ]
-        if not CMS_31 and args["server"]:
+        if args["server"]:
             CMS_MIDDLEWARE.append("cms.middleware.utils.ApphookReloadMiddleware")
         URLCONF = "app_helper.urls"  # NOQA
     else:

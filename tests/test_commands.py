@@ -599,6 +599,26 @@ class CommandTests(unittest.TestCase):
             self.assertTrue(os.path.exists(args["STATIC_ROOT"]))
             self.assertTrue(os.path.exists(args["MEDIA_ROOT"]))
 
+    def test_testrun_runner_options(self):
+        """Run test with additional options."""
+        try:
+            import cms  # noqa: F401
+        except ImportError:
+            raise unittest.SkipTest("django CMS not available, skipping test")
+        with wrap_test_environment():
+            with captured_output() as (out, err):
+                with self.assertRaises(SystemExit) as exit_state:
+                    args = copy(DEFAULT_ARGS)
+                    args["test"] = True
+                    args["<application>"] = "example1"
+                    args["--persistent"] = True
+                    args["--runner"] = "runners.CapturedOutputRunner"
+                    args["<test-label>"] = self.application
+                    args["--runner-options"] = ["--tag=a-tag"]
+                    core(args, self.application)
+            self.assertTrue("Ran 1 test in" in err.getvalue())
+            self.assertEqual(exit_state.exception.code, 0)
+
     def test_testrun_persistent_path(self):
         """Run test via API using custom runner which only picks tests in sample applications with persistent data."""
         try:
@@ -796,7 +816,6 @@ class CommandTests(unittest.TestCase):
                         args["test"] = True
                         args["--cms"] = False
                         args["--runner"] = "runners.CapturedOutputRunner"
-                        args["--runner-options"] = "--capture"
                         core(args, self.application)
         self.assertTrue("Ran 14 tests in" in err.getvalue())
         self.assertEqual(exit_state.exception.code, 0)
@@ -857,9 +876,9 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
                 except SystemExit:
                     pass
-        self.assertTrue("63 items / 62 deselected / 1 selected" in out.getvalue())
+        self.assertTrue("64 items / 63 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("1 passed, 62 deselected" in out.getvalue())
+        self.assertTrue("1 passed, 63 deselected" in out.getvalue())
 
     def test_runner_pytest(self):
         """Run tests via pytest via helper runner."""
@@ -874,9 +893,9 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner-options='-k test_create_django_image_object'")
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
-            self.assertTrue("63 items / 62 deselected / 1 selected" in out.getvalue())
+            self.assertTrue("64 items / 63 deselected / 1 selected" in out.getvalue())
             # warnings will depend on django version and adds too much noise
-            self.assertTrue("1 passed, 62 deselected" in out.getvalue())
+            self.assertTrue("1 passed, 63 deselected" in out.getvalue())
             self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):

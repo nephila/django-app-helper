@@ -2,6 +2,7 @@ import os
 import unittest
 
 from django.contrib.auth.models import AnonymousUser
+from django.test import tag
 
 from app_helper.base_test import BaseTestCase
 from app_helper.utils import get_user_model_labels
@@ -72,6 +73,7 @@ class FakeTests(BaseTestCase):
         self._login_context.user.has_perm("add_placeholdr")
         self._login_context.user.has_perm("add_text")
 
+    @tag("a-tag")
     def test_login_context(self):
         request = self.get_request(None, "en", path="/en")
         self.assertTrue(request.user, AnonymousUser())
