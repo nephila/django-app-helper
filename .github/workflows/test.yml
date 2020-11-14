@@ -11,7 +11,7 @@ jobs:
       matrix:
         python-version: [3.8, 3.7, 3.6, 3.5]
         django: [31, 30, 22]
-        cms: [no, 37]
+        cms: [no, 37, 38]
         continue-on-error: [false]
         exclude:
           - python-version: 3.5
@@ -20,19 +20,6 @@ jobs:
             django: 31
           - django: 31
             cms: 37
-        include:
-          - python-version: 3.8
-            django: 31
-            cms: 37
-            continue-on-error: true
-          - python-version: 3.7
-            django: 31
-            cms: 37
-            continue-on-error: true
-          - python-version: 3.6
-            django: 31
-            cms: 37
-            continue-on-error: true
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
