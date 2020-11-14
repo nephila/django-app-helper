@@ -13,6 +13,9 @@ Commands take the general form::
 where **<application>** is the Django application name and **<command>** is a Django supported
 command, *or* one of the django-app-helper commands detailed below. Options vary for each command.
 
+.. note:: while all examples here use the ``django-app-helper`` CLI, a more idiomatic way to run commands is by using
+          :ref:`runner`.
+
 
 Common options
 ==============
@@ -63,17 +66,15 @@ Options
 
 * ``--runner``: custom test runner to use in dotted path notation;
 * ``--runner-options=<option1>,<option2>``: comma separated list of command
-  line options for the test runner: e.g. ``--runner-options=--with-coverage,--cover-package=my_package``
+  line options for the test runner: e.g. ``--runner-options="--with-coverage,--cover-package=my_package"``
 * ``--failfast``: whether to stop at first test failure;
 * ``--migrate``: use migrations (default);
 * ``--persistent``: use persistent storage for media and static; by default  storage is created
-                    in ``data`` directory in the root of the application; if a different
-                    directory is needed, use ``--persistent-path`` to provide the path;
+  in ``data`` directory in the root of the application; if a different
+  directory is needed, use ``--persistent-path`` to provide the path;
 * ``--persistent-path``: persistent storage path, instead of ``data``
 * ``--no-migrate``: skip migrations;
-* ``--boilerplate``: adds ``aldryn-boilerplates`` configuration to settings;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
-* ``--simple-runner`` use Django DjangoTestSuiteRunner
 * ``--native`` use the native Django command: the use of this option is **incompatible** with
   the options above.
 
@@ -134,7 +135,7 @@ Options
 -------
 
 * ``--locale=locale``: ``makemessages`` allows a single option to choose the locale to update.
-                       If not provided **en** is used.
+  If not provided **en** is used.
 
 makemigrations
 ==============
@@ -145,14 +146,14 @@ makemigrations
 
 Updates the application migrations (south migrations or Django migrations
 according to the current installed Django version). For South, it automatically
-handles `initial` and `auto` options.
+handles ``initial`` and ``auto`` options.
 
 Options
 -------
 
-* ``--merge``: Enable fixing of migration conflicts (for Django 1.7+ only)
+* ``--merge``: Enable fixing of migration conflicts
 * ``--empty``: It generates an empty migration for customisations
-* ``--dry-run``: Does not create migrations file (for Django 1.7+ only)
+* ``--dry-run``: Does not create migrations file
 
 Arguments
 ---------
@@ -199,6 +200,17 @@ server
 
 ::
 
-    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
 
 Starts a runserver instance.
+
+* ``--port=<port>``: port to bind the server on;
+* ``--bind=<bind>``: address to bind the server on;
+* ``--extra-settings=</path/to/settings.py>``: path to extra settings file;
+* ``--cms``: enable django CMS settings;
+* ``--migrate``: run migrations on server start (default);
+* ``--no-migrate``: do not run migrations on server start;
+* ``--persistent | --persistent-path=<path>``: persist generated media directory; optionally you can provide a fixed path;
+* ``--verbose=<level>``: verbosity level;
+* ``--use-daphne``: use daphne server;
+* ``--use-channels]``: use channels server;

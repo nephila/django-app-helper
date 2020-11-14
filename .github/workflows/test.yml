@@ -1,70 +1,27 @@
-name: Linting - Tests
+name: Tox tests
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-
-  lint:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
-        toxenv: [pep8, isort, black, pypi-description, docs]
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Cache pip
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-lint-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-lint-
-          ${{ runner.os }}-
-    - name: Cache tox
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-tox-lint-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-tox-lint-
-          ${{ runner.os }}-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools tox>=1.8 coveralls codecov
-    - name: Test with tox
-      run: |
-        tox -e${{ matrix.toxenv }}
-
   test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.continue-on-error }}
     strategy:
       matrix:
-        python-version: [3.8, 3.7, 3.6, 3.5, 2.7]
-        django: [30, 22, 111]
-        cms: [no, 37, 36, 35, 34]
+        python-version: [3.8, 3.7, 3.6, 3.5]
+        django: [31, 30, 22]
+        cms: [nocms, cms37, cms38, async]
+        continue-on-error: [false]
         exclude:
-          - django: 30
-            cms: 36
-          - django: 30
-            cms: 35
-          - django: 30
-            cms: 34
-          - python-version: 3.7
-            django: 111
-          - python-version: 3.6
-            django: 111
           - python-version: 3.5
-            django: 111
-          - python-version: 2.7
             django: 30
-          - python-version: 2.7
-            django: 22
+          - python-version: 3.5
+            django: 31
+          - django: 31
+            cms: cms37
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -73,31 +30,30 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ matrix.toxenv }}
         restore-keys: |
-          ${{ runner.os }}-pip-
-          ${{ runner.os }}-
+          ${{ runner.os }}-pip-${{ matrix.toxenv }}
     - name: Cache tox
       uses: actions/cache@v1
       with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-tox-${{ hashFiles('requirements.txt') }}
+        path: .tox
+        key: ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-${{ hashFiles('setup.cfg') }}
         restore-keys: |
-          ${{ runner.os }}-tox-
-          ${{ runner.os }}-
+          ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-
     - name: Install dependencies
       run: |
         sudo apt-get install gettext
-        python -m pip install --upgrade pip setuptools tox>=1.8 coveralls codecov 'coverage<5'
+        python -m pip install --upgrade pip tox>=3.5
     - name: Test with tox
       env:
-        TOX_ENV: ${{ format('{{py{0}-django{1}-cms{2}}}', matrix.python-version, matrix.django, matrix.cms) }}
+        TOX_ENV: ${{ format('py-django{1}-{2}', matrix.python-version, matrix.django, matrix.cms) }}
         COMMAND: coverage run
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_SERVICE_NAME: github
       run: |
         tox -e$TOX_ENV
-        python -mcoverage xml
-        coveralls
+        .tox/$TOX_ENV/bin/coverage xml
+        .tox/$TOX_ENV/bin/coveralls
     - uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

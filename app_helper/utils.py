@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import contextlib
 import os
 import shutil
 import sys
 from distutils.version import LooseVersion
 from tempfile import mkdtemp
+from unittest.mock import patch
 
 import django
 import six
@@ -15,12 +13,6 @@ from django.urls import clear_url_caches
 from django.utils.functional import empty
 
 from . import HELPER_FILE
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
 
 try:
     import cms  # NOQA
@@ -49,16 +41,6 @@ except ImportError:  # pragma: no cover
     CMS_31 = False
     CMS_30 = False
 
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion("1.5")
-DJANGO_1_5 = LooseVersion(django.get_version()) < LooseVersion("1.6")
-DJANGO_1_6 = LooseVersion(django.get_version()) < LooseVersion("1.7")
-DJANGO_1_7 = LooseVersion(django.get_version()) < LooseVersion("1.8")
-DJANGO_1_8 = LooseVersion(django.get_version()) < LooseVersion("1.9")
-DJANGO_1_9 = LooseVersion(django.get_version()) < LooseVersion("1.10")
-DJANGO_1_10 = LooseVersion(django.get_version()) < LooseVersion("1.11")
-DJANGO_1_11 = LooseVersion(django.get_version()) < LooseVersion("2.0")
-DJANGO_2_0 = LooseVersion(django.get_version()) < LooseVersion("2.1")
-DJANGO_2_1 = LooseVersion(django.get_version()) < LooseVersion("2.2")
 DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion("3.0")
 DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion("3.1")
 DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion("3.2")
@@ -71,11 +53,11 @@ def load_from_file(module_path):
 
     Borrowed from django-cms
     """
-    from imp import load_module, PY_SOURCE
+    from imp import PY_SOURCE, load_module
 
     imported = None
     if module_path:
-        with open(module_path, "r") as openfile:
+        with open(module_path) as openfile:
             imported = load_module("mod", openfile, module_path, ("imported", "r", PY_SOURCE))
     return imported
 
@@ -128,11 +110,11 @@ def persistent_dir(suffix, container="data"):
     yield name
 
 
-class DisableMigrations(object):
-    def __contains__(self, item):
+class DisableMigrations:
+    def __contains__(self, item):  # pragma: no cover
         return True
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # pragma: no cover
         return None
 
 
@@ -150,13 +132,6 @@ def _reset_django(settings):
         clear_url_caches()
 
 
-def extend_settings(settings, extra_settings, key, insertion_point):
-    for item in extra_settings[key]:
-        if item not in settings[key]:
-            settings[key].insert(settings[key].index(insertion_point), item)
-    return settings
-
-
 def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQA
     """
     Setup the Django settings
@@ -168,17 +143,18 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
     :return:
     """
     import dj_database_url
-    from .default_settings import get_default_settings, get_boilerplates_settings
+
+    from .default_settings import get_default_settings
 
     try:
         extra_settings_file = args.get("--extra-settings")
         if not extra_settings_file:
             extra_settings_file = HELPER_FILE
-        if extra_settings_file[-3:] != ".py":
+        if extra_settings_file[-3:] != ".py":  # pragma: no cover
             filename, __ = os.path.splitext(extra_settings_file)
-            extra_settings_file = "{0}.py".format(filename)
+            extra_settings_file = "{}.py".format(filename)
         extra_settings = load_from_file(extra_settings_file).HELPER_SETTINGS
-    except (IOError, AttributeError):
+    except (OSError, AttributeError):
         extra_settings = None
     default_name = ":memory:" if args["test"] else "local.sqlite"
     db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
@@ -208,7 +184,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
             "cms.middleware.page.CurrentPageMiddleware",
             "cms.middleware.toolbar.ToolbarMiddleware",
         ]
-        if not CMS_31 and args["server"]:
+        if args["server"]:
             CMS_MIDDLEWARE.append("cms.middleware.utils.ApphookReloadMiddleware")
         URLCONF = "app_helper.urls"  # NOQA
     else:
@@ -252,34 +228,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
         default_settings["INSTALLED_APPS"].append("mptt")
     if "filer" in default_settings["INSTALLED_APPS"] and "easy_thumbnails" not in default_settings["INSTALLED_APPS"]:
         default_settings["INSTALLED_APPS"].append("easy_thumbnails")
-
-    if args["--boilerplate"]:
-        boilerplate_settings = get_boilerplates_settings()
-
-        # Do not override helper settings with defaults.
-        if "ALDRYN_BOILERPLATE_NAME" in default_settings.keys():
-            del boilerplate_settings["ALDRYN_BOILERPLATE_NAME"]
-
-        default_settings = extend_settings(
-            default_settings,
-            boilerplate_settings,
-            "STATICFILES_FINDERS",
-            "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-        )
-        del boilerplate_settings["STATICFILES_FINDERS"]
-
-        default_settings = extend_settings(
-            default_settings,
-            boilerplate_settings,
-            "TEMPLATE_LOADERS",
-            "django.template.loaders.app_directories.Loader",
-        )
-        del boilerplate_settings["TEMPLATE_LOADERS"]
-
-        for setting in ("INSTALLED_APPS", "TEMPLATE_CONTEXT_PROCESSORS"):
-            default_settings[setting].extend(boilerplate_settings[setting])
-            del boilerplate_settings[setting]
-        default_settings.update(boilerplate_settings)
 
     default_settings["TEMPLATES"] = [
         {
@@ -400,12 +348,12 @@ def create_user(
 def get_user_model_labels():
     User = get_user_model()  # NOQA
 
-    user_orm_label = "%s.%s" % (User._meta.app_label, User._meta.object_name)
-    user_model_label = "%s.%s" % (User._meta.app_label, User._meta.model_name)
+    user_orm_label = "{}.{}".format(User._meta.app_label, User._meta.object_name)
+    user_model_label = "{}.{}".format(User._meta.app_label, User._meta.model_name)
     return user_orm_label, user_model_label
 
 
-class UserLoginContext(object):
+class UserLoginContext:
     def __init__(self, testcase, user, password=None):
         self.testcase = testcase
         self.user = user
@@ -433,7 +381,7 @@ def ensure_unicoded_and_unique(args_list, application):
     """
     unicoded_args = []
     for argument in args_list:
-        argument = six.u(argument) if not isinstance(argument, six.text_type) else argument
+        argument = argument if not isinstance(argument, str) else argument
         if argument not in unicoded_args or argument == application:
             unicoded_args.append(argument)
     return unicoded_args

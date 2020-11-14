@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-
 def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE, URLCONF, application):  # NOQA
     return dict(  # NOQA
         INSTALLED_APPS=[
@@ -56,14 +52,5 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE,
         PASSWORD_HASHERS=("django.contrib.auth.hashers.MD5PasswordHasher",),
         MIGRATION_MODULES={},
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        ASGI_APPLICATION="app_helper.asgi:application",
     )
-
-
-def get_boilerplates_settings():
-    return {
-        "STATICFILES_FINDERS": ["aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder"],
-        "TEMPLATE_LOADERS": ["aldryn_boilerplates.template_loaders.AppDirectoriesLoader"],
-        "TEMPLATE_CONTEXT_PROCESSORS": ["aldryn_boilerplates.context_processors.boilerplate"],
-        "ALDRYN_BOILERPLATE_NAME": "bootstrap3",
-        "INSTALLED_APPS": ["aldryn_boilerplates"],
-    }

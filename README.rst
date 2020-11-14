@@ -4,10 +4,7 @@ Django App helper
 
 |Gitter| |PyPiVersion| |PyVersion| |GAStatus| |TestCoverage| |CodeClimate| |License|
 
-.. warning::  This project used to be called djangocms-helper. It's been renamed
-              in version 2.0 to clarify that it's not limited to django CMS apps.
-
-              See `Migrating from djangocms-helper to django-app-helper`_ for further information.
+.. warning:: Starting 3.0 django-app-helper only supports Django 2.2+ and django CMS 3.7+. If you need support for older (unsupported) versions, use django-app-helper 2.
 
 ******************************************
 Helper for django applications development
@@ -28,11 +25,11 @@ It supports both tests writted using Django ``TestCase`` and pytest ones
 Supported versions
 ==================
 
-Python: 2.7, 3.5, 3.6, 3.7
+Python: 3.6, 3.7, 3.8
 
-Django: 1.11 - 3.0
+Django: 2.2 - 3.1
 
-django CMS: 3.4 - 3.7
+django CMS: 3.7, 3.8
 
 Newer versions might work but are not tested yet.
 
@@ -80,6 +77,19 @@ Runner
 By using the integrated runned in the settings file you'll be able to run
 the commands without invoking ``django-app-helper``: see `Integrated runner`_
 for reference.
+
+***************
+ASGI / Channels
+***************
+
+ASGI / Channels are supported by installing the project with ``django-app-helper[async]``.
+
+With Daphne / Channels installed you can run ``django-app-helper server --use-daphne|--use-channels`` to run the
+project on ASGI.
+
+See `ASGI / Channels support`_
+
+Pure ASGI support is available only for Django 3.0+.
 
 ************
 Installation
@@ -136,7 +146,7 @@ deserve a huge thanks for their work.
     :target: https://pypi.python.org/pypi/django-app-helper
     :alt: Python versions
 
-.. |GAStatus| image:: https://github.com/nephila/django-app-helper/workflows/Linting%20-%20Tests/badge.svg
+.. |GAStatus| image:: https://github.com/nephila/django-app-helper/workflows/workflows/Tox%20tests/badge.svg
     :target: https://github.com/nephila/django-app-helper
     :alt: Latest CI build status
 
@@ -161,3 +171,4 @@ deserve a huge thanks for their work.
 .. _django CMS's: https://github.com/divio/django-cms:
 .. _usage: https://github.com/nephila/cookiecutter-djangopackage-helper#usage
 .. _pytest support: https://django-app-helper.readthedocs.io/en/latest/pytest.html
+.. _ASGI / Channels support: https://django-app-helper.readthedocs.io/en/latest/asgi.html

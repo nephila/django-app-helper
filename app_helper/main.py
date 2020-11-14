@@ -1,29 +1,16 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, print_function, unicode_literals
-
+import argparse
 import contextlib
 import os
 import subprocess
 import sys
 import warnings
 
-from django.utils import autoreload
 from django.utils.encoding import force_text
 from docopt import DocoptExit, docopt
-from six import text_type
 
 from . import __version__
-from .utils import (
-    DJANGO_1_11,
-    _create_db,
-    _make_settings,
-    create_user,
-    ensure_unicoded_and_unique,
-    get_user_model,
-    persistent_dir,
-    temp_dir,
-    work_in,
-)
+from .utils import _create_db, _make_settings, ensure_unicoded_and_unique, persistent_dir, temp_dir, work_in
 
 __doc__ = """django CMS applications development helper script.
 
@@ -31,16 +18,16 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    django-app-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
-    django-app-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
-    django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
-    django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
-    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>]
-    django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--boilerplate] [--migrate] [--no-migrate]
+    django-app-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
+    django-app-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate]
+    django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--locale=locale]
+    django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [<extra-applications>...]
+    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
+    django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--migrate] [--no-migrate]
 
 Options:
     -h --help                   Show this screen.
@@ -51,7 +38,6 @@ Options:
     --merge                     Merge migrations
     --failfast                  Stop tests on first failure.
     --native                    Use the native test command, instead of the django-app-helper on
-    --boilerplate               Add support for aldryn-boilerplates
     --persistent                Use persistent storage
     --persistent-path=<path>    Persistent storage path
     --locale=locale,-l=locale   Update messgaes for given locale
@@ -61,8 +47,19 @@ Options:
     --runner-options=<option1>,<option2>        Comma separated list of command line options for the test runner
     --port=<port>                               Port to listen on [default: 8000].
     --bind=<bind>                               Interface to bind to [default: 127.0.0.1].
+    --use-channels                              Run the channels runserver instead of the Django one
+    --use-daphne                                Run the Daphne runserver instead of the Django one
     <extra-applications>                        Comma separated list of applications to create migrations for
 """  # NOQA # nopyflakes
+
+
+def _parse_runner_options(test_runner_class, options):
+    if hasattr(test_runner_class, "add_arguments"):
+        parser = argparse.ArgumentParser()
+        test_runner_class.add_arguments(parser)
+        args = parser.parse_args(options)
+        return vars(args)
+    return {}  # pragma: no cover
 
 
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
@@ -80,9 +77,15 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=No
     settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)  # NOQA
 
+    kwargs = {"verbosity": verbose, "interactive": False, "failfast": failfast}
     if runner_options:
-        sys.argv.extend(runner_options.split(","))
-    test_runner = TestRunner(verbosity=verbose, interactive=False, failfast=failfast)
+        if "PytestTestRunner" in test_runner:
+            kwargs["pytest_args"] = runner_options
+        else:
+            extra = _parse_runner_options(TestRunner, runner_options)
+            extra.update(kwargs)
+            kwargs = extra
+    test_runner = TestRunner(**kwargs)
     failures = test_runner.run_tests(test_labels)
     return failures
 
@@ -98,7 +101,7 @@ def test(test_labels, application, failfast=False, test_runner=None, runner_opti
             test_labels = ["tests"]
         elif os.path.exists(os.path.join(application, "tests")):
             test_labels = ["%s.tests" % application]
-    elif type(test_labels) is text_type:
+    elif type(test_labels) is str:  # pragma: no cover
         test_labels = [test_labels]
     runner_options = runner_options or []
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
@@ -111,10 +114,7 @@ def compilemessages(application):
     from django.core.management import call_command
 
     with work_in(application):
-        if DJANGO_1_11:
-            call_command("compilemessages", all=True)
-        else:
-            call_command("compilemessages")
+        call_command("compilemessages")
 
 
 def makemessages(application, locale):
@@ -140,7 +140,7 @@ def cms_check(migrate_cmd=False):
 
         _create_db(migrate_cmd)
         call_command("cms", "check")
-    except ImportError:
+    except ImportError:  # pragma: no cover
         print("cms_check available only if django CMS is installed")
 
 
@@ -152,7 +152,7 @@ def makemigrations(application, merge=False, dry_run=False, empty=False, extra_a
 
     apps = [application]
     if extra_applications:
-        if isinstance(extra_applications, text_type):
+        if isinstance(extra_applications, str):  # pragma: no cover
             apps += [extra_applications]
         elif isinstance(extra_applications, list):
             apps += extra_applications
@@ -175,7 +175,7 @@ def generate_authors():
     for authfile in ("AUTHORS", "AUTHORS.rst"):
         if os.path.exists(authfile):
             break
-    with open(authfile, "r") as f:
+    with open(authfile) as f:
         for line in f.readlines():
             if line.startswith("*"):
                 author = force_text(line).strip("* \n")
@@ -192,7 +192,7 @@ def generate_authors():
     authors = sorted(authors, key=lambda x: x.lower())
 
     # Write our authors to the AUTHORS file
-    print("Authors (%s):\n\n\n* %s" % (len(authors), "\n* ".join(authors)))
+    print("Authors ({}):\n\n\n* {}".format(len(authors), "\n* ".join(authors)))
 
 
 def static_analisys(application):
@@ -216,68 +216,12 @@ def static_analisys(application):
         )
 
 
-def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
-    try:
-        from channels.management.commands import runserver
+def server(
+    settings, bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1, use_channels=False, use_daphne=False
+):  # pragma: no cover
+    from .server import run
 
-        logger = None
-        use_channels = True
-    except ImportError:
-        from django.contrib.staticfiles.management.commands import runserver
-
-        use_channels = False
-        logger = None
-
-    if os.environ.get("RUN_MAIN") != "true":
-        _create_db(migrate_cmd)
-        User = get_user_model()  # NOQA
-        if not User.objects.filter(is_superuser=True).exists():
-            usr = create_user("admin", "admin@admin.com", "admin", is_staff=True, is_superuser=True)
-            print("")
-            print("A admin user (username: %s, password: admin) " "has been created." % usr.get_username())
-            print("")
-    rs = runserver.Command()
-    try:
-        from django.core.management.base import OutputWrapper
-
-        rs.stdout = OutputWrapper(sys.stdout)
-        rs.stderr = OutputWrapper(sys.stderr)
-    except ImportError:
-        rs.stdout = sys.stdout
-        rs.stderr = sys.stderr
-    rs.use_ipv6 = False
-    rs._raw_ipv6 = False
-    rs.addr = bind
-    rs.port = port
-    if logger:
-        rs.logger = logger
-    if use_channels:
-        rs.http_timeout = 60
-        rs.websocket_handshake_timeout = 5
-    try:
-        autoreload.run_with_reloader(
-            rs.inner_run,
-            **{
-                "addrport": "%s:%s" % (bind, port),
-                "insecure_serving": True,
-                "use_static_handler": True,
-                "use_threading": True,
-                "verbosity": verbose,
-                "use_reloader": True,
-            }
-        )
-    except AttributeError:
-        autoreload.main(
-            rs.inner_run,
-            kwargs={
-                "addrport": "%s:%s" % (bind, port),
-                "insecure_serving": True,
-                "use_static_handler": True,
-                "use_threading": True,
-                "verbosity": verbose,
-                "use_reloader": True,
-            }
-        )
+    run(settings, bind, port, migrate_cmd, verbose, use_channels, use_daphne)
 
 
 def setup_env(settings):
@@ -386,7 +330,15 @@ def core(args, application):
                         )
                         sys.exit(num_failures)
                 elif args["server"]:
-                    server(args["--bind"], args["--port"], args.get("--migrate", True), args.get("--verbose", 1))
+                    server(
+                        settings,
+                        args["--bind"],
+                        args["--port"],
+                        args.get("--migrate", True),
+                        args.get("--verbose", 1),
+                        args.get("--use-channels", False),
+                        args.get("--use-daphne", False),
+                    )
                 elif args["cms_check"]:
                     cms_check(args.get("--migrate", True))
                 elif args["compilemessages"]:
