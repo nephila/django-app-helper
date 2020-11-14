@@ -132,13 +132,6 @@ def _reset_django(settings):
         clear_url_caches()
 
 
-def extend_settings(settings, extra_settings, key, insertion_point):
-    for item in extra_settings[key]:
-        if item not in settings[key]:
-            settings[key].insert(settings[key].index(insertion_point), item)
-    return settings
-
-
 def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQA
     """
     Setup the Django settings
