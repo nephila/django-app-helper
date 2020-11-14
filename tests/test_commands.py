@@ -8,12 +8,15 @@ from copy import copy
 from tempfile import mkdtemp
 from unittest.mock import patch
 
+import django
 from django.test.utils import setup_test_environment, teardown_test_environment
 
 from app_helper import runner
 from app_helper.default_settings import get_boilerplates_settings
 from app_helper.main import _make_settings, core
-from app_helper.utils import captured_output, temp_dir, work_in
+from app_helper.utils import captured_output, get_user_model, temp_dir, work_in
+
+User = get_user_model()
 
 
 @contextlib.contextmanager
@@ -57,6 +60,8 @@ DEFAULT_ARGS = {
     "--native": False,
     "--persistent": False,
     "--persistent-path": None,
+    "--use-daphne": False,
+    "--use-channels": False,
     "--bind": "",
     "--port": "",
     "<test-label>": "",
@@ -187,6 +192,8 @@ class CommandTests(unittest.TestCase):
             "--verbose": None,
             "--version": False,
             "--xvfb": False,
+            "--use-daphne": False,
+            "--use-channels": False,
             "<application>": "example1",
             "<command>": None,
             "<extra-applications>": [],
@@ -240,6 +247,8 @@ class CommandTests(unittest.TestCase):
             "--verbose": None,
             "--version": False,
             "--xvfb": False,
+            "--use-daphne": False,
+            "--use-channels": False,
             "<application>": "example1",
             "<command>": None,
             "<extra-applications>": [],
@@ -294,6 +303,8 @@ class CommandTests(unittest.TestCase):
             "--verbose": None,
             "--version": False,
             "--xvfb": False,
+            "--use-daphne": False,
+            "--use-channels": False,
             "<application>": "example1",
             "<command>": "some_command",
             "<extra-applications>": [],
@@ -402,15 +413,52 @@ class CommandTests(unittest.TestCase):
                                     set(local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]).intersection(set(value))
                                 )
 
-    @patch("app_helper.main.autoreload")
-    def test_server(self, mocked_command):
-        """Run server command and create default user."""
+    @patch("app_helper.server.autoreload.run_with_reloader")
+    def test_server_django(self, run_with_reloader):
+        """Run server command and create default user - django version."""
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args["server"] = True
                 core(args, self.application)
             self.assertTrue("A admin user (username: admin, password: admin) has been created." in out.getvalue())
+            self.assertEqual(run_with_reloader.call_args[0][0].__module__, "django.core.management.commands.runserver")
+        User.objects.all().delete()
+
+    @patch("app_helper.server.autoreload.run_with_reloader")
+    def test_server_channels(self, run_with_reloader):
+        """Run server command and create default user - channels version."""
+        try:
+            import channels  # noqa: F401
+        except ImportError:
+            raise unittest.SkipTest("channels is not available, skipping test")
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args["server"] = True
+                args["--use-channels"] = True
+                core(args, self.application)
+            self.assertTrue("A admin user (username: admin, password: admin) has been created." in out.getvalue())
+            self.assertEqual(run_with_reloader.call_args[0][0].__module__, "channels.management.commands.runserver")
+        User.objects.all().delete()
+
+    @unittest.skipIf(django.VERSION < (3, 0), "Daphne support requires Django 3.0+")
+    @patch("app_helper.server.autoreload.run_with_reloader")
+    def test_server_daphne(self, run_with_reloader):
+        """Run server command and create default user - daphne version."""
+        try:
+            import daphne  # noqa: F401
+        except ImportError:
+            raise unittest.SkipTest("daphne is not available, skipping test")
+        with work_in(self.basedir):
+            with captured_output() as (out, err):
+                args = copy(DEFAULT_ARGS)
+                args["server"] = True
+                args["--use-daphne"] = True
+                core(args, self.application)
+            self.assertTrue("A admin user (username: admin, password: admin) has been created." in out.getvalue())
+            self.assertEqual(run_with_reloader.call_args[0][0].__module__, "daphne.cli")
+        User.objects.all().delete()
 
     def test_makemigrations(self):
         """Run makemigrations command."""
@@ -876,9 +924,9 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
                 except SystemExit:
                     pass
-        self.assertTrue("64 items / 63 deselected / 1 selected" in out.getvalue())
+        self.assertTrue("66 items / 65 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("1 passed, 63 deselected" in out.getvalue())
+        self.assertTrue("1 passed, 65 deselected" in out.getvalue())
 
     def test_runner_pytest(self):
         """Run tests via pytest via helper runner."""
@@ -893,9 +941,9 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner-options='-k test_create_django_image_object'")
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
-            self.assertTrue("64 items / 63 deselected / 1 selected" in out.getvalue())
+            self.assertTrue("66 items / 65 deselected / 1 selected" in out.getvalue())
             # warnings will depend on django version and adds too much noise
-            self.assertTrue("1 passed, 63 deselected" in out.getvalue())
+            self.assertTrue("1 passed, 65 deselected" in out.getvalue())
             self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):

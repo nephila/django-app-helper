@@ -52,6 +52,7 @@ def get_default_settings(CMS_APP, CMS_PROCESSORS, CMS_MIDDLEWARE, CMS_APP_STYLE,
         PASSWORD_HASHERS=("django.contrib.auth.hashers.MD5PasswordHasher",),
         MIGRATION_MODULES={},
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+        ASGI_APPLICATION="app_helper.asgi:application",
     )
 
 

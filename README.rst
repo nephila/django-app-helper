@@ -78,6 +78,19 @@ By using the integrated runned in the settings file you'll be able to run
 the commands without invoking ``django-app-helper``: see `Integrated runner`_
 for reference.
 
+***************
+ASGI / Channels
+***************
+
+ASGI / Channels are supported by installing the project with ``django-app-helper[async]``.
+
+With Daphne / Channels installed you can run ``django-app-helper server --use-daphne|--use-channels`` to run the
+project on ASGI.
+
+See `ASGI / Channels support`_
+
+Pure ASGI support is available only for Django 3.0+.
+
 ************
 Installation
 ************
@@ -158,3 +171,4 @@ deserve a huge thanks for their work.
 .. _django CMS's: https://github.com/divio/django-cms:
 .. _usage: https://github.com/nephila/cookiecutter-djangopackage-helper#usage
 .. _pytest support: https://django-app-helper.readthedocs.io/en/latest/pytest.html
+.. _ASGI / Channels support: https://django-app-helper.readthedocs.io/en/latest/asgi.html

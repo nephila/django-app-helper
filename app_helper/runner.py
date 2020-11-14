@@ -61,12 +61,8 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     """
 
     def _pytest_setup(settings, module):
-        for setting in dir(settings):
-            if setting.isupper():
-                setting_value = getattr(settings, setting)
-                if setting == "SECRET_KEY" and not setting_value:
-                    setting_value = "SECRET"
-                setattr(module, setting, setting_value)
+        if not getattr(settings, "SECRET_KEY", None):
+            settings.SECRET_KEY = "SECRET"
 
     helper = helper_module.__file__
     argv = [os.path.basename(helper), app, "setup", "--extra-settings={}".format(helper)]
@@ -77,6 +73,7 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     settings = runner(argv)
     if "pytest_django" in sys.modules:
         _pytest_setup(settings, helper_module)
+    _pytest_setup(settings, helper_module)
     return settings
 
 

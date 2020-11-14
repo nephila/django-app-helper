@@ -147,14 +147,14 @@ makemigrations
 
 Updates the application migrations (south migrations or Django migrations
 according to the current installed Django version). For South, it automatically
-handles `initial` and `auto` options.
+handles ``initial`` and ``auto`` options.
 
 Options
 -------
 
-* ``--merge``: Enable fixing of migration conflicts (for Django 1.7+ only)
+* ``--merge``: Enable fixing of migration conflicts
 * ``--empty``: It generates an empty migration for customisations
-* ``--dry-run``: Does not create migrations file (for Django 1.7+ only)
+* ``--dry-run``: Does not create migrations file
 
 Arguments
 ---------
@@ -201,6 +201,17 @@ server
 
 ::
 
-    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
 
 Starts a runserver instance.
+
+* ``--port=<port>``: port to bind the server on;
+* ``--bind=<bind>``: address to bind the server on;
+* ``--extra-settings=</path/to/settings.py>``: path to extra settings file;
+* ``--cms``: enable django CMS settings;
+* ``--migrate``: run migrations on server start (default);
+* ``--no-migrate``: do not run migrations on server start;
+* ``--persistent | --persistent-path=<path>``: persist generated media directory; optionally you can provide a fixed path;
+* ``--verbose=<level>``: verbosity level;
+* ``--use-daphne``: use daphne server;
+* ``--use-channels]``: use channels server;

@@ -6,21 +6,11 @@ import subprocess
 import sys
 import warnings
 
-from django.utils import autoreload
 from django.utils.encoding import force_text
 from docopt import DocoptExit, docopt
 
 from . import __version__
-from .utils import (
-    _create_db,
-    _make_settings,
-    create_user,
-    ensure_unicoded_and_unique,
-    get_user_model,
-    persistent_dir,
-    temp_dir,
-    work_in,
-)
+from .utils import _create_db, _make_settings, ensure_unicoded_and_unique, persistent_dir, temp_dir, work_in
 
 __doc__ = """django CMS applications development helper script.
 
@@ -35,7 +25,7 @@ Usage:
     django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
     django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
     django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
     django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--boilerplate] [--migrate] [--no-migrate]
 
@@ -58,6 +48,8 @@ Options:
     --runner-options=<option1>,<option2>        Comma separated list of command line options for the test runner
     --port=<port>                               Port to listen on [default: 8000].
     --bind=<bind>                               Interface to bind to [default: 127.0.0.1].
+    --use-channels                              Run the channels runserver instead of the Django one
+    --use-daphne                                Run the Daphne runserver instead of the Django one
     <extra-applications>                        Comma separated list of applications to create migrations for
 """  # NOQA # nopyflakes
 
@@ -225,68 +217,12 @@ def static_analisys(application):
         )
 
 
-def server(bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1):  # pragma: no cover
-    try:
-        from channels.management.commands import runserver
+def server(
+    settings, bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1, use_channels=False, use_daphne=False
+):  # pragma: no cover
+    from .server import run
 
-        logger = None
-        use_channels = True
-    except ImportError:
-        from django.contrib.staticfiles.management.commands import runserver
-
-        use_channels = False
-        logger = None
-
-    if os.environ.get("RUN_MAIN") != "true":
-        _create_db(migrate_cmd)
-        User = get_user_model()  # NOQA
-        if not User.objects.filter(is_superuser=True).exists():
-            usr = create_user("admin", "admin@admin.com", "admin", is_staff=True, is_superuser=True)
-            print("")
-            print("A admin user (username: %s, password: admin) " "has been created." % usr.get_username())
-            print("")
-    rs = runserver.Command()
-    try:
-        from django.core.management.base import OutputWrapper
-
-        rs.stdout = OutputWrapper(sys.stdout)
-        rs.stderr = OutputWrapper(sys.stderr)
-    except ImportError:
-        rs.stdout = sys.stdout
-        rs.stderr = sys.stderr
-    rs.use_ipv6 = False
-    rs._raw_ipv6 = False
-    rs.addr = bind
-    rs.port = port
-    if logger:
-        rs.logger = logger
-    if use_channels:
-        rs.http_timeout = 60
-        rs.websocket_handshake_timeout = 5
-    try:
-        autoreload.run_with_reloader(
-            rs.inner_run,
-            **{
-                "addrport": "{}:{}".format(bind, port),
-                "insecure_serving": True,
-                "use_static_handler": True,
-                "use_threading": True,
-                "verbosity": verbose,
-                "use_reloader": True,
-            },
-        )
-    except AttributeError:
-        autoreload.main(
-            rs.inner_run,
-            kwargs={
-                "addrport": "{}:{}".format(bind, port),
-                "insecure_serving": True,
-                "use_static_handler": True,
-                "use_threading": True,
-                "verbosity": verbose,
-                "use_reloader": True,
-            },
-        )
+    run(settings, bind, port, migrate_cmd, verbose, use_channels, use_daphne)
 
 
 def setup_env(settings):
@@ -395,7 +331,15 @@ def core(args, application):
                         )
                         sys.exit(num_failures)
                 elif args["server"]:
-                    server(args["--bind"], args["--port"], args.get("--migrate", True), args.get("--verbose", 1))
+                    server(
+                        settings,
+                        args["--bind"],
+                        args["--port"],
+                        args.get("--migrate", True),
+                        args.get("--verbose", 1),
+                        args.get("--use-channels", False),
+                        args.get("--use-daphne", False),
+                    )
                 elif args["cms_check"]:
                     cms_check(args.get("--migrate", True))
                 elif args["compilemessages"]:
