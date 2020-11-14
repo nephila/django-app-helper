@@ -6,6 +6,41 @@ History
 
 .. towncrier release notes start
 
+3.0.0 (2020-11-14)
+==================
+
+Features
+--------
+
+- Add support for Django 3.1 / django CMS 3.8 (#196)
+- Add Django 3.0 / django CMS 3.7.2 support (#142)
+- Drop Python 2 / Django 1.11 (#148)
+- Add support for Daphne / channels runserver (#198)
+- Refactor BaseTestCaseMixin to more composable mixins (#107)
+- Replace makefile with invoke (#143)
+- Use pre-commit for code formatting (#149)
+- Allow to pass arguments to pytest via runner-options argument (#159)
+- Add support to pytest command (#167)
+- Update dotfiles to latest version (#189)
+- Reorganize tests outside main package (#191)
+- Remove support for aldryn-boilerplates (#199)
+
+
+Bugfixes
+--------
+
+- Fix runner_options support (#92)
+- Improve GA - Update contribution guide (#161)
+- Allow extra arguments in PytestTestRunner.run_tests (#165)
+- Update isort and linting configuration (#188)
+
+
+Misc
+----
+
+- #152, #185
+
+
 2.2.2 (2020-05-15)
 =======================
 

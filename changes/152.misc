@@ -1,1 +1,0 @@
-Add check for towncrier presence in tox, pre-commit and GA
