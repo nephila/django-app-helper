@@ -5,7 +5,6 @@ wheel
 pep517
 invoke
 tox>=1.8
-aldryn-boilerplates
 pyflakes<2.1
 pytest
 pytest-django

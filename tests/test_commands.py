@@ -12,7 +12,6 @@ import django
 from django.test.utils import setup_test_environment, teardown_test_environment
 
 from app_helper import runner
-from app_helper.default_settings import get_boilerplates_settings
 from app_helper.main import _make_settings, core
 from app_helper.utils import captured_output, get_user_model, temp_dir, work_in
 
@@ -54,7 +53,6 @@ DEFAULT_ARGS = {
     "--failfast": False,
     "--merge": False,
     "--locale": "",
-    "--boilerplate": False,
     "--dry-run": False,
     "--empty": False,
     "--native": False,
@@ -172,7 +170,6 @@ class CommandTests(unittest.TestCase):
         ]
         target_1 = {
             "--bind": "127.0.0.1",
-            "--boilerplate": False,
             "--cms": True,
             "--dry-run": False,
             "--empty": False,
@@ -227,7 +224,6 @@ class CommandTests(unittest.TestCase):
         ]
         target_2 = {
             "--bind": "127.0.0.1",
-            "--boilerplate": False,
             "--cms": True,
             "--dry-run": False,
             "--empty": False,
@@ -283,7 +279,6 @@ class CommandTests(unittest.TestCase):
         ]
         target_3 = {
             "--bind": "127.0.0.1",
-            "--boilerplate": False,
             "--cms": True,
             "--dry-run": False,
             "--empty": False,
@@ -353,7 +348,6 @@ class CommandTests(unittest.TestCase):
                         # Testing that helper.py in custom project is loaded
                         self.assertEqual(local_settings.TIME_ZONE, "Europe/Rome")
 
-                        args["--boilerplate"] = True
                         args["--extra-settings"] = "cms_helper_extra.py"
                         local_settings = _make_settings(args, self.application, settings, STATIC_ROOT, MEDIA_ROOT)
                         # Testing that helper.py in the command option is loaded
@@ -369,8 +363,6 @@ class CommandTests(unittest.TestCase):
                         )
                         self.assertEqual("top_middleware", local_settings.MIDDLEWARE[0])
                         self.assertTrue("some_middleware" in local_settings.MIDDLEWARE)
-
-                        boilerplate_settings = get_boilerplates_settings()
 
                         # Check the loaders
                         self.assertTrue(
@@ -393,25 +385,6 @@ class CommandTests(unittest.TestCase):
                         )
                         # Check template dirs
                         self.assertTrue("some/dir" in local_settings.TEMPLATES[0]["DIRS"])
-                        # Check for aldryn boilerplates
-                        for name, value in boilerplate_settings.items():
-                            if not name.startswith("TEMPLATE"):
-                                if type(value) in (list, tuple):
-                                    self.assertTrue(set(getattr(local_settings, name)).intersection(set(value)))
-                                elif name == "ALDRYN_BOILERPLATE_NAME":
-                                    self.assertEqual(getattr(local_settings, name), "legacy")
-                                else:
-                                    self.assertTrue(value in getattr(local_settings, name))
-                            elif name == "TEMPLATE_CONTEXT_PROCESSORS":
-                                self.assertTrue(
-                                    set(local_settings.TEMPLATES[0]["OPTIONS"]["context_processors"]).intersection(
-                                        set(value)
-                                    )
-                                )
-                            elif name == "TEMPLATE_LOADERS":
-                                self.assertTrue(
-                                    set(local_settings.TEMPLATES[0]["OPTIONS"]["loaders"]).intersection(set(value))
-                                )
 
     @patch("app_helper.server.autoreload.run_with_reloader")
     def test_server_django(self, run_with_reloader):
@@ -823,9 +796,10 @@ class CommandTests(unittest.TestCase):
         with captured_output():
             from tests.test_utils import helper
 
-            settings = runner.setup("example1", helper, use_cms=True, extra_args=["--boilerplate"])
+            settings = runner.setup("example1", helper, use_cms=True, extra_args=["--cms"])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
-        self.assertTrue("aldryn_boilerplates" in settings.INSTALLED_APPS)
+        self.assertTrue("djangocms_text_ckeditor" in settings.INSTALLED_APPS)
+        self.assertTrue("sekizai" in settings.INSTALLED_APPS)
         self.assertTrue("cms" in settings.INSTALLED_APPS)
 
     def test_setup_custom_user(self):
@@ -838,10 +812,11 @@ class CommandTests(unittest.TestCase):
         with captured_output():
             from tests.test_utils import cms_helper_custom
 
-            settings = runner.setup("example1", cms_helper_custom, use_cms=True, extra_args=["--boilerplate"])
+            settings = runner.setup("example1", cms_helper_custom, use_cms=True, extra_args=["--cms"])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
         self.assertTrue("custom_user" in settings.INSTALLED_APPS)
-        self.assertTrue("aldryn_boilerplates" in settings.INSTALLED_APPS)
+        self.assertTrue("djangocms_text_ckeditor" in settings.INSTALLED_APPS)
+        self.assertTrue("sekizai" in settings.INSTALLED_APPS)
         self.assertTrue("cms" in settings.INSTALLED_APPS)
         del os.environ["AUTH_USER_MODEL"]
 
@@ -852,7 +827,7 @@ class CommandTests(unittest.TestCase):
 
             settings = runner.setup("example1", helper, extra_args=[])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
-        self.assertFalse("aldryn_boilerplates" in settings.INSTALLED_APPS)
+        self.assertFalse("sekizai" in settings.INSTALLED_APPS)
         self.assertFalse("cms" in settings.INSTALLED_APPS)
 
     def test_testrun_nocms(self):

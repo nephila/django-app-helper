@@ -74,7 +74,6 @@ Options
   directory is needed, use ``--persistent-path`` to provide the path;
 * ``--persistent-path``: persistent storage path, instead of ``data``
 * ``--no-migrate``: skip migrations;
-* ``--boilerplate``: adds ``aldryn-boilerplates`` configuration to settings;
 * ``--xvfb``: whether to configure ``xvfb`` (for frontend tests);
 * ``--native`` use the native Django command: the use of this option is **incompatible** with
   the options above.
@@ -201,7 +200,7 @@ server
 
 ::
 
-    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
 
 Starts a runserver instance.
 
