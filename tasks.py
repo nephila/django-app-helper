@@ -60,7 +60,7 @@ def tag_dev(c):
 def docbuild(c):
     """ Build documentation. """
     os.chdir("docs")
-    c.run(f"python -msphinx -W -b html -d _build/doctrees . _build/html")
+    c.run("python -msphinx -W -b html -d _build/doctrees . _build/html")
 
 
 @task(docbuild)

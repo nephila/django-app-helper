@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os
+import shlex
 
 
 class PytestTestRunner(object):
@@ -19,7 +20,7 @@ class PytestTestRunner(object):
         """
         import pytest
 
-        argv = os.environ.get("PYTEST_ARGS", "").split(" ")
+        argv = shlex.split(os.environ.get("PYTEST_ARGS", ""))
         if self.verbosity == 0:
             argv.append("--quiet")
         if self.verbosity == 2:

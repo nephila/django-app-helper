@@ -6,6 +6,16 @@ History
 
 .. towncrier release notes start
 
+2.2.2 (2020-05-15)
+=======================
+
+Bugfixes
+--------
+
+- Fix pytest args splitting (#155)
+- Fix runserver autoreload with channels 2.4 (#157)
+
+
 2.2.1 (2020-04-23)
 ==================
 
