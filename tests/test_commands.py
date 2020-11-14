@@ -799,6 +799,7 @@ class CommandTests(unittest.TestCase):
             settings = runner.setup("example1", helper, use_cms=True, extra_args=["--cms"])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
         self.assertTrue("djangocms_text_ckeditor" in settings.INSTALLED_APPS)
+        self.assertTrue("sekizai" in settings.INSTALLED_APPS)
         self.assertTrue("cms" in settings.INSTALLED_APPS)
 
     def test_setup_custom_user(self):
@@ -815,6 +816,7 @@ class CommandTests(unittest.TestCase):
         self.assertTrue("example2" in settings.INSTALLED_APPS)
         self.assertTrue("custom_user" in settings.INSTALLED_APPS)
         self.assertTrue("djangocms_text_ckeditor" in settings.INSTALLED_APPS)
+        self.assertTrue("sekizai" in settings.INSTALLED_APPS)
         self.assertTrue("cms" in settings.INSTALLED_APPS)
         del os.environ["AUTH_USER_MODEL"]
 
@@ -825,7 +827,7 @@ class CommandTests(unittest.TestCase):
 
             settings = runner.setup("example1", helper, extra_args=[])
         self.assertTrue("example2" in settings.INSTALLED_APPS)
-        self.assertFalse("djangocms_text_ckeditor" in settings.INSTALLED_APPS)
+        self.assertFalse("sekizai" in settings.INSTALLED_APPS)
         self.assertFalse("cms" in settings.INSTALLED_APPS)
 
     def test_testrun_nocms(self):
