@@ -18,16 +18,16 @@ To use a different database, set the DATABASE_URL environment variable to a
 dj-database-url compatible value.
 
 Usage:
-    django-app-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--boilerplate] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
-    django-app-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--boilerplate]
-    django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--locale=locale]
-    django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [--boilerplate] [<extra-applications>...]
-    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
-    django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms] [--boilerplate]
-    django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--boilerplate] [--migrate] [--no-migrate]
+    django-app-helper <application> test [--failfast] [--migrate] [--no-migrate] [<test-label>...] [--xvfb] [--runner=<test.runner.class>] [--extra-settings=</path/to/settings.py>] [--cms] [--runner-options=<option1>,<option2>] [--native] [--persistent] [--persistent-path=<path>] [--verbose=<level>]
+    django-app-helper <application> cms_check [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate]
+    django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--locale=locale]
+    django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [<extra-applications>...]
+    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
+    django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms]
+    django-app-helper <application> <command> [options] [--extra-settings=</path/to/settings.py>] [--cms] [--persistent] [--persistent-path=<path>] [--migrate] [--no-migrate]
 
 Options:
     -h --help                   Show this screen.
@@ -38,7 +38,6 @@ Options:
     --merge                     Merge migrations
     --failfast                  Stop tests on first failure.
     --native                    Use the native test command, instead of the django-app-helper on
-    --boilerplate               Add support for aldryn-boilerplates
     --persistent                Use persistent storage
     --persistent-path=<path>    Persistent storage path
     --locale=locale,-l=locale   Update messgaes for given locale

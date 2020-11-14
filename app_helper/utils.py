@@ -151,7 +151,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
     """
     import dj_database_url
 
-    from .default_settings import get_boilerplates_settings, get_default_settings
+    from .default_settings import get_default_settings
 
     try:
         extra_settings_file = args.get("--extra-settings")
@@ -235,34 +235,6 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
         default_settings["INSTALLED_APPS"].append("mptt")
     if "filer" in default_settings["INSTALLED_APPS"] and "easy_thumbnails" not in default_settings["INSTALLED_APPS"]:
         default_settings["INSTALLED_APPS"].append("easy_thumbnails")
-
-    if args["--boilerplate"]:
-        boilerplate_settings = get_boilerplates_settings()
-
-        # Do not override helper settings with defaults.
-        if "ALDRYN_BOILERPLATE_NAME" in default_settings.keys():
-            del boilerplate_settings["ALDRYN_BOILERPLATE_NAME"]
-
-        default_settings = extend_settings(
-            default_settings,
-            boilerplate_settings,
-            "STATICFILES_FINDERS",
-            "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-        )
-        del boilerplate_settings["STATICFILES_FINDERS"]
-
-        default_settings = extend_settings(
-            default_settings,
-            boilerplate_settings,
-            "TEMPLATE_LOADERS",
-            "django.template.loaders.app_directories.Loader",
-        )
-        del boilerplate_settings["TEMPLATE_LOADERS"]
-
-        for setting in ("INSTALLED_APPS", "TEMPLATE_CONTEXT_PROCESSORS"):
-            default_settings[setting].extend(boilerplate_settings[setting])
-            del boilerplate_settings[setting]
-        default_settings.update(boilerplate_settings)
 
     default_settings["TEMPLATES"] = [
         {
