@@ -11,7 +11,7 @@ jobs:
       matrix:
         python-version: [3.8, 3.7, 3.6, 3.5]
         django: [31, 30, 22]
-        cms: [no, 37, 38]
+        cms: [nocms, cms37, cms38, async]
         continue-on-error: [false]
         exclude:
           - python-version: 3.5
@@ -19,7 +19,7 @@ jobs:
           - python-version: 3.5
             django: 31
           - django: 31
-            cms: 37
+            cms: cms37
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -37,16 +37,16 @@ jobs:
       uses: actions/cache@v1
       with:
         path: .tox
-        key: ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-cms{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-${{ hashFiles('setup.cfg') }}
+        key: ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-${{ hashFiles('setup.cfg') }}
         restore-keys: |
-          ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-cms{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-
+          ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-
     - name: Install dependencies
       run: |
         sudo apt-get install gettext
         python -m pip install --upgrade pip tox>=3.5
     - name: Test with tox
       env:
-        TOX_ENV: ${{ format('py-django{1}-cms{2}', matrix.python-version, matrix.django, matrix.cms) }}
+        TOX_ENV: ${{ format('py-django{1}-{2}', matrix.python-version, matrix.django, matrix.cms) }}
         COMMAND: coverage run
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_SERVICE_NAME: github

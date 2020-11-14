@@ -9,6 +9,7 @@
    runner
    migrating
    basetest
+   asgi
    pytest
    development
    contributing
