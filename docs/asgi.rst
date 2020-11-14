@@ -22,17 +22,21 @@ Example:
 
     .. code-block:: python
 
-        # required
-        ASGI_APPLICATION='tests.example_app.routing.application',
-        # Optional
-        CHANNEL_LAYERS={
-            'default': {
-                'BACKEND': 'channels_redis.core.RedisChannelLayer',
-                'CONFIG': {
-                    'hosts': [('localhost', 6379)],
+        HELPER_SETTINGS = dict(
+            ...
+            # required
+            ASGI_APPLICATION='tests.example_app.routing.application',
+            # Optional
+            CHANNEL_LAYERS={
+                'default': {
+                    'BACKEND': 'channels_redis.core.RedisChannelLayer',
+                    'CONFIG': {
+                        'hosts': [('localhost', 6379)],
+                    },
                 },
             },
-        }
+            ...
+        )
 
 
 The run the ``server`` command with the ``--use-channels`` option set::
@@ -49,7 +53,12 @@ Example:
 
     .. code-block:: python
 
-        ASGI_APPLICATION='my_project.asgi:application',
+
+        HELPER_SETTINGS = dict(
+            ...
+            ASGI_APPLICATION='my_project.asgi:application',
+            ...
+        )
 
 
 The run the ``server`` command with the ``--use-daphne`` option set::
