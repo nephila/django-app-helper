@@ -61,8 +61,26 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     """
 
     def _pytest_setup(settings, module):
-        if not getattr(settings, "SECRET_KEY", None):
-            settings.SECRET_KEY = "SECRET"
+        excluded_settings = {"PASSWORD_RESET_TIMEOUT": "PASSWORD_RESET_TIMEOUT_DAYS"}
+        default_settings = {"SECRET_KEY": "secret"}
+        for setting in dir(settings):
+            if setting.isupper():
+                setting_value = getattr(settings, setting)
+
+                # Empty settings value in the original value which must have a default are checked on
+                # default_settings dictionary and default is set, if available
+                default_value = default_settings.get(setting, None)
+                if default_value and not setting_value:
+                    setting_value = default_value
+
+                # If two settings exclude each other, we check if the alternate setting is already defined
+                # in the settings module and if not, we set the current setting
+                alternate_setting = excluded_settings.get(setting, None)
+                alternate_setting_value = None
+                if alternate_setting:
+                    alternate_setting_value = getattr(settings, alternate_setting, None)
+                if not alternate_setting_value:
+                    setattr(module, setting, setting_value)
 
     helper = helper_module.__file__
     argv = [os.path.basename(helper), app, "setup", "--extra-settings={}".format(helper)]
@@ -73,7 +91,6 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     settings = runner(argv)
     if "pytest_django" in sys.modules:
         _pytest_setup(settings, helper_module)
-    _pytest_setup(settings, helper_module)
     return settings
 
 
