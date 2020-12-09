@@ -6,6 +6,15 @@ History
 
 .. towncrier release notes start
 
+3.0.1 (2020-12-09)
+==================
+
+Bugfixes
+--------
+
+- Fix loading setting with pytest-django and django 3.1 (#202)
+
+
 3.0.0 (2020-11-14)
 ==================
 
