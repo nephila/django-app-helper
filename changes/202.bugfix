@@ -1,0 +1,1 @@
+Fix loading setting with pytest-django and django 3.1
