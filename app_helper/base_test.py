@@ -3,6 +3,7 @@ import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 from copy import deepcopy
+from io import StringIO
 from tempfile import mkdtemp
 from unittest.mock import patch
 
@@ -11,7 +12,6 @@ from django.core.handlers.base import BaseHandler
 from django.http import SimpleCookie
 from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.utils.functional import SimpleLazyObject
-from io import StringIO
 
 from .utils import UserLoginContext, create_user, get_user_model, reload_urls, temp_dir
 
