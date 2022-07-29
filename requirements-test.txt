@@ -1,6 +1,7 @@
 -r requirements.txt
 coverage
 coveralls>=2.0
+coverage-lcov
 wheel
 pep517
 invoke
