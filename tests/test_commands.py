@@ -43,7 +43,6 @@ DEFAULT_ARGS = {
     "compilemessages": False,
     "makemessages": False,
     "makemigrations": False,
-    "pyflakes": False,
     "authors": False,
     "server": False,
     "--xvfb": "",
@@ -208,7 +207,6 @@ class CommandTests(unittest.TestCase):
                 "--extra-settings==something.py",
                 "--runner==something.py",
             ],
-            "pyflakes": False,
             "server": False,
             "setup": False,
             "test": True,
@@ -262,7 +260,6 @@ class CommandTests(unittest.TestCase):
                 "--extra-settings==something.py",
                 "--runner==something.py",
             ],
-            "pyflakes": False,
             "server": True,
             "setup": False,
             "test": False,
@@ -317,7 +314,6 @@ class CommandTests(unittest.TestCase):
                 "--extra-settings==something.py",
                 "--runner==something.py",
             ],
-            "pyflakes": False,
             "server": False,
             "setup": False,
             "test": False,
@@ -562,39 +558,6 @@ class CommandTests(unittest.TestCase):
         self.assertFalse(os.path.exists(self.migration_file))
         self.assertTrue("Create model ExampleModel2" in out.getvalue())
         self.assertTrue(os.path.exists(self.migration_file_2))
-
-    @unittest.skipIf(sys.version_info[:2] in ((3, 8),), reason="This test fails on Python 3.8+")
-    def test_pyflakes(self):
-        try:
-            import cms  # noqa: F401
-        except ImportError:
-            raise unittest.SkipTest("django CMS not available, skipping test")
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args["pyflakes"] = True
-                core(args, self.application)
-        self.assertFalse(os.path.exists(args["STATIC_ROOT"]))
-        self.assertFalse(os.path.exists(args["MEDIA_ROOT"]))
-
-    def test_pyflakes_nocms(self):
-        """pyflakes command exists with message if django CMS is not installed."""
-        try:
-            import cms  # noqa: F401
-
-            raise unittest.SkipTest("django CMS available, skipping test")
-        except ImportError:
-            pass
-        with work_in(self.basedir):
-            with captured_output() as (out, err):
-                args = copy(DEFAULT_ARGS)
-                args["pyflakes"] = True
-                core(args, self.application)
-            self.assertTrue(
-                "Static analysis available only if django CMS and pyflakes are installed" in out.getvalue()
-            )
-        self.assertFalse(os.path.exists(args["STATIC_ROOT"]))
-        self.assertFalse(os.path.exists(args["MEDIA_ROOT"]))
 
     def test_testrun(self):
         """Run test via API using custom runner which only picks tests in sample applications."""
@@ -899,9 +862,9 @@ class CommandTests(unittest.TestCase):
                     core(args, self.application)
                 except SystemExit:
                     pass
-        self.assertTrue("66 items / 65 deselected / 1 selected" in out.getvalue())
+        self.assertTrue("64 items / 63 deselected / 1 selected" in out.getvalue())
         # warnings will depend on django version and adds too much noise
-        self.assertTrue("1 passed, 65 deselected" in out.getvalue())
+        self.assertTrue("1 passed, 63 deselected" in out.getvalue())
 
     def test_runner_pytest(self):
         """Run tests via pytest via helper runner."""
@@ -916,9 +879,9 @@ class CommandTests(unittest.TestCase):
                     args.append("--runner-options='-k test_create_django_image_object'")
                     args.append("--runner=app_helper.pytest_runner.PytestTestRunner")
                     runner.run("example1", args)
-            self.assertTrue("66 items / 65 deselected / 1 selected" in out.getvalue())
-            # warnings will depend on django version and adds too much noise
-            self.assertTrue("1 passed, 65 deselected" in out.getvalue())
+            self.assertTrue("64 items / 63 deselected / 1 selected" in out.getvalue())
+            # # warnings will depend on django version and adds too much noise
+            self.assertTrue("1 passed, 63 deselected" in out.getvalue())
             self.assertEqual(exit_state.exception.code, 0)
 
     def test_authors(self):

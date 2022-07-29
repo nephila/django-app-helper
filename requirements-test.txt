@@ -1,11 +1,11 @@
 -r requirements.txt
 coverage
 coveralls>=2.0
+coverage-lcov
 wheel
 pep517
 invoke
 tox>=1.8
-pyflakes<2.1
-pytest
+pytest<7.1
 pytest-django
 django-filer

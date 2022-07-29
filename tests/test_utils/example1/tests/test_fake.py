@@ -117,7 +117,12 @@ class FakeTests(BaseTestCase):
             self.assertEqual(request.META["REQUEST_METHOD"], "POST")
             self.assertEqual(request.POST.get("payload"), "1")
 
-            request = self.get_page_request(pages[1], lang="en", user=self.user_staff, edit=True,)
+            request = self.get_page_request(
+                pages[1],
+                lang="en",
+                user=self.user_staff,
+                edit=True,
+            )
             self.assertEqual(request.path, "/en/second-page/")
             self.assertTrue(request.toolbar)
             self.assertEqual(request.META["REQUEST_METHOD"], "GET")

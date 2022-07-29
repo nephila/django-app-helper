@@ -103,7 +103,7 @@ def runner(argv):
     helper = os.path.abspath(inspect.getframeinfo(inspect.stack()[2][0]).filename)
     # check if extra settings has been passed
     # if not, user the helper file
-    extra_settings = any(map(lambda x: x.startswith("--extra-settings="), argv))
+    extra_settings = any(x.startswith("--extra-settings=") for x in argv)
     if os.path.basename(helper) not in (HELPER_FILE,) and not extra_settings:
         argv.append("--extra-settings=%s" % helper)
     return main(argv)
