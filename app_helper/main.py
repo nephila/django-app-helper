@@ -23,7 +23,6 @@ Usage:
     django-app-helper <application> compilemessages [--extra-settings=</path/to/settings.py>] [--cms]
     django-app-helper <application> makemessages [--extra-settings=</path/to/settings.py>] [--cms] [--locale=locale]
     django-app-helper <application> makemigrations [--extra-settings=</path/to/settings.py>] [--cms] [--merge] [--empty] [--dry-run] [<extra-applications>...]
-    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
     django-app-helper <application> authors [--extra-settings=</path/to/settings.py>] [--cms]
     django-app-helper <application> server [--port=<port>] [--bind=<bind>] [--extra-settings=</path/to/settings.py>] [--cms] [--migrate] [--no-migrate] [--persistent | --persistent-path=<path>] [--verbose=<level>] [--use-daphne] [--use-channels]
     django-app-helper <application> setup [--extra-settings=</path/to/settings.py>] [--cms]
@@ -64,7 +63,10 @@ def _parse_runner_options(test_runner_class, options):
 
 def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=None, verbose=1):
     warnings.filterwarnings(
-        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields",
+        "error",
+        r"DateTimeField received a naive datetime",
+        RuntimeWarning,
+        r"django\.db\.models\.fields",
     )
     from django.conf import settings
     from django.test.utils import get_runner
@@ -195,27 +197,6 @@ def generate_authors():
     print("Authors ({}):\n\n\n* {}".format(len(authors), "\n* ".join(authors)))
 
 
-def static_analisys(application):
-    """
-    Performs a pyflakes static analysis with the same configuration as
-    django CMS testsuite
-    """
-    try:
-        from cms.test_utils.util.static_analysis import pyflakes
-
-        application_module = __import__(application)
-        report = pyflakes((application_module,))
-        if type(report) == tuple:
-            assert report[0] == 0
-        else:
-            assert report == 0
-    except ImportError:
-        print(
-            "Static analysis available only if django CMS and pyflakes are installed.\n"
-            "Install django-app-helper[pyflakes] to fix this."
-        )
-
-
 def server(
     settings, bind="127.0.0.1", port=8000, migrate_cmd=False, verbose=1, use_channels=False, use_daphne=False
 ):  # pragma: no cover
@@ -261,7 +242,10 @@ def core(args, application):
 
     # configure django
     warnings.filterwarnings(
-        "error", r"DateTimeField received a naive datetime", RuntimeWarning, r"django\.db\.models\.fields",
+        "error",
+        r"DateTimeField received a naive datetime",
+        RuntimeWarning,
+        r"django\.db\.models\.fields",
     )
     if args["--persistent"]:
         create_dir = persistent_dir
@@ -353,8 +337,6 @@ def core(args, application):
                         empty=args["--empty"],
                         extra_applications=args["<extra-applications>"],
                     )
-                elif args["pyflakes"]:
-                    return static_analisys(application)
                 elif args["authors"]:
                     return generate_authors()
                 elif args["setup"]:

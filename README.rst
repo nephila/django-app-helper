@@ -25,11 +25,11 @@ It supports both tests writted using Django ``TestCase`` and pytest ones
 Supported versions
 ==================
 
-Python: 3.6, 3.7, 3.8
+Python: 3.7, 3.8, 3.9, 3.10
 
-Django: 2.2 - 3.1
+Django: 2.2, 3.2
 
-django CMS: 3.7, 3.8
+django CMS: 3.7 - 3.11
 
 Newer versions might work but are not tested yet.
 

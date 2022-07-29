@@ -175,17 +175,6 @@ Arguments
 
 * ``<migration-name>``: Squash migrations until this migration
 
-pyflakes
-========
-
-::
-
-    django-app-helper <application> pyflakes [--extra-settings=</path/to/settings.py>] [--cms]
-
-Performs static analysis using pyflakes, with the same configuration as django CMS.
-
-This requires ``pyflakes<2.1`` only installed with ``django-app-helper[pyflakes]``.
-
 authors
 =======
 
