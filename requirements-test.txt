@@ -5,7 +5,6 @@ wheel
 pep517
 invoke
 tox>=1.8
-pyflakes<2.1
 pytest<7.1
 pytest-django
 django-filer
