@@ -122,7 +122,7 @@ Documentation is available on `readthedocs`_.
 Authors
 *******
 
-``django-app-helper`` was written by `Iacopo Spalletti <i.spalletti@nephila.it>`_ with help from
+``django-app-helper`` was written by `Iacopo Spalletti <i.spalletti@nephila.digital>`_ with help from
 other contributors.
 
 Thanks

@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Iacopo Spalletti <i.spalletti@nephila.it>
+* Iacopo Spalletti <i.spalletti@nephila.digital>
 
 Contributors
 ------------
@@ -15,3 +15,5 @@ Contributors
 * Daniele Procida
 * Eraldo Energy
 * Felipe Prenholato
+* Jacob Rief
+* Kirill Kniazev
