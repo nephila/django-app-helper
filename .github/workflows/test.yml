@@ -13,6 +13,13 @@ jobs:
         django: [32, 22]
         cms: [nocms, cms37, cms38, cms39, async]
         continue-on-error: [false]
+        exclude:
+          - python-version: 3.10.3
+            django: 22
+          - django: 32
+            cms: cms37
+          - django: 32
+            cms: cms38
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
