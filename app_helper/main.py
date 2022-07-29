@@ -6,7 +6,7 @@ import subprocess
 import sys
 import warnings
 
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from docopt import DocoptExit, docopt
 
 from . import __version__
@@ -180,12 +180,12 @@ def generate_authors():
     with open(authfile) as f:
         for line in f.readlines():
             if line.startswith("*"):
-                author = force_text(line).strip("* \n")
+                author = force_str(line).strip("* \n")
                 if author.lower() not in seen_authors:
                     seen_authors.append(author.lower())
                     authors.append(author)
     for author in r.stdout.readlines():
-        author = force_text(author).strip()
+        author = force_str(author).strip()
         if author.lower() not in seen_authors:
             seen_authors.append(author.lower())
             authors.append(author)
