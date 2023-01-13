@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
-from django.http import SimpleCookie
+from django.http import HttpResponse, SimpleCookie
 from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.utils.functional import SimpleLazyObject
 
@@ -61,8 +61,12 @@ class RequestTestCaseMixin:
         elif use_toolbar:
             from cms.middleware.toolbar import ToolbarMiddleware
 
-            mid = ToolbarMiddleware()
-            mid.process_request(request)
+            if hasattr(ToolbarMiddleware, "process_request"):
+                mid = ToolbarMiddleware()
+                mid.process_request(request)
+            else:
+                mid = ToolbarMiddleware(lambda req: HttpResponse())
+                mid.__call__(request)
         return request
 
     def _apply_middlewares(self, request):
@@ -71,9 +75,13 @@ class RequestTestCaseMixin:
 
         for middleware_path in reversed(settings.MIDDLEWARE):
             middleware = import_string(middleware_path)
-            mw_instance = middleware(handler)
-            if hasattr(mw_instance, "process_request"):
+
+            if hasattr(middleware, "process_request"):
+                mw_instance = middleware(handler)
                 mw_instance.process_request(request)
+            else:
+                mw_instance = middleware(lambda req: HttpResponse())
+                mw_instance.__call__(request)
 
     def login_user_context(self, user, password=None):
         """
