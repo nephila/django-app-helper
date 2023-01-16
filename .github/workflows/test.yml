@@ -9,7 +9,7 @@ jobs:
     continue-on-error: ${{ matrix.continue-on-error }}
     strategy:
       matrix:
-        python-version: [3.10.x, 3.9, 3.8, 3.7]
+        python-version: [3.11, 3.10.x, 3.9, 3.8, 3.7]
         django: [32, 22]
         cms: [nocms, cms37, cms38, cms39, cms311, async]
         continue-on-error: [false]
