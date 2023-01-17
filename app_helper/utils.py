@@ -21,6 +21,9 @@ try:
 
     CMS = True
     CMS_40 = LooseVersion("4.0") <= LooseVersion(cms.__version__) < LooseVersion("4.1")
+    CMS_311 = LooseVersion("3.11") <= LooseVersion(cms.__version__) < LooseVersion("4.0")
+    CMS_310 = LooseVersion("3.10") <= LooseVersion(cms.__version__) < LooseVersion("3.11")
+    CMS_39 = LooseVersion("3.9") <= LooseVersion(cms.__version__) < LooseVersion("3.10")
     CMS_38 = LooseVersion("3.8") <= LooseVersion(cms.__version__) < LooseVersion("3.9")
     CMS_37 = LooseVersion("3.7") <= LooseVersion(cms.__version__) < LooseVersion("3.8")
     CMS_36 = LooseVersion("3.6") <= LooseVersion(cms.__version__) < LooseVersion("3.7")
@@ -33,6 +36,9 @@ try:
 except ImportError:  # pragma: no cover
     CMS = False
     CMS_40 = False
+    CMS_311 = False
+    CMS_310 = False
+    CMS_39 = False
     CMS_38 = False
     CMS_37 = False
     CMS_36 = False
