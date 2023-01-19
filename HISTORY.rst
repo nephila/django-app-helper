@@ -6,6 +6,15 @@ History
 
 .. towncrier release notes start
 
+3.2.0 (2023-01-19)
+==================
+
+Features
+--------
+
+- Add djangocms 3.11 to tox, fix tests accordingly (#311)
+
+
 3.1.0 (2022-07-29)
 ==================
 
