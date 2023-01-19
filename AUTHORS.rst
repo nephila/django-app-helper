@@ -17,3 +17,4 @@ Contributors
 * Felipe Prenholato
 * Jacob Rief
 * Kirill Kniazev
+* Leonardo Cavallucci
