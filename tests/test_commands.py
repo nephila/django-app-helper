@@ -386,6 +386,8 @@ class CommandTests(unittest.TestCase):
     def test_server_django(self, run_with_reloader):
         """Run server command and create default user - django version."""
         with work_in(self.basedir):
+            User = get_user_model()
+            User.objects.all().delete()
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args["server"] = True
@@ -401,6 +403,8 @@ class CommandTests(unittest.TestCase):
             import channels  # noqa: F401
         except ImportError:
             raise unittest.SkipTest("channels is not available, skipping test")
+        if channels.__version__ > "4.0":
+            raise unittest.SkipTest("channels 4 removed support for runserver, use daphne version instead, skipping")
         with work_in(self.basedir):
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
@@ -420,6 +424,8 @@ class CommandTests(unittest.TestCase):
         except ImportError:
             raise unittest.SkipTest("daphne is not available, skipping test")
         with work_in(self.basedir):
+            User = get_user_model()
+            User.objects.all().delete()
             with captured_output() as (out, err):
                 args = copy(DEFAULT_ARGS)
                 args["server"] = True

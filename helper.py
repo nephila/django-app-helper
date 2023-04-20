@@ -21,7 +21,7 @@ try:
     import cms  # noqa: F401
 
     HELPER_SETTINGS["INSTALLED_APPS"].append("djangocms_text_ckeditor")
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     pass
 
 
@@ -32,7 +32,7 @@ def run():
         import cms  # noqa: F401 F811
 
         runner.cms("app_helper")
-    except ImportError:
+    except (ImportError, ModuleNotFoundError):
         runner.run("app_helper")
 
 
@@ -43,7 +43,7 @@ def setup():
         import cms  # noqa: F401 F811
 
         use_cms = True
-    except ImportError:
+    except (ImportError, ModuleNotFoundError):
         use_cms = False
     runner.setup("app_helper", sys.modules[__name__], use_cms=use_cms)
 
