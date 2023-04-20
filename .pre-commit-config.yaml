@@ -25,34 +25,21 @@ repos:
     rev: 23.3.0
     hooks:
       - id: black
-  - repo: https://github.com/pycqa/flake8
-    rev: 5.0.4
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.262'
     hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-broken-line
-          - flake8-bugbear
-          - flake8-builtins
-          - flake8-coding
-          - flake8-commas
-          - flake8-comprehensions
-          - flake8-eradicate
-          - flake8-quotes
-          - flake8-tidy-imports
-          - pep8-naming
-  - repo: https://github.com/econchick/interrogate
-    rev: 1.5.0
-    hooks:
-      - id: interrogate
-        args:
-          - "-cpyproject.toml"
-          - "--quiet"
+      - id: ruff
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.3.1
     hooks:
       - id: pyupgrade
         args:
           - --py3-plus
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: "1.13.0"
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "3.2"]
   - repo: local
     hooks:
       - id: towncrier
