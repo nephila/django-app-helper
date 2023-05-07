@@ -6,6 +6,15 @@ History
 
 .. towncrier release notes start
 
+3.3.0 (2023-05-07)
+==================
+
+Features
+--------
+
+- Add support for Django 4.x (#208)
+
+
 3.2.0 (2023-01-19)
 ==================
 
