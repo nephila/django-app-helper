@@ -1,4 +1,4 @@
-__version__ = "3.3.0"
+__version__ = "3.4.0.dev1"
 __author__ = "Iacopo Spalletti <i.spalletti@nephila.digital>"
 __all__ = ["runner"]
 
