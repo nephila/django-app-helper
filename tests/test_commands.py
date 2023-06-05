@@ -604,7 +604,7 @@ class CommandTests(unittest.TestCase):
                     args["--persistent"] = True
                     args["--runner"] = "runners.CapturedOutputRunner"
                     args["<test-label>"] = self.application
-                    args["--runner-options"] = ["--tag=a-tag"]
+                    args["--runner-options"] = "--tag=a-tag"
                     core(args, self.application)
             self.assertTrue("Ran 1 test in" in err.getvalue())
             self.assertEqual(exit_state.exception.code, 0)

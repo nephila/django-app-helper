@@ -48,6 +48,7 @@ def _init_runserver(runserver_module, bind, port, verbose, logger=None, channels
             "use_static_handler": True,
             "use_threading": True,
             "verbosity": verbose,
+            "skip_checks": True,
             "use_reloader": True,
         },
     )
