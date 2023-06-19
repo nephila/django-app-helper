@@ -239,6 +239,7 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
             default_settings["INSTALLED_APPS"].append("treebeard")
     if "filer" in default_settings["INSTALLED_APPS"] and "mptt" not in default_settings["INSTALLED_APPS"]:
         from filer import __version__
+
         if __version__ < "3":
             # As of django-filer 3.0 mptt is not needed as a dependency
             default_settings["INSTALLED_APPS"].append("mptt")
