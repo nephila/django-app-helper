@@ -6,6 +6,16 @@ History
 
 .. towncrier release notes start
 
+3.3.1 (2023-07-09)
+==================
+
+Bugfixes
+--------
+
+- Fix runner-options argument on Django test runner (#220)
+- Do not add mptt with django-filer 3+ (#225)
+
+
 3.3.0 (2023-05-07)
 ==================
 

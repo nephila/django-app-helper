@@ -14,6 +14,7 @@ Contributors
 * Andrea Stagi
 * Daniele Procida
 * Eraldo Energy
+* Fabian Braun
 * Felipe Prenholato
 * Jacob Rief
 * Kirill Kniazev
