@@ -84,6 +84,8 @@ def _test_run_worker(test_labels, test_runner, failfast=False, runner_options=No
         if "PytestTestRunner" in test_runner:
             kwargs["pytest_args"] = runner_options
         else:
+            if not isinstance(runner_options, list):
+                runner_options = runner_options.split(" ")
             extra = _parse_runner_options(TestRunner, runner_options)
             extra.update(kwargs)
             kwargs = extra
