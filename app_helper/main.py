@@ -105,7 +105,7 @@ def test(test_labels, application, failfast=False, test_runner=None, runner_opti
             test_labels = ["tests"]
         elif os.path.exists(os.path.join(application, "tests")):
             test_labels = ["%s.tests" % application]
-    elif type(test_labels) is str:  # pragma: no cover
+    elif isinstance(test_labels, str):  # pragma: no cover
         test_labels = [test_labels]
     runner_options = runner_options or []
     return _test_run_worker(test_labels, test_runner, failfast, runner_options, verbose)
