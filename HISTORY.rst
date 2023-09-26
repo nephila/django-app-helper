@@ -6,6 +6,21 @@ History
 
 .. towncrier release notes start
 
+3.3.2 (2023-09-26)
+==================
+
+Features
+--------
+
+- Migrate to bump-my-version (#237)
+
+
+Bugfixes
+--------
+
+- Fix ruff linting (#232)
+
+
 3.3.1 (2023-07-09)
 ==================
 
