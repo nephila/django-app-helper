@@ -4,7 +4,6 @@ import random
 import shutil
 import string
 import sys
-from distutils.version import LooseVersion
 from tempfile import mkdtemp
 from unittest.mock import patch
 
@@ -15,6 +14,11 @@ from django.urls import clear_url_caches
 from django.utils.functional import empty
 
 from . import HELPER_FILE
+
+try:
+    from distutils.version import LooseVersion
+except ImportError:  # pragma: no cover
+    from setuptools import LooseVersion
 
 try:
     import cms  # NOQA
@@ -61,12 +65,17 @@ def load_from_file(module_path):
 
     Borrowed from django-cms
     """
-    from imp import PY_SOURCE, load_module
-
     imported = None
     if module_path:
-        with open(module_path) as openfile:
-            imported = load_module("mod", openfile, module_path, ("imported", "r", PY_SOURCE))
+        try:
+            from imp import PY_SOURCE, load_module
+
+            with open(module_path) as openfile:
+                imported = load_module("mod", openfile, module_path, ("imported", "r", PY_SOURCE))
+        except ImportError:  # pragma: no cover
+            from importlib.machinery import SourceFileLoader
+
+            imported = SourceFileLoader("mod", module_path).load_module()
     return imported
 
 
