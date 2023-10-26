@@ -16,9 +16,9 @@ from django.utils.functional import empty
 from . import HELPER_FILE
 
 try:
-    from distutils.version import LooseVersion
-except ImportError:  # pragma: no cover
     from setuptools import LooseVersion
+except ImportError:  # pragma: no cover
+    from distutils.version import LooseVersion
 
 try:
     import cms  # NOQA
@@ -68,14 +68,14 @@ def load_from_file(module_path):
     imported = None
     if module_path:
         try:
+            from importlib.machinery import SourceFileLoader
+
+            imported = SourceFileLoader("mod", module_path).load_module()
+        except ImportError:  # pragma: no cover
             from imp import PY_SOURCE, load_module
 
             with open(module_path) as openfile:
                 imported = load_module("mod", openfile, module_path, ("imported", "r", PY_SOURCE))
-        except ImportError:  # pragma: no cover
-            from importlib.machinery import SourceFileLoader
-
-            imported = SourceFileLoader("mod", module_path).load_module()
     return imported
 
 
