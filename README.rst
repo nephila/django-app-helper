@@ -28,9 +28,9 @@ It supports both tests writted using Django ``TestCase`` and pytest ones
 Supported versions
 ==================
 
-Python: 3.9, 3.10, 3.11
+Python: 3.8, 3.9, 3.10, 3.11, 3.12
 
-Django: 3.2, 4.0, 4.1, 4.2
+Django: 3.2, 4.0, 4.1, 4.2, 5.0
 
 django CMS: 3.11
 
