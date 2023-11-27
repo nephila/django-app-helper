@@ -16,7 +16,7 @@ def _run_daphne(settings, bind, port, migrate_cmd, verbose):
     from daphne.cli import CommandLineInterface
 
     _setup_db(migrate_cmd)
-    daphne_args = ["-b", bind, "-p", port, "-v", verbose, settings.ASGI_APPLICATION]
+    daphne_args = ["-b", bind, "-p", port, "-v", verbose or "1", settings.ASGI_APPLICATION]
     autoreload.run_with_reloader(CommandLineInterface().run, daphne_args)
 
 
