@@ -6,6 +6,16 @@ History
 
 .. towncrier release notes start
 
+3.3.3 (2023-11-28)
+==================
+
+Features
+--------
+
+- Prepare for Django 5.0 / Python 3.12 compatibility (#244)
+- Switch to Coveralls Github action (#248)
+
+
 3.3.2 (2023-09-26)
 ==================
 
