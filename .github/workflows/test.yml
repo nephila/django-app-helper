@@ -9,10 +9,17 @@ jobs:
     continue-on-error: ${{ matrix.continue-on-error }}
     strategy:
       matrix:
-        python-version: ["3.11", "3.10", "3.9"]
-        django: [42, 32]
+        python-version: ["3.12", "3.11", "3.10", "3.9", "3.8"]
+        django: [50, 42, 32]
         cms: [nocms, cms311, async]
         continue-on-error: [false]
+        exclude:
+          - django: 50
+            cms: cms311
+          - django: 50
+            python-version: 3.9
+          - django: 50
+            python-version: 3.8
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -39,7 +46,7 @@ jobs:
         python -m pip install --upgrade pip setuptools tox>4
     - name: Test with tox
       env:
-        TOX_ENV: ${{ format('py-django{1}-{2}', matrix.python-version, matrix.django, matrix.cms) }}
+        TOX_ENV: ${{ format('py{0}-django{1}-{2}', matrix.python-version, matrix.django, matrix.cms) }}
         COMMAND: coverage run
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_SERVICE_NAME: github
