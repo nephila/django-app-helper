@@ -15,8 +15,6 @@ jobs:
         continue-on-error: [false]
         exclude:
           - django: 50
-            cms: cms311
-          - django: 50
             python-version: 3.9
           - django: 50
             python-version: 3.8

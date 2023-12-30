@@ -9,8 +9,6 @@ Django App helper
 
     Starting from 3 django-app-helper only supports Django 2.2+ and django CMS 3.7+. If you need support for older (unsupported) versions, use django-app-helper 2.
 
-    Django 5.0 support exclude django CMS 3.11 support, as django CMS 3.11 doesn't yet support Django 5.0.
-
 ******************************************
 Helper for django applications development
 ******************************************
