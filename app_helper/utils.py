@@ -4,6 +4,7 @@ import random
 import shutil
 import string
 import sys
+import warnings
 from tempfile import mkdtemp
 from unittest.mock import patch
 
@@ -12,18 +13,16 @@ import six
 from django.core.management import call_command
 from django.urls import clear_url_caches
 from django.utils.functional import empty
+from setuptools._distutils.version import LooseVersion
 
 from . import HELPER_FILE
-
-try:
-    from setuptools import LooseVersion
-except ImportError:  # pragma: no cover
-    from distutils.version import LooseVersion
 
 try:
     import cms  # NOQA
 
     CMS = True
+    CMS_42 = LooseVersion("4.2") <= LooseVersion(cms.__version__) < LooseVersion("4.3")
+    CMS_41 = LooseVersion("4.1") <= LooseVersion(cms.__version__) < LooseVersion("4.2")
     CMS_40 = LooseVersion("4.0") <= LooseVersion(cms.__version__) < LooseVersion("4.1")
     CMS_311 = LooseVersion("3.11") <= LooseVersion(cms.__version__) < LooseVersion("4.0")
     CMS_310 = LooseVersion("3.10") <= LooseVersion(cms.__version__) < LooseVersion("3.11")
@@ -39,6 +38,8 @@ try:
     CMS_30 = LooseVersion("3.0") <= LooseVersion(cms.__version__) < LooseVersion("3.1")
 except ImportError:  # pragma: no cover
     CMS = False
+    CMS_42 = False
+    CMS_41 = False
     CMS_40 = False
     CMS_311 = False
     CMS_310 = False
@@ -53,10 +54,16 @@ except ImportError:  # pragma: no cover
     CMS_31 = False
     CMS_30 = False
 
-DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion("3.0")
-DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion("3.1")
-DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion("3.2")
-DJANGO_3_2 = LooseVersion(django.get_version()) < LooseVersion("4.0")
+DJANGO_2_2 = LooseVersion("2.2") <= LooseVersion(django.get_version()) < LooseVersion("3.0")
+DJANGO_3_0 = LooseVersion("3.0") <= LooseVersion(django.get_version()) < LooseVersion("3.1")
+DJANGO_3_1 = LooseVersion("3.1") <= LooseVersion(django.get_version()) < LooseVersion("3.2")
+DJANGO_3_2 = LooseVersion("3.2") <= LooseVersion(django.get_version()) < LooseVersion("4.0")
+DJANGO_4_0 = LooseVersion("4.0") <= LooseVersion(django.get_version()) < LooseVersion("4.1")
+DJANGO_4_1 = LooseVersion("4.1") <= LooseVersion(django.get_version()) < LooseVersion("4.2")
+DJANGO_4_2 = LooseVersion("4.2") <= LooseVersion(django.get_version()) < LooseVersion("5.0")
+DJANGO_5_0 = LooseVersion("5.0") <= LooseVersion(django.get_version()) < LooseVersion("5.1")
+DJANGO_5_1 = LooseVersion("5.1") <= LooseVersion(django.get_version()) < LooseVersion("5.2")
+DJANGO_5_2 = LooseVersion("5.2") <= LooseVersion(django.get_version()) < LooseVersion("6.0")
 
 
 def load_from_file(module_path):
@@ -300,7 +307,36 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
     default_settings["DEFAULT_AUTO_FIELD"] = "django.db.models.BigAutoField"
 
     _reset_django(settings)
+    is_file_storage_defined = extra_settings and "DEFAULT_FILE_STORAGE" in extra_settings
+    is_staticfiles_storage_defined = extra_settings and "STATICFILES_STORAGE" in extra_settings
     settings.configure(**default_settings)
+    django_has_file_storage = hasattr(settings, "DEFAULT_FILE_STORAGE")
+    django_has_staticfile_storage = hasattr(settings, "STATICFILES_STORAGE")
+    django_has_storages = hasattr(settings, "STORAGES")
+    if django_has_file_storage and django_has_storages and not is_file_storage_defined:
+        del settings.DEFAULT_FILE_STORAGE
+        try:
+            from django.utils.deprecation import RemovedInDjango51Warning
+
+            warnings.warn(
+                "DEFAULT_FILE_STORAGE is deprecated in Django 4.2, use the STORAGES setting instead."
+                "DEFAULT_FILE_STORAGE is going to be removed from project settings",
+                RemovedInDjango51Warning,
+            )
+        except ImportError:
+            pass
+    if django_has_staticfile_storage and django_has_storages and not is_staticfiles_storage_defined:
+        del settings.STATICFILES_STORAGE
+        try:
+            from django.utils.deprecation import RemovedInDjango51Warning
+
+            warnings.warn(
+                "STATICFILES_STORAGE is deprecated in Django 4.2, use the STORAGES setting instead."
+                "STATICFILES_STORAGE is going to be removed from project settings",
+                RemovedInDjango51Warning,
+            )
+        except ImportError:
+            pass
     django.setup()
     reload_urls(settings, cms_apps=False)
     return settings
