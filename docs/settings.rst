@@ -34,10 +34,7 @@ An alternative, and possibly clearer form is::
 By default any setting option provided in ``helper.py`` will override the default ones.
 
 .. warning:: On Django 4.2 and up you **cannot** use ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE``
-             in ``HELPER_SETTINGS``. ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` are deprecated and
-             ``django-app-helper`` will remove it from ``HELPER_SETTINGS`` due to compatibility issues.
-
-             Use ``STORAGES`` setting instead.
+             in ``HELPER_SETTINGS``: use new ``STORAGES`` setting instead.
 
 
 Special settings
