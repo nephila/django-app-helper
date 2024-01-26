@@ -61,7 +61,11 @@ def setup(app, helper_module, extra_args=None, use_cms=False):
     """
 
     def _pytest_setup(settings, module):
-        excluded_settings = {"PASSWORD_RESET_TIMEOUT": "PASSWORD_RESET_TIMEOUT_DAYS"}
+        excluded_settings = {
+            "PASSWORD_RESET_TIMEOUT": "PASSWORD_RESET_TIMEOUT_DAYS",
+            "DEFAULT_FILE_STORAGE": "STORAGES",
+            "STATICFILES_STORAGE": "STORAGES",
+        }
         default_settings = {"SECRET_KEY": "secret"}
         for setting in dir(settings):
             if setting.isupper():
