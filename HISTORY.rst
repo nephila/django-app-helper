@@ -6,6 +6,21 @@ History
 
 .. towncrier release notes start
 
+3.3.4 (2024-01-28)
+==================
+
+Features
+--------
+
+- Add DjangoCMS 3.11 to Django 5.0 test matrix (#252)
+
+
+Bugfixes
+--------
+
+- Fix support for DEFAULT_FILE_STORAGE/STATICFILES_STORAGE in django 4.2 (#255)
+
+
 3.3.3 (2023-11-28)
 ==================
 
