@@ -12,33 +12,33 @@ import six
 from django.core.management import call_command
 from django.urls import clear_url_caches
 from django.utils.functional import empty
+from packaging import version
 
 from . import HELPER_FILE
-
-try:
-    from setuptools import LooseVersion
-except ImportError:  # pragma: no cover
-    from distutils.version import LooseVersion
 
 try:
     import cms  # NOQA
 
     CMS = True
-    CMS_40 = LooseVersion("4.0") <= LooseVersion(cms.__version__) < LooseVersion("4.1")
-    CMS_311 = LooseVersion("3.11") <= LooseVersion(cms.__version__) < LooseVersion("4.0")
-    CMS_310 = LooseVersion("3.10") <= LooseVersion(cms.__version__) < LooseVersion("3.11")
-    CMS_39 = LooseVersion("3.9") <= LooseVersion(cms.__version__) < LooseVersion("3.10")
-    CMS_38 = LooseVersion("3.8") <= LooseVersion(cms.__version__) < LooseVersion("3.9")
-    CMS_37 = LooseVersion("3.7") <= LooseVersion(cms.__version__) < LooseVersion("3.8")
-    CMS_36 = LooseVersion("3.6") <= LooseVersion(cms.__version__) < LooseVersion("3.7")
-    CMS_35 = LooseVersion("3.5") <= LooseVersion(cms.__version__) < LooseVersion("3.6")
-    CMS_34 = LooseVersion("3.4") <= LooseVersion(cms.__version__) < LooseVersion("3.5")
-    CMS_33 = LooseVersion("3.3") <= LooseVersion(cms.__version__) < LooseVersion("3.4")
-    CMS_32 = LooseVersion("3.2") <= LooseVersion(cms.__version__) < LooseVersion("3.3")
-    CMS_31 = LooseVersion("3.1") <= LooseVersion(cms.__version__) < LooseVersion("3.2")
-    CMS_30 = LooseVersion("3.0") <= LooseVersion(cms.__version__) < LooseVersion("3.1")
+    CMS_42 = version.parse("4.2") <= version.parse(cms.__version__) < version.parse("4.3")
+    CMS_41 = version.parse("4.1") <= version.parse(cms.__version__) < version.parse("4.2")
+    CMS_40 = version.parse("4.0") <= version.parse(cms.__version__) < version.parse("4.1")
+    CMS_311 = version.parse("3.11") <= version.parse(cms.__version__) < version.parse("4.0")
+    CMS_310 = version.parse("3.10") <= version.parse(cms.__version__) < version.parse("3.11")
+    CMS_39 = version.parse("3.9") <= version.parse(cms.__version__) < version.parse("3.10")
+    CMS_38 = version.parse("3.8") <= version.parse(cms.__version__) < version.parse("3.9")
+    CMS_37 = version.parse("3.7") <= version.parse(cms.__version__) < version.parse("3.8")
+    CMS_36 = version.parse("3.6") <= version.parse(cms.__version__) < version.parse("3.7")
+    CMS_35 = version.parse("3.5") <= version.parse(cms.__version__) < version.parse("3.6")
+    CMS_34 = version.parse("3.4") <= version.parse(cms.__version__) < version.parse("3.5")
+    CMS_33 = version.parse("3.3") <= version.parse(cms.__version__) < version.parse("3.4")
+    CMS_32 = version.parse("3.2") <= version.parse(cms.__version__) < version.parse("3.3")
+    CMS_31 = version.parse("3.1") <= version.parse(cms.__version__) < version.parse("3.2")
+    CMS_30 = version.parse("3.0") <= version.parse(cms.__version__) < version.parse("3.1")
 except ImportError:  # pragma: no cover
     CMS = False
+    CMS_42 = False
+    CMS_41 = False
     CMS_40 = False
     CMS_311 = False
     CMS_310 = False
@@ -53,10 +53,16 @@ except ImportError:  # pragma: no cover
     CMS_31 = False
     CMS_30 = False
 
-DJANGO_2_2 = LooseVersion(django.get_version()) < LooseVersion("3.0")
-DJANGO_3_0 = LooseVersion(django.get_version()) < LooseVersion("3.1")
-DJANGO_3_1 = LooseVersion(django.get_version()) < LooseVersion("3.2")
-DJANGO_3_2 = LooseVersion(django.get_version()) < LooseVersion("4.0")
+DJANGO_2_2 = version.parse("2.2") <= version.parse(django.get_version()) < version.parse("3.0")
+DJANGO_3_0 = version.parse("3.0") <= version.parse(django.get_version()) < version.parse("3.1")
+DJANGO_3_1 = version.parse("3.1") <= version.parse(django.get_version()) < version.parse("3.2")
+DJANGO_3_2 = version.parse("3.2") <= version.parse(django.get_version()) < version.parse("4.0")
+DJANGO_4_0 = version.parse("4.0") <= version.parse(django.get_version()) < version.parse("4.1")
+DJANGO_4_1 = version.parse("4.1") <= version.parse(django.get_version()) < version.parse("4.2")
+DJANGO_4_2 = version.parse("4.2") <= version.parse(django.get_version()) < version.parse("5.0")
+DJANGO_5_0 = version.parse("5.0") <= version.parse(django.get_version()) < version.parse("5.1")
+DJANGO_5_1 = version.parse("5.1") <= version.parse(django.get_version()) < version.parse("5.2")
+DJANGO_5_2 = version.parse("5.2") <= version.parse(django.get_version()) < version.parse("6.0")
 
 
 def load_from_file(module_path):
@@ -247,9 +253,9 @@ def _make_settings(args, application, settings, STATIC_ROOT, MEDIA_ROOT):  # NOQ
         if "treebeard" not in default_settings["INSTALLED_APPS"]:
             default_settings["INSTALLED_APPS"].append("treebeard")
     if "filer" in default_settings["INSTALLED_APPS"] and "mptt" not in default_settings["INSTALLED_APPS"]:
-        from filer import __version__
+        from filer import __version__ as filer_version
 
-        if __version__ < "3":
+        if filer_version < "3":
             # As of django-filer 3.0 mptt is not needed as a dependency
             default_settings["INSTALLED_APPS"].append("mptt")
     if "filer" in default_settings["INSTALLED_APPS"] and "easy_thumbnails" not in default_settings["INSTALLED_APPS"]:
