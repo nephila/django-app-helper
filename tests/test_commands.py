@@ -415,8 +415,7 @@ class CommandTests(unittest.TestCase):
             self.assertEqual(run_with_reloader.call_args[0][0].__module__, "channels.management.commands.runserver")
         User.objects.all().delete()
 
-    @unittest.skipIf(django.VERSION < (3, 0), "Daphne support requires Django 3.0+")
-    @patch("app_helper.server.autoreload.run_with_reloader")
+        @patch("app_helper.server.autoreload.run_with_reloader")
     def test_server_daphne(self, run_with_reloader):
         """Run server command and create default user - daphne version."""
         try:
