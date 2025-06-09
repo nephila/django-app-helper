@@ -6,6 +6,15 @@ History
 
 .. towncrier release notes start
 
+3.3.5 (2025-06-05)
+==================
+
+Bugfixes
+--------
+
+- Fix CI build on python 3.8 (#288)
+
+
 3.3.4 (2024-01-28)
 ==================
 
