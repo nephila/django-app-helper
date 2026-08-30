@@ -109,6 +109,7 @@ class RequestTestCaseMixin:
         use_middlewares=False,
         secure=False,
         use_toolbar=False,
+        headers=None,
     ):
         """
         Create a request for the given parameters.
@@ -138,10 +139,12 @@ class RequestTestCaseMixin:
         :param secure: create HTTPS request
         :type secure: bool
         :param use_toolbar: add django CMS toolbar
-        :type secure: bool
+        :type use_toolbar: bool
+        :param headers: additional headers
+        :type headers: dict
         :return: request
         """
-        request = getattr(RequestFactory(), method)(path, data=data, secure=secure)
+        request = getattr(RequestFactory(), method)(path, data=data, secure=secure, headers=headers)
         return self._prepare_request(
             request,
             page,
